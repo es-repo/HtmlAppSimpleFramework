@@ -1,0 +1,49 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>X Bubble</title>
+    <link rel="stylesheet" href="../../app.css" type="text/css" />
+
+    <script src="../../babylon.math.js"></script>
+    <script src="../../outputDevice.js"></script>
+    <script src="../../graphicDevice.js"></script>
+    <script src="../../htmlCanvasDevice.js"></script>
+    <script src="../../figure.js"></script>
+    <script src="../../vertex.js"></script>
+    <script src="../../face.js"></script>
+    <script src="../../material.js"></script>
+    <script src="../../texture.js"></script>
+    <script src="../../mesh.js"></script>
+    <script src="../../camera.js"></script>
+    <script src="../../scene.js"></script>
+    <script src="../../renderer.js"></script>
+    <script src="../../phisics.js"></script>
+    <script src="../../abstractEvent.js"></script>
+    <script src="../../inputDevice.js"></script>
+    <script src="../../mouse.js"></script>
+    <script src="../../htmlMouse.js"></script>
+    <script src="../../keyboard.js"></script>
+    <script src="../../htmlKeyboard.js"></script>
+    <script src="../../inputDevices.js"></script>
+    <script src="../../app.js"></script>
+    
+    <script src="bubble.js"></script>
+    <script src="player.js"></script>
+    <script src="xBubbleScene.js"></script>
+    <script src="xBubbleApp.js"></script>
+</head>
+<body>
+    <canvas id="canvas" width="1000" height="750"></canvas>
+</body>
+<script>
+    window.onload = function () {
+        var inputDevices = new InputDevices();
+        inputDevices.keyboard = new HtmlKeyboard();
+        inputDevices.mouse = new HtmlMouse("canvas");
+        var app = new XBubbleApp(new HtmlCanvasDevice("canvas"), inputDevices);
+        app.start();
+    };
+</script>
+</html>

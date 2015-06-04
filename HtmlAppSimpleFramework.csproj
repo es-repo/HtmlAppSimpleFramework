@@ -1,0 +1,103 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.Default.props" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.Default.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <ProjectGuid>{4B0B9B18-78F2-467B-A329-25D2FF5881BA}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <OutputPath>bin</OutputPath>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <TypeScriptToolsVersion>1.4</TypeScriptToolsVersion>
+    <UseIISExpress>true</UseIISExpress>
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="samples\3dObject\index.html" />
+    <Content Include="app.css" />
+    <Content Include="index.html" />
+    <Content Include="samples\3dObject\monkey.jpg" />
+    <Content Include="web.config" />
+    <Content Include="samples\xBubble\index.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <TypeScriptCompile Include="abstractEvent.ts" />
+    <TypeScriptCompile Include="htmlKeyboard.ts" />
+    <TypeScriptCompile Include="htmlMouse.ts" />
+    <TypeScriptCompile Include="inputDevice.ts" />
+    <TypeScriptCompile Include="inputDevices.ts" />
+    <TypeScriptCompile Include="keyboard.ts" />
+    <TypeScriptCompile Include="mouse.ts" />
+    <TypeScriptCompile Include="outputDevice.ts" />
+    <TypeScriptCompile Include="samples\3dObject\3dObjectApp.ts" />
+    <TypeScriptCompile Include="app.ts" />
+    <TypeScriptCompile Include="babylon.math.ts" />
+    <TypeScriptCompile Include="camera.ts" />
+    <TypeScriptCompile Include="graphicDevice.ts" />
+    <TypeScriptCompile Include="face.ts" />
+    <TypeScriptCompile Include="figure.ts" />
+    <TypeScriptCompile Include="htmlCanvasDevice.ts" />
+    <TypeScriptCompile Include="material.ts" />
+    <TypeScriptCompile Include="mesh.ts" />
+    <TypeScriptCompile Include="meshLoader.ts" />
+    <TypeScriptCompile Include="phisics.ts" />
+    <TypeScriptCompile Include="renderer.ts" />
+    <TypeScriptCompile Include="scanLineData.ts" />
+    <TypeScriptCompile Include="scene.ts" />
+    <TypeScriptCompile Include="texture.ts" />
+    <TypeScriptCompile Include="vertex.ts" />
+    <TypeScriptCompile Include="samples\xBubble\bubble.ts" />
+    <TypeScriptCompile Include="samples\xBubble\player.ts" />
+    <TypeScriptCompile Include="samples\xBubble\xBubbleApp.ts" />
+    <TypeScriptCompile Include="samples\xBubble\xBubbleScene.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="samples\3dObject\monkey.babylon" />
+    <None Include="web.Debug.config">
+      <DependentUpon>web.config</DependentUpon>
+    </None>
+    <None Include="web.Release.config">
+      <DependentUpon>web.config</DependentUpon>
+    </None>
+  </ItemGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">12.0</VisualStudioVersion>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RootNamespace>HtmlAppSimpleFramework</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\WebApplications\Microsoft.WebApplication.targets" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\WebApplications\Microsoft.WebApplication.targets')" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>True</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>49396</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:49396/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <TypeScriptRemoveComments>false</TypeScriptRemoveComments>
+    <TypeScriptSourceMap>true</TypeScriptSourceMap>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <TypeScriptRemoveComments>true</TypeScriptRemoveComments>
+    <TypeScriptSourceMap>false</TypeScriptSourceMap>
+  </PropertyGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets')" />
+</Project>
