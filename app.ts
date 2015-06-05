@@ -1,11 +1,12 @@
 ﻿class App {
-
-    private previousDate: number;
+    
     private graphicDevice: GraphicDevice;
     private scene: Scene;
     private renderer: Renderer;
     private phisics: Phisics;
     private inputDevices: InputDevices;
+
+    private previousDate: number;
 
     constructor(graphicDevice: GraphicDevice, inputDevices: InputDevices) {
         this.graphicDevice = graphicDevice;
@@ -35,18 +36,21 @@
         
         this.processScene(this.scene, this.phisics);
         this.graphicDevice.clear();
-        this.renderer.renderScene(this.scene);
-
+        this.drawFrame(this.graphicDevice);
         this.graphicDevice.present();
         this.graphicDevice.drawFps(fps);
         requestAnimationFrame(() => this.appLoop());
     }
 
     protected createScene(continuation: (scene: Scene)=> void) {
-        throw new Error("Abstract method.");    
+        continuation(new Scene());    
     }
 
     protected processScene(scene: Scene, phisics: Phisics) {
+    }
+
+    protected drawFrame(graphicDevice: GraphicDevice) {
+        this.renderer.renderScene(this.scene);
     }
 
     protected handleKeyboardEvent(eventArgs: KeyboardEventArgs, scene: Scene) {

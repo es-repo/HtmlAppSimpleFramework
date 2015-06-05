@@ -1,14 +1,6 @@
 // THE CODE IS BASED ON http://blogs.msdn.com/b/davrous/archive/2013/06/13/tutorial-series-learning-how-to-write-a-3d-soft-engine-from-scratch-in-c-typescript-or-javascript.aspx
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var GraphicDevice = (function (_super) {
-    __extends(GraphicDevice, _super);
+var GraphicDevice = (function () {
     function GraphicDevice(workingWidth, workingHeight) {
-        _super.call(this);
         this.workingWidth = workingWidth;
         this.workingHeight = workingHeight;
         this.depthbuffer = new Array(this.workingWidth * this.workingHeight);
@@ -129,5 +121,5 @@ var GraphicDevice = (function (_super) {
                     this.drawPoint(cx + x, cy + y, z, color);
     };
     return GraphicDevice;
-})(OutputDevice);
+})();
 //# sourceMappingURL=graphicDevice.js.map

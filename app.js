@@ -23,15 +23,18 @@ var App = (function () {
         this.previousDate = now;
         this.processScene(this.scene, this.phisics);
         this.graphicDevice.clear();
-        this.renderer.renderScene(this.scene);
+        this.drawFrame(this.graphicDevice);
         this.graphicDevice.present();
         this.graphicDevice.drawFps(fps);
         requestAnimationFrame(function () { return _this.appLoop(); });
     };
     App.prototype.createScene = function (continuation) {
-        throw new Error("Abstract method.");
+        continuation(new Scene());
     };
     App.prototype.processScene = function (scene, phisics) {
+    };
+    App.prototype.drawFrame = function (graphicDevice) {
+        this.renderer.renderScene(this.scene);
     };
     App.prototype.handleKeyboardEvent = function (eventArgs, scene) {
     };

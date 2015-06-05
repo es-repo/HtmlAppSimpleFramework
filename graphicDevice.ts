@@ -1,13 +1,12 @@
 ﻿// THE CODE IS BASED ON http://blogs.msdn.com/b/davrous/archive/2013/06/13/tutorial-series-learning-how-to-write-a-3d-soft-engine-from-scratch-in-c-typescript-or-javascript.aspx
 
-class GraphicDevice extends OutputDevice {
+class GraphicDevice {
 
     protected workingWidth: number;
     protected workingHeight: number;
     protected depthbuffer: number[];
 
     constructor(workingWidth: number, workingHeight: number) {
-        super();
         this.workingWidth = workingWidth;
         this.workingHeight = workingHeight;
         this.depthbuffer = new Array(this.workingWidth * this.workingHeight);

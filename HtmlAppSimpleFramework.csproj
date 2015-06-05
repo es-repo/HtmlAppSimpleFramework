@@ -33,7 +33,6 @@
     <TypeScriptCompile Include="inputDevices.ts" />
     <TypeScriptCompile Include="keyboard.ts" />
     <TypeScriptCompile Include="mouse.ts" />
-    <TypeScriptCompile Include="outputDevice.ts" />
     <TypeScriptCompile Include="samples\3dObject\3dObjectApp.ts" />
     <TypeScriptCompile Include="app.ts" />
     <TypeScriptCompile Include="babylon.math.ts" />
