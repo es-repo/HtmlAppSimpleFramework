@@ -256,4 +256,4 @@ var Renderer3d = (function () {
     };
     return Renderer3d;
 })();
-//# sourceMappingURL=renderer.js.map
+//# sourceMappingURL=renderer3d.js.map

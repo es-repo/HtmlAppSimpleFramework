@@ -27,12 +27,14 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="abstractEvent.ts" />
+    <TypeScriptCompile Include="graphicOutputBuffer.ts" />
     <TypeScriptCompile Include="htmlKeyboard.ts" />
     <TypeScriptCompile Include="htmlMouse.ts" />
     <TypeScriptCompile Include="inputDevice.ts" />
     <TypeScriptCompile Include="inputDevices.ts" />
     <TypeScriptCompile Include="keyboard.ts" />
     <TypeScriptCompile Include="mouse.ts" />
+    <TypeScriptCompile Include="renderer2d.ts" />
     <TypeScriptCompile Include="samples\3dObject\3dObjectApp.ts" />
     <TypeScriptCompile Include="app.ts" />
     <TypeScriptCompile Include="babylon.math.ts" />
@@ -45,7 +47,7 @@
     <TypeScriptCompile Include="mesh.ts" />
     <TypeScriptCompile Include="meshLoader.ts" />
     <TypeScriptCompile Include="phisics.ts" />
-    <TypeScriptCompile Include="renderer.ts" />
+    <TypeScriptCompile Include="renderer3d.ts" />
     <TypeScriptCompile Include="scanLineData.ts" />
     <TypeScriptCompile Include="scene.ts" />
     <TypeScriptCompile Include="texture.ts" />

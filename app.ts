@@ -2,15 +2,13 @@
     
     private graphicDevice: GraphicDevice;
     private scene: Scene;
-    private renderer: Renderer;
     private phisics: Phisics;
     private inputDevices: InputDevices;
 
-    private previousDate: number;
+    private previousFrameTime: number;
 
     constructor(graphicDevice: GraphicDevice, inputDevices: InputDevices) {
         this.graphicDevice = graphicDevice;
-        this.renderer = new Renderer(this.graphicDevice);
         this.phisics = new Phisics();
         this.inputDevices = inputDevices;
     }
@@ -31,13 +29,11 @@
     private appLoop() {
 
         var now = new Date().getTime();
-        var fps = 1000.0 / (now - this.previousDate) >> 0;
-        this.previousDate = now;
+        var fps = 1000.0 / (now - this.previousFrameTime) >> 0;
+        this.previousFrameTime = now;
         
         this.processScene(this.scene, this.phisics);
-        this.graphicDevice.clear();
-        this.drawFrame(this.graphicDevice);
-        this.graphicDevice.present();
+        this.drawFrame(this.graphicDevice, this.scene);
         this.graphicDevice.drawFps(fps);
         requestAnimationFrame(() => this.appLoop());
     }
@@ -49,8 +45,13 @@
     protected processScene(scene: Scene, phisics: Phisics) {
     }
 
-    protected drawFrame(graphicDevice: GraphicDevice) {
-        this.renderer.renderScene(this.scene);
+    protected drawFrame(graphicDevice: GraphicDevice, scene: Scene) {
+
+        var outputBuffer = graphicDevice.get_outputBuffer();
+        //outputBuffer.clear();
+        var renderer3d = new Renderer3d(outputBuffer);
+        renderer3d.drawScene(this.scene);
+        graphicDevice.presentOutputBuffer();
     }
 
     protected handleKeyboardEvent(eventArgs: KeyboardEventArgs, scene: Scene) {

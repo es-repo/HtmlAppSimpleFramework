@@ -1,18 +1,19 @@
 ﻿// THE CODE IS BASED ON http://blogs.msdn.com/b/davrous/archive/2013/06/13/tutorial-series-learning-how-to-write-a-3d-soft-engine-from-scratch-in-c-typescript-or-javascript.aspx
 
-class Renderer {
+class Renderer3d {
 
-    private graphicDevice: GraphicDevice;
+    private output: GraphicOutputBuffer;
+    public renderer2d: Renderer2d;
 
-    constructor(graphicDevice: GraphicDevice) {
-        this.graphicDevice = graphicDevice;
+    constructor(output: GraphicOutputBuffer) {
+        this.output = output;
+        this.renderer2d = new Renderer2d(output);
     }
 
     public projectScene(scene: Scene) {
 
         var viewMatrix = BABYLON.Matrix.LookAtLH(scene.camera.position, scene.camera.direction, scene.camera.up);
-        var projectionMatrix = BABYLON.Matrix.PerspectiveFovLH(scene.camera.fov,
-            this.graphicDevice.get_workingWidth() / this.graphicDevice.get_workingHeight(),
+        var projectionMatrix = BABYLON.Matrix.PerspectiveFovLH(scene.camera.fov, this.output.width / this.output.height,
             scene.camera.zNear, scene.camera.zFar);
 
         for (var i = 0; i < scene.figures.length; i++) {
@@ -31,8 +32,8 @@ class Renderer {
     private projectVector(v: BABYLON.Vector3, transMat: BABYLON.Matrix): BABYLON.Vector3 {
 
         var point = BABYLON.Vector3.TransformCoordinates(v, transMat);
-        var x = point.x * this.graphicDevice.get_workingWidth() + this.graphicDevice.get_workingWidth() / 2.0;
-        var y = -point.y * this.graphicDevice.get_workingHeight() + this.graphicDevice.get_workingHeight() / 2.0;
+        var x = point.x * this.output.width + this.output.width / 2.0;
+        var y = -point.y * this.output.height + this.output.height / 2.0;
         return (new BABYLON.Vector3(x, y, point.z));
     }
 
@@ -77,27 +78,29 @@ class Renderer {
         }
     }
 
-    public renderScene(scene: Scene) {
+    public drawScene(scene: Scene) {
 
         this.projectScene(scene);
 
         for (var i = 0; i < scene.figures.length; i++) {
-            var f = scene.figures[i];
-
-            if (f instanceof Circle) {
-                this.renderCircle(<Circle>f);
-            }
-            else if (f instanceof Mesh) {
-                this.renderMesh(<Mesh>f);
-            }
+            this.drawFigure(scene.figures[i]);
         } 
     }
 
-    public renderCircle(circle: Circle) {
-        this.graphicDevice.drawFilledCircle(circle.projectedPosition.x, circle.projectedPosition.y, circle.projectedPosition.z, circle.get_projectedRadius(), circle.color);
+    public drawFigure(f: Figure) {
+        if (f instanceof Circle) {
+            this.drawCircle(<Circle>f);
+        }
+        else if (f instanceof Mesh) {
+            this.drawMesh(<Mesh>f);
+        }
     }
 
-    public renderMesh(m: Mesh) {
+    private drawCircle(circle: Circle) {
+        this.renderer2d.drawFilledCircle(circle.projectedPosition.x, circle.projectedPosition.y, circle.projectedPosition.z, circle.get_projectedRadius(), circle.color);
+    }
+
+    private drawMesh(m: Mesh) {
         for (var indexFaces = 0; indexFaces < m.faces.length; indexFaces++) {
             var currentFace = m.faces[indexFaces];
 
@@ -106,11 +109,11 @@ class Renderer {
             var vc = m.projectedVertices[currentFace.c];
 
             var color = 1.0;
-            this.renderTriangle(va, vb, vc, new BABYLON.Color4(color, color, color, 1), m.texture);
+            this.drawTriangle(va, vb, vc, new BABYLON.Color4(color, color, color, 1), m.texture);
         }
     }
 
-    public renderTriangle(v1: Vertex, v2: Vertex, v3: Vertex, color: BABYLON.Color4, texture?: Texture): void {
+    public drawTriangle(v1: Vertex, v2: Vertex, v3: Vertex, color: BABYLON.Color4, texture?: Texture): void {
         // Sorting the points in order to always have this order on screen p1, p2 & p3
         // with p1 always up (thus having the Y the lowest possible to be near the top screen)
         // then p2 between p1 & p3
@@ -308,7 +311,7 @@ class Renderer {
             // changing the native color value using the cosine of the angle
             // between the light vector and the normal vector
             // and the texture color
-            this.graphicDevice.drawPoint(x, data.currentY, z,
+            this.renderer2d.drawPoint(x, data.currentY, z,
                 new BABYLON.Color4(color.r * ndotl * textureColor.r,
                     color.g * ndotl * textureColor.g,
                     color.b * ndotl * textureColor.b, 1));

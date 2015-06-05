@@ -1,34 +1,30 @@
 ﻿class HtmlCanvasDevice extends GraphicDevice {
-
+    
     private workingContext: CanvasRenderingContext2D;
-    private backbuffer: ImageData;
+    private outputBuffer: GraphicOutputBuffer;
+    private internalOutputBuffer: ImageData;
 
     constructor(canvasId: string) {
+        super();
         var canvas = <HTMLCanvasElement> document.getElementById(canvasId);
-        super(canvas.width, canvas.height);
         this.workingContext = canvas.getContext("2d");
+        this.internalOutputBuffer = this.workingContext.getImageData(0, 0, canvas.width, canvas.height);
+        this.outputBuffer = new GraphicOutputBuffer(this.internalOutputBuffer.data, canvas.width, canvas.height);
     }
 
-    protected clearInternal() {
-        this.workingContext.clearRect(0, 0, this.get_workingWidth(), this.get_workingHeight());
-        this.backbuffer = this.workingContext.getImageData(0, 0, this.get_workingWidth(), this.get_workingHeight());
-    }
+    public get_outputWidth() { return this.workingContext.canvas.width; }
 
-    public present() {
-        this.workingContext.putImageData(this.backbuffer, 0, 0);
-    }
+    public get_outputHeight() { return this.workingContext.canvas.height; }
 
-    public putPixelInternal(index: number, color: BABYLON.Color4): void {
-        var index4: number = index * 4;
-        this.backbuffer.data[index4] = color.r * 255;
-        this.backbuffer.data[index4 + 1] = color.g * 255;
-        this.backbuffer.data[index4 + 2] = color.b * 255;
-        this.backbuffer.data[index4 + 3] = color.a * 255;
+    public get_outputBuffer(): GraphicOutputBuffer { return this.outputBuffer; }
+
+    public presentOutputBuffer() {
+        this.workingContext.putImageData(this.internalOutputBuffer, 0, 0);
     }
 
     public drawFps(fps: number) {
         this.workingContext.font = "30px Verdana";
-        var gradient = this.workingContext.createLinearGradient(0, 0, this.get_workingWidth() / 6, 0);
+        var gradient = this.workingContext.createLinearGradient(0, 0, this.get_outputWidth() / 6, 0);
         gradient.addColorStop(0, "magenta");
         gradient.addColorStop(0.5, "blue");
         gradient.addColorStop(1.0, "red");

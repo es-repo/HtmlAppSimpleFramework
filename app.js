@@ -1,7 +1,6 @@
 var App = (function () {
     function App(graphicDevice, inputDevices) {
         this.graphicDevice = graphicDevice;
-        this.renderer = new Renderer(this.graphicDevice);
         this.phisics = new Phisics();
         this.inputDevices = inputDevices;
     }
@@ -19,12 +18,10 @@ var App = (function () {
     App.prototype.appLoop = function () {
         var _this = this;
         var now = new Date().getTime();
-        var fps = 1000.0 / (now - this.previousDate) >> 0;
-        this.previousDate = now;
+        var fps = 1000.0 / (now - this.previousFrameTime) >> 0;
+        this.previousFrameTime = now;
         this.processScene(this.scene, this.phisics);
-        this.graphicDevice.clear();
-        this.drawFrame(this.graphicDevice);
-        this.graphicDevice.present();
+        this.drawFrame(this.graphicDevice, this.scene);
         this.graphicDevice.drawFps(fps);
         requestAnimationFrame(function () { return _this.appLoop(); });
     };
@@ -33,8 +30,12 @@ var App = (function () {
     };
     App.prototype.processScene = function (scene, phisics) {
     };
-    App.prototype.drawFrame = function (graphicDevice) {
-        this.renderer.renderScene(this.scene);
+    App.prototype.drawFrame = function (graphicDevice, scene) {
+        var outputBuffer = graphicDevice.get_outputBuffer();
+        //outputBuffer.clear();
+        var renderer3d = new Renderer3d(outputBuffer);
+        renderer3d.drawScene(this.scene);
+        graphicDevice.presentOutputBuffer();
     };
     App.prototype.handleKeyboardEvent = function (eventArgs, scene) {
     };

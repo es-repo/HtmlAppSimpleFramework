@@ -13,7 +13,6 @@ class Circle extends Figure {
     public set_diameter(d: number) { this.size.x = d; }
     public get_projectedDiameter(): number { return this.projectedSize.x; }
 
-
     public get_radius(): number { return this.get_diameter() / 2.0; }
     public set_radius(r: number) { this.set_diameter(r * 2); }
     public get_square() { return this.get_radius() * this.get_radius() * Math.PI; }
