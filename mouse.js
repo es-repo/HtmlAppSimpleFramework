@@ -19,4 +19,3 @@ var Mouse = (function (_super) {
     }
     return Mouse;
 })(InputDevice);
-//# sourceMappingURL=mouse.js.map

@@ -67,4 +67,3 @@ var D3ObjectApp = (function (_super) {
     D3ObjectApp.rotateDelta = 0.01;
     return D3ObjectApp;
 })(App);
-//# sourceMappingURL=3dObjectApp.js.map

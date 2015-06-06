@@ -87,4 +87,3 @@ var XBubbleApp = (function (_super) {
     };
     return XBubbleApp;
 })(App);
-//# sourceMappingURL=xBubbleApp.js.map

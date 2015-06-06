@@ -43,4 +43,3 @@ var HtmlMouse = (function (_super) {
     };
     return HtmlMouse;
 })(Mouse);
-//# sourceMappingURL=htmlMouse.js.map

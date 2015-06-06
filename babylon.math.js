@@ -460,4 +460,3 @@ var BABYLON;
     })();
     BABYLON.Matrix = Matrix;
 })(BABYLON || (BABYLON = {}));
-//# sourceMappingURL=babylon.math.js.map

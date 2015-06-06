@@ -78,4 +78,3 @@ var Renderer2d = (function (_super) {
     };
     return Renderer2d;
 })(Renderer);
-//# sourceMappingURL=renderer2d.js.map

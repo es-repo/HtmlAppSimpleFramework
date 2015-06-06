@@ -26,4 +26,3 @@ var XBubbleScene = (function (_super) {
     }
     return XBubbleScene;
 })(Scene);
-//# sourceMappingURL=xBubbleScene.js.map

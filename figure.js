@@ -43,4 +43,3 @@ var Circle = (function (_super) {
     };
     return Circle;
 })(Figure);
-//# sourceMappingURL=figure.js.map

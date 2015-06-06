@@ -94,4 +94,3 @@ var MeshLoader = (function () {
     };
     return MeshLoader;
 })();
-//# sourceMappingURL=meshLoader.js.map

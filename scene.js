@@ -5,4 +5,3 @@ var Scene = (function () {
     }
     return Scene;
 })();
-//# sourceMappingURL=scene.js.map

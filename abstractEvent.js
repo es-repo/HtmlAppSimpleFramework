@@ -23,4 +23,3 @@ var AbstractEvent = (function () {
     };
     return AbstractEvent;
 })();
-//# sourceMappingURL=abstractEvent.js.map

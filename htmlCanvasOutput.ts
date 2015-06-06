@@ -20,7 +20,7 @@
         this.canvasContext.putImageData(this.outputBuffer, 0, 0);
     }
 
-    public drawText(text: string, x: number, y: number, color: string = "ffffff", size: number = 30, font: string = "Verdana") {
+    public drawText(text: string, x: number, y: number, color: string = "ffffff", size: number = 20, font: string = "Verdana") {
         this.canvasContext.font = size + "px " + font;
         this.canvasContext.fillStyle = "#" + color;
         this.canvasContext.fillText(text, x, y);

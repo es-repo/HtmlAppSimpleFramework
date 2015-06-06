@@ -53,4 +53,3 @@ var Bubble = (function (_super) {
     Bubble.canAnnihilateColor = new BABYLON.Color4(1, 0, 0, 1);
     return Bubble;
 })(Circle);
-//# sourceMappingURL=bubble.js.map

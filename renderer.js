@@ -4,4 +4,3 @@ var Renderer = (function () {
     }
     return Renderer;
 })();
-//# sourceMappingURL=renderer.js.map

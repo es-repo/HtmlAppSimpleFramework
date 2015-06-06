@@ -263,4 +263,3 @@ var Renderer3d = (function (_super) {
     };
     return Renderer3d;
 })(Renderer);
-//# sourceMappingURL=renderer3d.js.map

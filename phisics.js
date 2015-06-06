@@ -27,4 +27,3 @@ var Phisics = (function () {
     };
     return Phisics;
 })();
-//# sourceMappingURL=phisics.js.map

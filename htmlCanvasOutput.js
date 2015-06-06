@@ -26,7 +26,7 @@ var HtmlCanvasOutput = (function (_super) {
     };
     HtmlCanvasOutput.prototype.drawText = function (text, x, y, color, size, font) {
         if (color === void 0) { color = "ffffff"; }
-        if (size === void 0) { size = 30; }
+        if (size === void 0) { size = 20; }
         if (font === void 0) { font = "Verdana"; }
         this.canvasContext.font = size + "px " + font;
         this.canvasContext.fillStyle = "#" + color;
@@ -34,4 +34,3 @@ var HtmlCanvasOutput = (function (_super) {
     };
     return HtmlCanvasOutput;
 })(GraphicOutput);
-//# sourceMappingURL=htmlCanvasOutput.js.map

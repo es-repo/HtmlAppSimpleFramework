@@ -40,4 +40,3 @@ var Texture = (function () {
     };
     return Texture;
 })();
-//# sourceMappingURL=texture.js.map

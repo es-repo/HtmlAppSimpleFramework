@@ -17,4 +17,3 @@ var InputDevice = (function () {
     }
     return InputDevice;
 })();
-//# sourceMappingURL=inputDevice.js.map

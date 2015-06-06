@@ -60,7 +60,7 @@
     }
 
     private drawFps(graphicalOutput: GraphicOutput, fps: number) {
-        graphicalOutput.drawText(fps.toString(), 10, 30);
+        graphicalOutput.drawText(fps.toString(), 10, 25);
     }
 
     protected handleKeyboardEvent(eventArgs: KeyboardEventArgs, scene: Scene) {

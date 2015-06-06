@@ -41,7 +41,7 @@ var App = (function () {
         graphicOutput.drawBuffer();
     };
     App.prototype.drawFps = function (graphicalOutput, fps) {
-        graphicalOutput.drawText(fps.toString(), 10, 30);
+        graphicalOutput.drawText(fps.toString(), 10, 25);
     };
     App.prototype.handleKeyboardEvent = function (eventArgs, scene) {
     };
@@ -49,4 +49,3 @@ var App = (function () {
     };
     return App;
 })();
-//# sourceMappingURL=app.js.map

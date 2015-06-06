@@ -14,4 +14,3 @@ var Mesh = (function (_super) {
     }
     return Mesh;
 })(Figure);
-//# sourceMappingURL=mesh.js.map
