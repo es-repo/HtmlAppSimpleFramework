@@ -6,7 +6,8 @@
     <title>3d Object</title>
     <link rel="stylesheet" href="../../app.css" type="text/css" />
     <script src="../../build/htmlAppSimpleFramework.js"></script>
-    <script src="3dObjectApp.js"></script>
+    <script src="monkey.js"></script>
+    <script src="object3dApp.js"></script>
 </head>
 <body>
     <canvas id="canvas" width="1000" height="750"></canvas>
@@ -16,7 +17,7 @@
         var inputDevices = new InputDevices();
         inputDevices.keyboard = new HtmlKeyboard();
         inputDevices.mouse = new HtmlMouse("canvas");
-        var app = new D3ObjectApp(new HtmlCanvasOutput("canvas"), inputDevices);
+        var app = new Object3dApp(new HtmlCanvasOutput("canvas"), inputDevices);
         app.start();
     };
 </script>

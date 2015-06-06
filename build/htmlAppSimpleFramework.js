@@ -560,25 +560,25 @@ var Circle = (function (_super) {
 })(Figure);
 var Texture = (function () {
     // Working with a fix sized texture (512x512, 1024x1024, etc.).
-    function Texture(filename, width, height) {
+    function Texture(width, height) {
         this.width = width;
         this.height = height;
-        this.load(filename);
     }
     Texture.prototype.load = function (filename) {
         var _this = this;
-        var imageTexture = new Image();
-        imageTexture.height = this.height;
-        imageTexture.width = this.width;
-        imageTexture.onload = function () {
-            var internalCanvas = document.createElement("canvas");
-            internalCanvas.width = _this.width;
-            internalCanvas.height = _this.height;
-            var internalContext = internalCanvas.getContext("2d");
-            internalContext.drawImage(imageTexture, 0, 0);
+        var image = new Image();
+        image.crossOrigin = "Anonymous";
+        image.height = this.height;
+        image.width = this.width;
+        image.onload = function () {
+            var canvas = document.createElement("canvas");
+            canvas.width = _this.width;
+            canvas.height = _this.height;
+            var internalContext = canvas.getContext("2d");
+            internalContext.drawImage(image, 0, 0);
             _this.internalBuffer = internalContext.getImageData(0, 0, _this.width, _this.height);
         };
-        imageTexture.src = filename;
+        image.src = filename;
     };
     // Takes the U & V coordinates exported by Blender
     // and return the corresponding pixel color in the texture
@@ -611,38 +611,39 @@ var Mesh = (function (_super) {
     return Mesh;
 })(Figure);
 // THE CODE IS BASED ON http://blogs.msdn.com/b/davrous/archive/2013/06/13/tutorial-series-learning-how-to-write-a-3d-soft-engine-from-scratch-in-c-typescript-or-javascript.aspx
-var MeshLoader = (function () {
-    function MeshLoader() {
+var MeshFactory = (function () {
+    function MeshFactory() {
     }
-    MeshLoader.loadFromJsonFileAsync = function (fileName, callback) {
-        var _this = this;
+    MeshFactory.loadFromJsonFileAsync = function (fileName, callback) {
         var jsonObject = {};
         var xmlhttp = new XMLHttpRequest();
         xmlhttp.open("GET", fileName, true);
         xmlhttp.onreadystatechange = function () {
             if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
                 jsonObject = JSON.parse(xmlhttp.responseText);
-                callback(_this.createMeshesFromJSON(jsonObject));
+                var meshes = MeshFactory.createFromBabylonData(jsonObject);
+                callback(meshes);
             }
         };
         xmlhttp.send(null);
     };
-    MeshLoader.createMeshesFromJSON = function (jsonObject) {
+    MeshFactory.createFromBabylonData = function (babylonData, loadTextures) {
+        if (loadTextures === void 0) { loadTextures = true; }
         var meshes = [];
         var materials = [];
-        for (var materialIndex = 0; materialIndex < jsonObject.materials.length; materialIndex++) {
+        for (var materialIndex = 0; materialIndex < babylonData.materials.length; materialIndex++) {
             var material = {};
-            material.Name = jsonObject.materials[materialIndex].name;
-            material.ID = jsonObject.materials[materialIndex].id;
-            if (jsonObject.materials[materialIndex].diffuseTexture)
-                material.DiffuseTextureName = jsonObject.materials[materialIndex].diffuseTexture.name;
+            material.Name = babylonData.materials[materialIndex].name;
+            material.ID = babylonData.materials[materialIndex].id;
+            if (babylonData.materials[materialIndex].diffuseTexture)
+                material.DiffuseTextureName = babylonData.materials[materialIndex].diffuseTexture.name;
             materials[material.ID] = material;
         }
-        for (var meshIndex = 0; meshIndex < jsonObject.meshes.length; meshIndex++) {
-            var verticesArray = jsonObject.meshes[meshIndex].vertices;
+        for (var meshIndex = 0; meshIndex < babylonData.meshes.length; meshIndex++) {
+            var verticesArray = babylonData.meshes[meshIndex].vertices;
             // Faces
-            var indicesArray = jsonObject.meshes[meshIndex].indices;
-            var uvCount = jsonObject.meshes[meshIndex].uvCount;
+            var indicesArray = babylonData.meshes[meshIndex].indices;
+            var uvCount = babylonData.meshes[meshIndex].uvCount;
             var verticesStep = 1;
             switch (uvCount) {
                 case 0:
@@ -693,18 +694,27 @@ var MeshLoader = (function () {
                 };
             }
             // Getting the position you've set in Blender
-            var position = jsonObject.meshes[meshIndex].position;
+            var position = babylonData.meshes[meshIndex].position;
             mesh.position = new BABYLON.Vector3(position[0], position[1], position[2]);
             if (uvCount > 0) {
-                var meshTextureID = jsonObject.meshes[meshIndex].materialId;
+                var meshTextureID = babylonData.meshes[meshIndex].materialId;
                 var meshTextureName = materials[meshTextureID].DiffuseTextureName;
-                mesh.texture = new Texture(meshTextureName.toString(), 512, 512);
+                mesh.texture = new Texture(512, 512);
+                if (loadTextures)
+                    mesh.texture.load(meshTextureName.toString());
             }
             meshes.push(mesh);
         }
         return meshes;
     };
-    return MeshLoader;
+    MeshFactory.createFromBabylonAndtextureBase64Data = function (json) {
+        var meshes = MeshFactory.createFromBabylonData(json.babylonData, false);
+        for (var i = 0; i < meshes.length; i++) {
+            meshes[i].texture.load(json.textureBase64Data);
+        }
+        return meshes;
+    };
+    return MeshFactory;
 })();
 var Camera = (function () {
     function Camera() {
@@ -1275,7 +1285,6 @@ var App = (function () {
     };
     App.prototype.drawFps = function (graphicalOutput, fps) {
         graphicalOutput.drawText(fps.toString(), 10, 25);
-        debugger;
     };
     App.prototype.handleKeyboardEvent = function (eventArgs, scene) {
     };

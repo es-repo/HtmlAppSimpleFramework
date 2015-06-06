@@ -552,28 +552,29 @@ interface Material {
 class Texture {
     width: number;
     height: number;
+    filename: string;
     internalBuffer: ImageData;
 
     // Working with a fix sized texture (512x512, 1024x1024, etc.).
-    constructor(filename: string, width: number, height: number) {
+    constructor(width: number, height: number) {
         this.width = width;
         this.height = height;
-        this.load(filename);
     }
 
     public load(filename: string): void {
-        var imageTexture = new Image();
-        imageTexture.height = this.height;
-        imageTexture.width = this.width;
-        imageTexture.onload = () => {
-            var internalCanvas: HTMLCanvasElement = document.createElement("canvas");
-            internalCanvas.width = this.width;
-            internalCanvas.height = this.height;
-            var internalContext: CanvasRenderingContext2D = internalCanvas.getContext("2d");
-            internalContext.drawImage(imageTexture, 0, 0);
+        var image = new Image();
+        image.crossOrigin = "Anonymous";
+        image.height = this.height;
+        image.width = this.width;
+        image.onload = () => {
+            var canvas: HTMLCanvasElement = document.createElement("canvas");
+            canvas.width = this.width;
+            canvas.height = this.height;
+            var internalContext: CanvasRenderingContext2D = canvas.getContext("2d");
+            internalContext.drawImage(image, 0, 0);
             this.internalBuffer = internalContext.getImageData(0, 0, this.width, this.height);
         };
-        imageTexture.src = filename;
+        image.src = filename;
     }
 
     // Takes the U & V coordinates exported by Blender
@@ -614,7 +615,7 @@ class Mesh extends Figure {
 }
 // THE CODE IS BASED ON http://blogs.msdn.com/b/davrous/archive/2013/06/13/tutorial-series-learning-how-to-write-a-3d-soft-engine-from-scratch-in-c-typescript-or-javascript.aspx
 
-class MeshLoader {
+class MeshFactory {
 
     public static loadFromJsonFileAsync(fileName: string, callback: (result: Mesh[]) => any): void {
         var jsonObject = {};
@@ -623,33 +624,33 @@ class MeshLoader {
         xmlhttp.onreadystatechange = () => {
             if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
                 jsonObject = JSON.parse(xmlhttp.responseText);
-                callback(this.createMeshesFromJSON(jsonObject));
-            }
+                var meshes = MeshFactory.createFromBabylonData(jsonObject);
+                callback(meshes);            }
         };
         xmlhttp.send(null);
     }
 
-    private static createMeshesFromJSON(jsonObject): Mesh[] {
+    public static createFromBabylonData(babylonData, loadTextures: boolean = true): Mesh[] {
         var meshes: Mesh[] = [];
         var materials: Material[] = [];
 
-        for (var materialIndex = 0; materialIndex < jsonObject.materials.length; materialIndex++) {
+        for (var materialIndex = 0; materialIndex < babylonData.materials.length; materialIndex++) {
             var material: Material = {};
 
-            material.Name = jsonObject.materials[materialIndex].name;
-            material.ID = jsonObject.materials[materialIndex].id;
-            if (jsonObject.materials[materialIndex].diffuseTexture)
-                material.DiffuseTextureName = jsonObject.materials[materialIndex].diffuseTexture.name;
+            material.Name = babylonData.materials[materialIndex].name;
+            material.ID = babylonData.materials[materialIndex].id;
+            if (babylonData.materials[materialIndex].diffuseTexture)
+                material.DiffuseTextureName = babylonData.materials[materialIndex].diffuseTexture.name;
 
             materials[material.ID] = material;
         }
 
-        for (var meshIndex = 0; meshIndex < jsonObject.meshes.length; meshIndex++) {
-            var verticesArray: number[] = jsonObject.meshes[meshIndex].vertices;
+        for (var meshIndex = 0; meshIndex < babylonData.meshes.length; meshIndex++) {
+            var verticesArray: number[] = babylonData.meshes[meshIndex].vertices;
             // Faces
-            var indicesArray: number[] = jsonObject.meshes[meshIndex].indices;
+            var indicesArray: number[] = babylonData.meshes[meshIndex].indices;
 
-            var uvCount: number = jsonObject.meshes[meshIndex].uvCount;
+            var uvCount: number = babylonData.meshes[meshIndex].uvCount;
             var verticesStep = 1;
 
             // Depending of the number of texture's coordinates per vertex
@@ -711,16 +712,26 @@ class MeshLoader {
             }
                 
             // Getting the position you've set in Blender
-            var position = jsonObject.meshes[meshIndex].position;
+            var position = babylonData.meshes[meshIndex].position;
             mesh.position = new BABYLON.Vector3(position[0], position[1], position[2]);
 
             if (uvCount > 0) {
-                var meshTextureID = jsonObject.meshes[meshIndex].materialId;
+                var meshTextureID = babylonData.meshes[meshIndex].materialId;
                 var meshTextureName = materials[meshTextureID].DiffuseTextureName;
-                mesh.texture = new Texture(meshTextureName.toString(), 512, 512);
+                mesh.texture = new Texture(512, 512);
+                if (loadTextures)
+                    mesh.texture.load(meshTextureName.toString());
             }
 
             meshes.push(mesh);
+        }
+        return meshes;
+    }
+
+    public static createFromBabylonAndtextureBase64Data(json: {babylonData:any; textureBase64Data: string}): Mesh[] {
+        var meshes = MeshFactory.createFromBabylonData(json.babylonData, false);
+        for (var i = 0; i < meshes.length; i++) {
+            meshes[i].texture.load(json.textureBase64Data);
         }
         return meshes;
     }
@@ -1408,7 +1419,6 @@ class App {
 
     private drawFps(graphicalOutput: GraphicOutput, fps: number) {
         graphicalOutput.drawText(fps.toString(), 10, 25);
-        debugger 
     }
 
     protected handleKeyboardEvent(eventArgs: KeyboardEventArgs, scene: Scene) {

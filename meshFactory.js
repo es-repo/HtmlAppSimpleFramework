@@ -1,36 +1,37 @@
 // THE CODE IS BASED ON http://blogs.msdn.com/b/davrous/archive/2013/06/13/tutorial-series-learning-how-to-write-a-3d-soft-engine-from-scratch-in-c-typescript-or-javascript.aspx
-var MeshLoader = (function () {
-    function MeshLoader() {
+var MeshFactory = (function () {
+    function MeshFactory() {
     }
-    MeshLoader.loadFromJsonFileAsync = function (fileName, callback) {
-        var _this = this;
+    MeshFactory.loadFromJsonFileAsync = function (fileName, callback) {
         var jsonObject = {};
         var xmlhttp = new XMLHttpRequest();
         xmlhttp.open("GET", fileName, true);
         xmlhttp.onreadystatechange = function () {
             if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
                 jsonObject = JSON.parse(xmlhttp.responseText);
-                callback(_this.createMeshesFromJSON(jsonObject));
+                var meshes = MeshFactory.createFromBabylonData(jsonObject);
+                callback(meshes);
             }
         };
         xmlhttp.send(null);
     };
-    MeshLoader.createMeshesFromJSON = function (jsonObject) {
+    MeshFactory.createFromBabylonData = function (babylonData, loadTextures) {
+        if (loadTextures === void 0) { loadTextures = true; }
         var meshes = [];
         var materials = [];
-        for (var materialIndex = 0; materialIndex < jsonObject.materials.length; materialIndex++) {
+        for (var materialIndex = 0; materialIndex < babylonData.materials.length; materialIndex++) {
             var material = {};
-            material.Name = jsonObject.materials[materialIndex].name;
-            material.ID = jsonObject.materials[materialIndex].id;
-            if (jsonObject.materials[materialIndex].diffuseTexture)
-                material.DiffuseTextureName = jsonObject.materials[materialIndex].diffuseTexture.name;
+            material.Name = babylonData.materials[materialIndex].name;
+            material.ID = babylonData.materials[materialIndex].id;
+            if (babylonData.materials[materialIndex].diffuseTexture)
+                material.DiffuseTextureName = babylonData.materials[materialIndex].diffuseTexture.name;
             materials[material.ID] = material;
         }
-        for (var meshIndex = 0; meshIndex < jsonObject.meshes.length; meshIndex++) {
-            var verticesArray = jsonObject.meshes[meshIndex].vertices;
+        for (var meshIndex = 0; meshIndex < babylonData.meshes.length; meshIndex++) {
+            var verticesArray = babylonData.meshes[meshIndex].vertices;
             // Faces
-            var indicesArray = jsonObject.meshes[meshIndex].indices;
-            var uvCount = jsonObject.meshes[meshIndex].uvCount;
+            var indicesArray = babylonData.meshes[meshIndex].indices;
+            var uvCount = babylonData.meshes[meshIndex].uvCount;
             var verticesStep = 1;
             switch (uvCount) {
                 case 0:
@@ -81,16 +82,25 @@ var MeshLoader = (function () {
                 };
             }
             // Getting the position you've set in Blender
-            var position = jsonObject.meshes[meshIndex].position;
+            var position = babylonData.meshes[meshIndex].position;
             mesh.position = new BABYLON.Vector3(position[0], position[1], position[2]);
             if (uvCount > 0) {
-                var meshTextureID = jsonObject.meshes[meshIndex].materialId;
+                var meshTextureID = babylonData.meshes[meshIndex].materialId;
                 var meshTextureName = materials[meshTextureID].DiffuseTextureName;
-                mesh.texture = new Texture(meshTextureName.toString(), 512, 512);
+                mesh.texture = new Texture(512, 512);
+                if (loadTextures)
+                    mesh.texture.load(meshTextureName.toString());
             }
             meshes.push(mesh);
         }
         return meshes;
     };
-    return MeshLoader;
+    MeshFactory.createFromBabylonAndtextureBase64Data = function (json) {
+        var meshes = MeshFactory.createFromBabylonData(json.babylonData, false);
+        for (var i = 0; i < meshes.length; i++) {
+            meshes[i].texture.load(json.textureBase64Data);
+        }
+        return meshes;
+    };
+    return MeshFactory;
 })();

@@ -4,26 +4,31 @@ var __extends = this.__extends || function (d, b) {
     __.prototype = b.prototype;
     d.prototype = new __();
 };
-var D3ObjectApp = (function (_super) {
-    __extends(D3ObjectApp, _super);
-    function D3ObjectApp(graphicOutput, inputControllerHandlers) {
+var Object3dApp = (function (_super) {
+    __extends(Object3dApp, _super);
+    function Object3dApp(graphicOutput, inputControllerHandlers) {
         _super.call(this, graphicOutput, inputControllerHandlers);
-        this.rotateVector = new BABYLON.Vector3(0, D3ObjectApp.rotateDelta, 0);
+        this.rotateVector = new BABYLON.Vector3(0, Object3dApp.rotateDelta, 0);
     }
-    D3ObjectApp.prototype.createScene = function (continuation) {
-        var _this = this;
-        MeshLoader.loadFromJsonFileAsync("monkey.babylon", function (meshes) {
-            var scene = new Scene();
-            scene.figures = meshes;
-            scene.camera.position.z = 10;
-            _this.rotateScene(scene, new BABYLON.Vector3(0, Math.PI, 0));
-            continuation((scene));
-        });
+    Object3dApp.prototype.createScene = function (continuation) {
+        var meshes = MeshFactory.createFromBabylonAndtextureBase64Data(Objects3dLib.monkey);
+        var scene = new Scene();
+        scene.figures = meshes;
+        scene.camera.position.z = 10;
+        this.rotateScene(scene, new BABYLON.Vector3(0, Math.PI, 0));
+        continuation((scene));
+        //MeshFactory.loadFromJsonFileAsync("monkey.babylon", meshes => {
+        //    var scene = new Scene();
+        //    scene.figures = meshes;
+        //    scene.camera.position.z = 10;
+        //    this.rotateScene(scene, new BABYLON.Vector3(0, Math.PI, 0));
+        //    continuation((scene));
+        //});
     };
-    D3ObjectApp.prototype.processScene = function (scene, phisics) {
+    Object3dApp.prototype.processScene = function (scene, phisics) {
         this.rotateScene(scene, this.rotateVector);
     };
-    D3ObjectApp.prototype.rotateScene = function (scene, rotationDelta) {
+    Object3dApp.prototype.rotateScene = function (scene, rotationDelta) {
         for (var i = 0; i < scene.figures.length; i++) {
             var m = scene.figures[i];
             m.rotation.x += rotationDelta.x;
@@ -31,7 +36,7 @@ var D3ObjectApp = (function (_super) {
             m.rotation.z += rotationDelta.z;
         }
     };
-    D3ObjectApp.prototype.handleKeyboardEvent = function (eventArgs, scene) {
+    Object3dApp.prototype.handleKeyboardEvent = function (eventArgs, scene) {
         var k = eventArgs.pressedKey;
         var cameraDelta = 3;
         if (k == 189) {
@@ -57,13 +62,13 @@ var D3ObjectApp = (function (_super) {
             this.rotateVector = new BABYLON.Vector3(0, 0, 0);
         }
     };
-    D3ObjectApp.prototype.handleMouseEvent = function (eventArgs, scene) {
+    Object3dApp.prototype.handleMouseEvent = function (eventArgs, scene) {
         if (eventArgs.leftButtonClicked) {
             this.rotateVector = new BABYLON.Vector3(-eventArgs.deltaY, -eventArgs.deltaX, 0);
             this.rotateVector = this.rotateVector.scale(0.003);
         }
         scene.camera.position.z += eventArgs.wheelDelta / 100;
     };
-    D3ObjectApp.rotateDelta = 0.01;
-    return D3ObjectApp;
+    Object3dApp.rotateDelta = 0.01;
+    return Object3dApp;
 })(App);

@@ -9,7 +9,7 @@ Get-Content babylon.math.ts, `
  material.ts, `
  texture.ts, `
  mesh.ts, `
- meshLoader.ts, `
+ meshFactory.ts, `
  camera.ts, `
  scene.ts, `
  rendererOutput.ts, `

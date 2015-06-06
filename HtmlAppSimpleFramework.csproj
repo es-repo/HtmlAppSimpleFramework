@@ -18,6 +18,7 @@
     <IISExpressUseClassicPipelineMode />
   </PropertyGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="samples\3dObject\monkey.ts" />
     <Content Include="samples\3dObject\index.html" />
     <Content Include="app.css" />
     <Content Include="index.html" />
@@ -36,7 +37,7 @@
     <TypeScriptCompile Include="keyboard.ts" />
     <TypeScriptCompile Include="mouse.ts" />
     <TypeScriptCompile Include="renderer2d.ts" />
-    <TypeScriptCompile Include="samples\3dObject\3dObjectApp.ts" />
+    <TypeScriptCompile Include="samples\3dObject\object3dApp.ts" />
     <TypeScriptCompile Include="app.ts" />
     <TypeScriptCompile Include="babylon.math.ts" />
     <TypeScriptCompile Include="camera.ts" />
@@ -46,7 +47,7 @@
     <TypeScriptCompile Include="htmlCanvasOutput.ts" />
     <TypeScriptCompile Include="material.ts" />
     <TypeScriptCompile Include="mesh.ts" />
-    <TypeScriptCompile Include="meshLoader.ts" />
+    <TypeScriptCompile Include="meshFactory.ts" />
     <TypeScriptCompile Include="phisics.ts" />
     <TypeScriptCompile Include="renderer3d.ts" />
     <TypeScriptCompile Include="scanLineData.ts" />
@@ -59,7 +60,7 @@
     <TypeScriptCompile Include="samples\xBubble\xBubbleScene.ts" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="samples\3dObject\monkey.babylon" />
+    <None Include="samples\3dObject\monkey.babylon" />
     <Content Include="build\postbuild.ps1" />
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>

@@ -1,24 +1,24 @@
 var Texture = (function () {
     // Working with a fix sized texture (512x512, 1024x1024, etc.).
-    function Texture(filename, width, height) {
+    function Texture(width, height) {
         this.width = width;
         this.height = height;
-        this.load(filename);
     }
     Texture.prototype.load = function (filename) {
         var _this = this;
-        var imageTexture = new Image();
-        imageTexture.height = this.height;
-        imageTexture.width = this.width;
-        imageTexture.onload = function () {
-            var internalCanvas = document.createElement("canvas");
-            internalCanvas.width = _this.width;
-            internalCanvas.height = _this.height;
-            var internalContext = internalCanvas.getContext("2d");
-            internalContext.drawImage(imageTexture, 0, 0);
+        var image = new Image();
+        image.crossOrigin = "Anonymous";
+        image.height = this.height;
+        image.width = this.width;
+        image.onload = function () {
+            var canvas = document.createElement("canvas");
+            canvas.width = _this.width;
+            canvas.height = _this.height;
+            var internalContext = canvas.getContext("2d");
+            internalContext.drawImage(image, 0, 0);
             _this.internalBuffer = internalContext.getImageData(0, 0, _this.width, _this.height);
         };
-        imageTexture.src = filename;
+        image.src = filename;
     };
     // Takes the U & V coordinates exported by Blender
     // and return the corresponding pixel color in the texture

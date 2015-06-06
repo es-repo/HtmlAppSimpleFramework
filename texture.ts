@@ -1,28 +1,29 @@
 ﻿class Texture {
     width: number;
     height: number;
+    filename: string;
     internalBuffer: ImageData;
 
     // Working with a fix sized texture (512x512, 1024x1024, etc.).
-    constructor(filename: string, width: number, height: number) {
+    constructor(width: number, height: number) {
         this.width = width;
         this.height = height;
-        this.load(filename);
     }
 
     public load(filename: string): void {
-        var imageTexture = new Image();
-        imageTexture.height = this.height;
-        imageTexture.width = this.width;
-        imageTexture.onload = () => {
-            var internalCanvas: HTMLCanvasElement = document.createElement("canvas");
-            internalCanvas.width = this.width;
-            internalCanvas.height = this.height;
-            var internalContext: CanvasRenderingContext2D = internalCanvas.getContext("2d");
-            internalContext.drawImage(imageTexture, 0, 0);
+        var image = new Image();
+        image.crossOrigin = "Anonymous";
+        image.height = this.height;
+        image.width = this.width;
+        image.onload = () => {
+            var canvas: HTMLCanvasElement = document.createElement("canvas");
+            canvas.width = this.width;
+            canvas.height = this.height;
+            var internalContext: CanvasRenderingContext2D = canvas.getContext("2d");
+            internalContext.drawImage(image, 0, 0);
             this.internalBuffer = internalContext.getImageData(0, 0, this.width, this.height);
         };
-        imageTexture.src = filename;
+        image.src = filename;
     }
 
     // Takes the U & V coordinates exported by Blender

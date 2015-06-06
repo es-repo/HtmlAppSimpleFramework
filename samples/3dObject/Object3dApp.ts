@@ -1,22 +1,29 @@
-﻿class D3ObjectApp extends App {
+﻿class Object3dApp extends App {
 
     private static rotateDelta: number = 0.01; 
     private rotateVector: BABYLON.Vector3;
 
     constructor(graphicOutput: GraphicOutput, inputControllerHandlers: InputDevices) {
         super(graphicOutput, inputControllerHandlers);
-        this.rotateVector = new BABYLON.Vector3(0, D3ObjectApp.rotateDelta, 0);
+        this.rotateVector = new BABYLON.Vector3(0, Object3dApp.rotateDelta, 0);
     }
 
     protected createScene(continuation: (Scene: Scene) => void) {
 
-        MeshLoader.loadFromJsonFileAsync("monkey.babylon", meshes => {
-            var scene = new Scene();
-            scene.figures = meshes;
-            scene.camera.position.z = 10;
-            this.rotateScene(scene, new BABYLON.Vector3(0, Math.PI, 0));
-            continuation((scene));
-        });
+        var meshes = MeshFactory.createFromBabylonAndtextureBase64Data(Objects3dLib.monkey);
+        var scene = new Scene();
+        scene.figures = meshes;
+        scene.camera.position.z = 10;
+        this.rotateScene(scene, new BABYLON.Vector3(0, Math.PI, 0));
+        continuation((scene));
+            
+        //MeshFactory.loadFromJsonFileAsync("monkey.babylon", meshes => {
+        //    var scene = new Scene();
+        //    scene.figures = meshes;
+        //    scene.camera.position.z = 10;
+        //    this.rotateScene(scene, new BABYLON.Vector3(0, Math.PI, 0));
+        //    continuation((scene));
+        //});
     }
 
     protected processScene(scene: Scene, phisics: Phisics) {
