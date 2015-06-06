@@ -26,6 +26,6 @@ Get-Content babylon.math.ts, `
  htmlKeyboard.ts, `
  inputDevices.ts, `
  app.ts `
- | Out-File htmlAppSimpleFramework.ts -Encoding UTF8
+ | Out-File build\htmlAppSimpleFramework.ts -Encoding UTF8
 
- &("C:\Program Files (x86)\Microsoft SDKs\TypeScript\1.4\tsc") --sourceMap htmlAppSimpleFramework.ts
+ &("C:\Program Files (x86)\Microsoft SDKs\TypeScript\1.4\tsc") --sourceMap build\htmlAppSimpleFramework.ts

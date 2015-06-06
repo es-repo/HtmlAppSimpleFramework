@@ -60,7 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="samples\3dObject\monkey.babylon" />
-    <Content Include="buildScripts\postbuild.ps1" />
+    <Content Include="build\postbuild.ps1" />
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>
@@ -108,6 +108,6 @@
     </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>powershell -file "$(ProjectDir)\buildScripts\postbuild.ps1"</PostBuildEvent>
+    <PostBuildEvent>powershell -file "$(ProjectDir)\build\postbuild.ps1"</PostBuildEvent>
   </PropertyGroup>
 </Project>

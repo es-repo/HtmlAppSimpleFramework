@@ -1274,8 +1274,8 @@ var App = (function () {
         graphicOutput.drawBuffer();
     };
     App.prototype.drawFps = function (graphicalOutput, fps) {
-        debugger;
         graphicalOutput.drawText(fps.toString(), 10, 25);
+        debugger;
     };
     App.prototype.handleKeyboardEvent = function (eventArgs, scene) {
     };

@@ -1407,8 +1407,8 @@ class App {
     }
 
     private drawFps(graphicalOutput: GraphicOutput, fps: number) {
-        debugger
         graphicalOutput.drawText(fps.toString(), 10, 25);
+        debugger 
     }
 
     protected handleKeyboardEvent(eventArgs: KeyboardEventArgs, scene: Scene) {
