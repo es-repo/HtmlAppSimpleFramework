@@ -2,8 +2,8 @@
 
     private gameOver: boolean;
 
-    constructor(graphicDevice: GraphicDevice, inputControllerHandlers: InputDevices) {
-        super(graphicDevice, inputControllerHandlers);
+    constructor(graphicOutput: GraphicOutput, inputControllerHandlers: InputDevices) {
+        super(graphicOutput, inputControllerHandlers);
     }
 
     protected createScene(continuation: (Scene: Scene) => void) {

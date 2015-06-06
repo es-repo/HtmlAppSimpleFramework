@@ -1,9 +1,7 @@
-﻿class Renderer2d {
+﻿class Renderer2d extends Renderer {
 
-    private output: GraphicOutputBuffer;
-
-    constructor(output: GraphicOutputBuffer) {
-        this.output = output;
+    constructor(output: RendererOutput) {
+        super(output);
     }
 
     public drawPoint(x: number, y: number, z: number, color: BABYLON.Color4): void {
@@ -12,14 +10,14 @@
 
             var index: number = ((x >> 0) + (y >> 0) * this.output.width);
 
-            if (this.output.depthData[index] >= z) {
-                this.output.depthData[index] = z;
+            if (this.output.depthBuffer[index] >= z) {
+                this.output.depthBuffer[index] = z;
 
                 var index4: number = index * 4;
-                this.output.colorData[index4] = color.r * 255;
-                this.output.colorData[index4 + 1] = color.g * 255;
-                this.output.colorData[index4 + 2] = color.b * 255;
-                this.output.colorData[index4 + 3] = color.a * 255;
+                this.output.colorBuffer[index4] = color.r * 255;
+                this.output.colorBuffer[index4 + 1] = color.g * 255;
+                this.output.colorBuffer[index4 + 2] = color.b * 255;
+                this.output.colorBuffer[index4 + 3] = color.a * 255;
             }
         }
     }

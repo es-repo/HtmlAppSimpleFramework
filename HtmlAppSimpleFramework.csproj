@@ -27,7 +27,8 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="abstractEvent.ts" />
-    <TypeScriptCompile Include="graphicOutputBuffer.ts" />
+    <TypeScriptCompile Include="renderer.ts" />
+    <TypeScriptCompile Include="rendererOutput.ts" />
     <TypeScriptCompile Include="htmlKeyboard.ts" />
     <TypeScriptCompile Include="htmlMouse.ts" />
     <TypeScriptCompile Include="inputDevice.ts" />
@@ -39,10 +40,10 @@
     <TypeScriptCompile Include="app.ts" />
     <TypeScriptCompile Include="babylon.math.ts" />
     <TypeScriptCompile Include="camera.ts" />
-    <TypeScriptCompile Include="graphicDevice.ts" />
+    <TypeScriptCompile Include="graphicOutput.ts" />
     <TypeScriptCompile Include="face.ts" />
     <TypeScriptCompile Include="figure.ts" />
-    <TypeScriptCompile Include="htmlCanvasDevice.ts" />
+    <TypeScriptCompile Include="htmlCanvasOutput.ts" />
     <TypeScriptCompile Include="material.ts" />
     <TypeScriptCompile Include="mesh.ts" />
     <TypeScriptCompile Include="meshLoader.ts" />

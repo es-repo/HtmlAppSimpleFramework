@@ -3,8 +3,8 @@
     private static rotateDelta: number = 0.01; 
     private rotateVector: BABYLON.Vector3;
 
-    constructor(graphicDevice: GraphicDevice, inputControllerHandlers: InputDevices) {
-        super(graphicDevice, inputControllerHandlers);
+    constructor(graphicOutput: GraphicOutput, inputControllerHandlers: InputDevices) {
+        super(graphicOutput, inputControllerHandlers);
         this.rotateVector = new BABYLON.Vector3(0, D3ObjectApp.rotateDelta, 0);
     }
 

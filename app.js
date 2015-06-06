@@ -1,6 +1,6 @@
 var App = (function () {
-    function App(graphicDevice, inputDevices) {
-        this.graphicDevice = graphicDevice;
+    function App(graphicOutput, inputDevices) {
+        this.graphicOutput = graphicOutput;
         this.phisics = new Phisics();
         this.inputDevices = inputDevices;
     }
@@ -8,6 +8,7 @@ var App = (function () {
         var _this = this;
         this.createScene(function (scene) {
             _this.scene = scene;
+            _this.renderer = _this.createRenderer(_this.graphicOutput);
             requestAnimationFrame(function () { return _this.appLoop(); });
             if (_this.inputDevices.keyboard != null)
                 _this.inputDevices.keyboard.inputEvent.addHandler(function (args) { return _this.handleKeyboardEvent(args, _this.scene); });
@@ -21,8 +22,8 @@ var App = (function () {
         var fps = 1000.0 / (now - this.previousFrameTime) >> 0;
         this.previousFrameTime = now;
         this.processScene(this.scene, this.phisics);
-        this.drawFrame(this.graphicDevice, this.scene);
-        this.graphicDevice.drawFps(fps);
+        this.drawFrame(this.graphicOutput, this.scene, this.renderer);
+        this.drawFps(this.graphicOutput, fps);
         requestAnimationFrame(function () { return _this.appLoop(); });
     };
     App.prototype.createScene = function (continuation) {
@@ -30,12 +31,17 @@ var App = (function () {
     };
     App.prototype.processScene = function (scene, phisics) {
     };
-    App.prototype.drawFrame = function (graphicDevice, scene) {
-        var outputBuffer = graphicDevice.get_outputBuffer();
-        //outputBuffer.clear();
-        var renderer3d = new Renderer3d(outputBuffer);
-        renderer3d.drawScene(this.scene);
-        graphicDevice.presentOutputBuffer();
+    App.prototype.createRenderer = function (graphicOutput) {
+        var renderOutput = new RendererOutput(graphicOutput.get_buffer(), graphicOutput.get_width(), graphicOutput.get_height());
+        return new Renderer3d(renderOutput);
+    };
+    App.prototype.drawFrame = function (graphicOutput, scene, renderer) {
+        renderer.output.clear();
+        renderer.drawScene(this.scene);
+        graphicOutput.drawBuffer();
+    };
+    App.prototype.drawFps = function (graphicalOutput, fps) {
+        graphicalOutput.drawText(fps.toString(), 10, 30);
     };
     App.prototype.handleKeyboardEvent = function (eventArgs, scene) {
     };

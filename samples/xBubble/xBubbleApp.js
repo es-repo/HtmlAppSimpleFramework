@@ -6,8 +6,8 @@ var __extends = this.__extends || function (d, b) {
 };
 var XBubbleApp = (function (_super) {
     __extends(XBubbleApp, _super);
-    function XBubbleApp(graphicDevice, inputControllerHandlers) {
-        _super.call(this, graphicDevice, inputControllerHandlers);
+    function XBubbleApp(graphicOutput, inputControllerHandlers) {
+        _super.call(this, graphicOutput, inputControllerHandlers);
     }
     XBubbleApp.prototype.createScene = function (continuation) {
         continuation(new XBubbleScene());

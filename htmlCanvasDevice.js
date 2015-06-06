@@ -4,36 +4,35 @@ var __extends = this.__extends || function (d, b) {
     __.prototype = b.prototype;
     d.prototype = new __();
 };
-var HtmlCanvasDevice = (function (_super) {
-    __extends(HtmlCanvasDevice, _super);
-    function HtmlCanvasDevice(canvasId) {
+var HtmlCanvasOutput = (function (_super) {
+    __extends(HtmlCanvasOutput, _super);
+    function HtmlCanvasOutput(canvasId) {
         _super.call(this);
         var canvas = document.getElementById(canvasId);
         this.workingContext = canvas.getContext("2d");
-        this.internalOutputBuffer = this.workingContext.getImageData(0, 0, canvas.width, canvas.height);
-        this.outputBuffer = new GraphicOutputBuffer(this.internalOutputBuffer.data, canvas.width, canvas.height);
+        this.outputBuffer = this.workingContext.getImageData(0, 0, canvas.width, canvas.height);
     }
-    HtmlCanvasDevice.prototype.get_outputWidth = function () {
+    HtmlCanvasOutput.prototype.get_width = function () {
         return this.workingContext.canvas.width;
     };
-    HtmlCanvasDevice.prototype.get_outputHeight = function () {
+    HtmlCanvasOutput.prototype.get_height = function () {
         return this.workingContext.canvas.height;
     };
-    HtmlCanvasDevice.prototype.get_outputBuffer = function () {
-        return this.outputBuffer;
+    HtmlCanvasOutput.prototype.get_buffer = function () {
+        return this.outputBuffer.data;
     };
-    HtmlCanvasDevice.prototype.presentOutputBuffer = function () {
-        this.workingContext.putImageData(this.internalOutputBuffer, 0, 0);
+    HtmlCanvasOutput.prototype.drawBuffer = function () {
+        this.workingContext.putImageData(this.outputBuffer, 0, 0);
     };
-    HtmlCanvasDevice.prototype.drawFps = function (fps) {
+    HtmlCanvasOutput.prototype.drawFps = function (fps) {
         this.workingContext.font = "30px Verdana";
-        var gradient = this.workingContext.createLinearGradient(0, 0, this.get_outputWidth() / 6, 0);
+        var gradient = this.workingContext.createLinearGradient(0, 0, this.get_width() / 6, 0);
         gradient.addColorStop(0, "magenta");
         gradient.addColorStop(0.5, "blue");
         gradient.addColorStop(1.0, "red");
         this.workingContext.fillStyle = gradient;
         this.workingContext.fillText(fps.toString(), 10, 30);
     };
-    return HtmlCanvasDevice;
-})(GraphicDevice);
+    return HtmlCanvasOutput;
+})(GraphicOutput);
 //# sourceMappingURL=htmlCanvasDevice.js.map

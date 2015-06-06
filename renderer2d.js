@@ -1,17 +1,24 @@
-var Renderer2d = (function () {
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Renderer2d = (function (_super) {
+    __extends(Renderer2d, _super);
     function Renderer2d(output) {
-        this.output = output;
+        _super.call(this, output);
     }
     Renderer2d.prototype.drawPoint = function (x, y, z, color) {
         if (x >= 0 && y >= 0 && x < this.output.width && y < this.output.height) {
             var index = ((x >> 0) + (y >> 0) * this.output.width);
-            if (this.output.depthData[index] >= z) {
-                this.output.depthData[index] = z;
+            if (this.output.depthBuffer[index] >= z) {
+                this.output.depthBuffer[index] = z;
                 var index4 = index * 4;
-                this.output.colorData[index4] = color.r * 255;
-                this.output.colorData[index4 + 1] = color.g * 255;
-                this.output.colorData[index4 + 2] = color.b * 255;
-                this.output.colorData[index4 + 3] = color.a * 255;
+                this.output.colorBuffer[index4] = color.r * 255;
+                this.output.colorBuffer[index4 + 1] = color.g * 255;
+                this.output.colorBuffer[index4 + 2] = color.b * 255;
+                this.output.colorBuffer[index4 + 3] = color.a * 255;
             }
         }
     };
@@ -70,5 +77,5 @@ var Renderer2d = (function () {
                     this.drawPoint(cx + x, cy + y, z, color);
     };
     return Renderer2d;
-})();
+})(Renderer);
 //# sourceMappingURL=renderer2d.js.map

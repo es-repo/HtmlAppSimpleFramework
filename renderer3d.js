@@ -1,7 +1,14 @@
 // THE CODE IS BASED ON http://blogs.msdn.com/b/davrous/archive/2013/06/13/tutorial-series-learning-how-to-write-a-3d-soft-engine-from-scratch-in-c-typescript-or-javascript.aspx
-var Renderer3d = (function () {
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Renderer3d = (function (_super) {
+    __extends(Renderer3d, _super);
     function Renderer3d(output) {
-        this.output = output;
+        _super.call(this, output);
         this.renderer2d = new Renderer2d(output);
     }
     Renderer3d.prototype.projectScene = function (scene) {
@@ -255,5 +262,5 @@ var Renderer3d = (function () {
         return Math.max(0, BABYLON.Vector3.Dot(normal, lightDirection));
     };
     return Renderer3d;
-})();
+})(Renderer);
 //# sourceMappingURL=renderer3d.js.map

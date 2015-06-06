@@ -7,9 +7,8 @@
     <link rel="stylesheet" href="../../app.css" type="text/css" />
 
     <script src="../../babylon.math.js"></script>
-    <script src="../../graphicOutputBuffer.js"></script>
-    <script src="../../graphicDevice.js"></script>
-    <script src="../../htmlCanvasDevice.js"></script>
+    <script src="../../graphicOutput.js"></script>
+    <script src="../../htmlCanvasOutput.js"></script>
     <script src="../../figure.js"></script>
     <script src="../../vertex.js"></script>
     <script src="../../face.js"></script>
@@ -19,6 +18,8 @@
     <script src="../../meshLoader.js"></script>
     <script src="../../camera.js"></script>
     <script src="../../scene.js"></script>
+    <script src="../../rendererOutput.js"></script>
+    <script src="../../renderer.js"></script>
     <script src="../../renderer2d.js"></script>
     <script src="../../renderer3d.js"></script>
     <script src="../../phisics.js"></script>
@@ -41,7 +42,7 @@
         var inputDevices = new InputDevices();
         inputDevices.keyboard = new HtmlKeyboard();
         inputDevices.mouse = new HtmlMouse("canvas");
-        var app = new D3ObjectApp(new HtmlCanvasDevice("canvas"), inputDevices);
+        var app = new D3ObjectApp(new HtmlCanvasOutput("canvas"), inputDevices);
         app.start();
     };
 </script>

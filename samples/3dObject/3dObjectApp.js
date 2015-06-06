@@ -6,8 +6,8 @@ var __extends = this.__extends || function (d, b) {
 };
 var D3ObjectApp = (function (_super) {
     __extends(D3ObjectApp, _super);
-    function D3ObjectApp(graphicDevice, inputControllerHandlers) {
-        _super.call(this, graphicDevice, inputControllerHandlers);
+    function D3ObjectApp(graphicOutput, inputControllerHandlers) {
+        _super.call(this, graphicOutput, inputControllerHandlers);
         this.rotateVector = new BABYLON.Vector3(0, D3ObjectApp.rotateDelta, 0);
     }
     D3ObjectApp.prototype.createScene = function (continuation) {

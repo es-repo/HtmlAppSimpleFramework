@@ -1,14 +1,15 @@
 ﻿class App {
     
-    private graphicDevice: GraphicDevice;
+    private graphicOutput: GraphicOutput;
+    private renderer: Renderer;
     private scene: Scene;
     private phisics: Phisics;
     private inputDevices: InputDevices;
 
     private previousFrameTime: number;
 
-    constructor(graphicDevice: GraphicDevice, inputDevices: InputDevices) {
-        this.graphicDevice = graphicDevice;
+    constructor(graphicOutput: GraphicOutput, inputDevices: InputDevices) {
+        this.graphicOutput = graphicOutput;
         this.phisics = new Phisics();
         this.inputDevices = inputDevices;
     }
@@ -16,6 +17,8 @@
     start() {
         this.createScene((scene) => {
             this.scene = scene;
+            this.renderer = this.createRenderer(this.graphicOutput);
+
             requestAnimationFrame(() => this.appLoop());
 
             if (this.inputDevices.keyboard != null)
@@ -33,8 +36,8 @@
         this.previousFrameTime = now;
         
         this.processScene(this.scene, this.phisics);
-        this.drawFrame(this.graphicDevice, this.scene);
-        this.graphicDevice.drawFps(fps);
+        this.drawFrame(this.graphicOutput, this.scene, this.renderer);
+        this.drawFps(this.graphicOutput, fps);
         requestAnimationFrame(() => this.appLoop());
     }
 
@@ -45,13 +48,19 @@
     protected processScene(scene: Scene, phisics: Phisics) {
     }
 
-    protected drawFrame(graphicDevice: GraphicDevice, scene: Scene) {
+    protected createRenderer(graphicOutput: GraphicOutput) : Renderer {
+        var renderOutput = new RendererOutput(graphicOutput.get_buffer(), graphicOutput.get_width(), graphicOutput.get_height());
+        return new Renderer3d(renderOutput);
+    }
 
-        var outputBuffer = graphicDevice.get_outputBuffer();
-        //outputBuffer.clear();
-        var renderer3d = new Renderer3d(outputBuffer);
-        renderer3d.drawScene(this.scene);
-        graphicDevice.presentOutputBuffer();
+    protected drawFrame(graphicOutput: GraphicOutput, scene: Scene, renderer: Renderer) {
+        renderer.output.clear();
+        (<Renderer3d>renderer).drawScene(this.scene);
+        graphicOutput.drawBuffer();
+    }
+
+    private drawFps(graphicalOutput: GraphicOutput, fps: number) {
+        graphicalOutput.drawText(fps.toString(), 10, 30);
     }
 
     protected handleKeyboardEvent(eventArgs: KeyboardEventArgs, scene: Scene) {

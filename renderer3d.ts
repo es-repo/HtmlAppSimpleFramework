@@ -1,12 +1,11 @@
 ﻿// THE CODE IS BASED ON http://blogs.msdn.com/b/davrous/archive/2013/06/13/tutorial-series-learning-how-to-write-a-3d-soft-engine-from-scratch-in-c-typescript-or-javascript.aspx
 
-class Renderer3d {
+class Renderer3d extends Renderer {
 
-    private output: GraphicOutputBuffer;
     public renderer2d: Renderer2d;
 
-    constructor(output: GraphicOutputBuffer) {
-        this.output = output;
+    constructor(output: RendererOutput) {
+        super(output);
         this.renderer2d = new Renderer2d(output);
     }
 
@@ -329,14 +328,4 @@ class Renderer3d {
 
         return Math.max(0, BABYLON.Vector3.Dot(normal, lightDirection));
     }
-
-    //private unprojectVector(v: BABYLON.Vector3, view: BABYLON.Matrix, projection: BABYLON.Matrix): BABYLON.Vector3 {
-
-    //    var world = BABYLON.Matrix.Identity();
-    //    var matrix = world.multiply(view).multiply(projection);
-    //    matrix.invert();
-    //    v.x = v.x / this.graphicDevice.get_workingWidth() * 2 - 1;
-    //    v.y = -(v.y / this.graphicDevice.get_workingHeight() * 2 - 1);
-    //    return BABYLON.Vector3.TransformCoordinates(v, matrix);
-    //}
 }
