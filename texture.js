@@ -7,7 +7,6 @@ var Texture = (function () {
     Texture.prototype.load = function (filename) {
         var _this = this;
         var image = new Image();
-        image.crossOrigin = "Anonymous";
         image.height = this.height;
         image.width = this.width;
         image.onload = function () {

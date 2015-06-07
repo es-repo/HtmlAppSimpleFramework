@@ -12,7 +12,6 @@
 
     public load(filename: string): void {
         var image = new Image();
-        image.crossOrigin = "Anonymous";
         image.height = this.height;
         image.width = this.width;
         image.onload = () => {

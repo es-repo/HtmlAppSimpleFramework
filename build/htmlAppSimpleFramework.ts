@@ -563,7 +563,6 @@ class Texture {
 
     public load(filename: string): void {
         var image = new Image();
-        image.crossOrigin = "Anonymous";
         image.height = this.height;
         image.width = this.width;
         image.onload = () => {
@@ -732,6 +731,7 @@ class MeshFactory {
     public static createFromBabylonAndTextureBase64Data(json: {babylonData:any; textureBase64Data: string}): Mesh[] {
         var meshes = MeshFactory.createFromBabylonData(json.babylonData, false);
         for (var i = 0; i < meshes.length; i++) {
+            debugger
             meshes[i].texture.load(json.textureBase64Data);
         }
         return meshes;

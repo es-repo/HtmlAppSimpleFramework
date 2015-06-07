@@ -24,7 +24,7 @@ class Object3dApp extends App {
         this.rotateScene(scene, new BABYLON.Vector3(0, Math.PI, 0));
         continuation((scene));
             
-        //MeshFactory.loadFromJsonFileAsync("monkey.babylon", meshes => {
+        //MeshFactory.loadFromBabylonJsonFileAsync("monkey.babylon", meshes => {
         //    var scene = new Scene();
         //    scene.figures = meshes;
         //    scene.camera.position.z = 10;

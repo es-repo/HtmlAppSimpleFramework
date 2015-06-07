@@ -567,7 +567,6 @@ var Texture = (function () {
     Texture.prototype.load = function (filename) {
         var _this = this;
         var image = new Image();
-        image.crossOrigin = "Anonymous";
         image.height = this.height;
         image.width = this.width;
         image.onload = function () {
@@ -710,6 +709,7 @@ var MeshFactory = (function () {
     MeshFactory.createFromBabylonAndTextureBase64Data = function (json) {
         var meshes = MeshFactory.createFromBabylonData(json.babylonData, false);
         for (var i = 0; i < meshes.length; i++) {
+            debugger;
             meshes[i].texture.load(json.textureBase64Data);
         }
         return meshes;
