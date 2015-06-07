@@ -1,6 +1,12 @@
 ﻿// THE CODE IS BASED ON http://blogs.msdn.com/b/davrous/archive/2013/06/13/tutorial-series-learning-how-to-write-a-3d-soft-engine-from-scratch-in-c-typescript-or-javascript.aspx
 
+class Renderer3dSettings {
+    public showTextures: boolean = true;
+}
+
 class Renderer3d extends Renderer {
+
+    public renderSettings: Renderer3dSettings = new Renderer3dSettings();
 
     public renderer2d: Renderer2d;
 
@@ -108,7 +114,7 @@ class Renderer3d extends Renderer {
             var vc = m.projectedVertices[currentFace.c];
 
             var color = 1.0;
-            this.drawTriangle(va, vb, vc, new BABYLON.Color4(color, color, color, 1), m.texture);
+            this.drawTriangle(va, vb, vc, new BABYLON.Color4(color, color, color, 1), this.renderSettings.showTextures ? m.texture : null);
         }
     }
 

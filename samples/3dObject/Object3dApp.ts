@@ -1,4 +1,8 @@
-﻿class Object3dApp extends App {
+﻿class Settings {
+
+}
+
+class Object3dApp extends App {
 
     private static rotateDelta: number = 0.01; 
     private rotateVector: BABYLON.Vector3;
@@ -6,11 +10,14 @@
     constructor(graphicOutput: GraphicOutput, inputControllerHandlers: InputDevices) {
         super(graphicOutput, inputControllerHandlers);
         this.rotateVector = new BABYLON.Vector3(0, Object3dApp.rotateDelta, 0);
+
+        var showTexturesCheckBox = <HTMLInputElement>document.getElementById("showTexturesCheckBox");
+        showTexturesCheckBox.addEventListener("click", ev => this.renderer3d.renderSettings.showTextures = showTexturesCheckBox.checked);
     }
 
     protected createScene(continuation: (Scene: Scene) => void) {
 
-        var meshes = MeshFactory.createFromBabylonAndtextureBase64Data(Objects3dLib.monkey);
+        var meshes = MeshFactory.createFromBabylonAndTextureBase64Data(Objects3dLib.monkey);
         var scene = new Scene();
         scene.figures = meshes;
         scene.camera.position.z = 10;
@@ -26,8 +33,8 @@
         //});
     }
 
-    protected processScene(scene: Scene, phisics: Phisics) {
-        this.rotateScene(scene, this.rotateVector);
+    protected doLogicStep() {
+        this.rotateScene(this.scene, this.rotateVector);
     }
 
     private rotateScene(scene: Scene, rotationDelta: BABYLON.Vector3) {
@@ -39,17 +46,17 @@
         }
     }
 
-    protected handleKeyboardEvent(eventArgs: KeyboardEventArgs, scene: Scene) {
+    protected handleKeyboardEvent(eventArgs: KeyboardEventArgs) {
 
         var k = eventArgs.pressedKey; 
         var cameraDelta = 3;
 
         if (k == 189) {
-            scene.camera.position.z += cameraDelta;
+            this.scene.camera.position.z += cameraDelta;
         }
 
         if (k == 187) {
-            scene.camera.position.z -= cameraDelta;
+            this.scene.camera.position.z -= cameraDelta;
         }
 
         var rotateDelta = 0.01;
@@ -75,14 +82,14 @@
         }
     }
 
-    protected handleMouseEvent(eventArgs: MouseEventArgs, scene: Scene) {
+    protected handleMouseEvent(eventArgs: MouseEventArgs) {
 
         if (eventArgs.leftButtonClicked) {
             this.rotateVector = new BABYLON.Vector3(-eventArgs.deltaY, -eventArgs.deltaX, 0);
             this.rotateVector = this.rotateVector.scale(0.003);
         }
         
-        scene.camera.position.z += eventArgs.wheelDelta / 100;
+        this.scene.camera.position.z += eventArgs.wheelDelta / 100;
     }
 }
 

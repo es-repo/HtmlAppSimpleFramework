@@ -2,7 +2,7 @@
 var MeshFactory = (function () {
     function MeshFactory() {
     }
-    MeshFactory.loadFromJsonFileAsync = function (fileName, callback) {
+    MeshFactory.loadFromBabylonJsonFileAsync = function (fileName, callback) {
         var jsonObject = {};
         var xmlhttp = new XMLHttpRequest();
         xmlhttp.open("GET", fileName, true);
@@ -95,7 +95,7 @@ var MeshFactory = (function () {
         }
         return meshes;
     };
-    MeshFactory.createFromBabylonAndtextureBase64Data = function (json) {
+    MeshFactory.createFromBabylonAndTextureBase64Data = function (json) {
         var meshes = MeshFactory.createFromBabylonData(json.babylonData, false);
         for (var i = 0; i < meshes.length; i++) {
             meshes[i].texture.load(json.textureBase64Data);

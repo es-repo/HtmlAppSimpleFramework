@@ -617,7 +617,7 @@ class Mesh extends Figure {
 
 class MeshFactory {
 
-    public static loadFromJsonFileAsync(fileName: string, callback: (result: Mesh[]) => any): void {
+    public static loadFromBabylonJsonFileAsync(fileName: string, callback: (result: Mesh[]) => any): void {
         var jsonObject = {};
         var xmlhttp = new XMLHttpRequest();
         xmlhttp.open("GET", fileName, true);
@@ -625,7 +625,8 @@ class MeshFactory {
             if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
                 jsonObject = JSON.parse(xmlhttp.responseText);
                 var meshes = MeshFactory.createFromBabylonData(jsonObject);
-                callback(meshes);            }
+                callback(meshes);
+            }
         };
         xmlhttp.send(null);
     }
@@ -728,7 +729,7 @@ class MeshFactory {
         return meshes;
     }
 
-    public static createFromBabylonAndtextureBase64Data(json: {babylonData:any; textureBase64Data: string}): Mesh[] {
+    public static createFromBabylonAndTextureBase64Data(json: {babylonData:any; textureBase64Data: string}): Mesh[] {
         var meshes = MeshFactory.createFromBabylonData(json.babylonData, false);
         for (var i = 0; i < meshes.length; i++) {
             meshes[i].texture.load(json.textureBase64Data);
@@ -867,7 +868,13 @@ class Renderer2d extends Renderer {
 }
 // THE CODE IS BASED ON http://blogs.msdn.com/b/davrous/archive/2013/06/13/tutorial-series-learning-how-to-write-a-3d-soft-engine-from-scratch-in-c-typescript-or-javascript.aspx
 
+class Renderer3dSettings {
+    public showTextures: boolean = true;
+}
+
 class Renderer3d extends Renderer {
+
+    public renderSettings: Renderer3dSettings = new Renderer3dSettings();
 
     public renderer2d: Renderer2d;
 
@@ -975,7 +982,7 @@ class Renderer3d extends Renderer {
             var vc = m.projectedVertices[currentFace.c];
 
             var color = 1.0;
-            this.drawTriangle(va, vb, vc, new BABYLON.Color4(color, color, color, 1), m.texture);
+            this.drawTriangle(va, vb, vc, new BABYLON.Color4(color, color, color, 1), this.renderSettings.showTextures ? m.texture : null);
         }
     }
 
@@ -1357,73 +1364,74 @@ class InputDevices {
 }
 
 class App {
-    
-    private graphicOutput: GraphicOutput;
-    private renderer: Renderer;
-    private scene: Scene;
-    private phisics: Phisics;
-    private inputDevices: InputDevices;
 
+    protected graphicOutput: GraphicOutput;
+    protected renderer3d: Renderer3d;
+    protected scene: Scene;
+    protected phisics: Phisics;
+    protected inputDevices: InputDevices;
     private previousFrameTime: number;
 
     constructor(graphicOutput: GraphicOutput, inputDevices: InputDevices) {
         this.graphicOutput = graphicOutput;
         this.phisics = new Phisics();
         this.inputDevices = inputDevices;
+        var rendererOutput = new RendererOutput(this.graphicOutput.get_buffer(), this.graphicOutput.get_width(), this.graphicOutput.get_height());
+        this.renderer3d = new Renderer3d(rendererOutput);
     }
 
-    start() {
+    private start() {
         this.createScene((scene) => {
             this.scene = scene;
-            this.renderer = this.createRenderer(this.graphicOutput);
 
-            requestAnimationFrame(() => this.appLoop());
+            requestAnimationFrame(() => this.loopAnimation());
 
             if (this.inputDevices.keyboard != null)
-                this.inputDevices.keyboard.inputEvent.addHandler(args => this.handleKeyboardEvent(args, this.scene));
+                this.inputDevices.keyboard.inputEvent.addHandler(args => {
+                    this.handleKeyboardEvent(args);
+                });
 
             if (this.inputDevices.mouse != null)
-                this.inputDevices.mouse.inputEvent.addHandler(args => this.handleMouseEvent(args, this.scene));
+                this.inputDevices.mouse.inputEvent.addHandler(args => {
+                    this.handleMouseEvent(args);
+                });
         });
     }
 
-    private appLoop() {
+    protected createScene(continuation: (scene: Scene) => void) {
+        continuation(new Scene());
+    }
 
+    private loopAnimation() {
+        this.doAnimationStep();
+        requestAnimationFrame(() => this.loopAnimation());
+    }
+
+    private doAnimationStep() {
         var now = new Date().getTime();
         var fps = 1000.0 / (now - this.previousFrameTime) >> 0;
         this.previousFrameTime = now;
-        
-        this.processScene(this.scene, this.phisics);
-        this.drawFrame(this.graphicOutput, this.scene, this.renderer);
-        this.drawFps(this.graphicOutput, fps);
-        requestAnimationFrame(() => this.appLoop());
+        this.doLogicStep();
+        this.drawFrame();
+        this.drawFps(fps);
     }
 
-    protected createScene(continuation: (scene: Scene)=> void) {
-        continuation(new Scene());    
+    protected doLogicStep() {
     }
 
-    protected processScene(scene: Scene, phisics: Phisics) {
+    protected drawFrame() {
+        this.renderer3d.output.clear();
+        this.renderer3d.drawScene(this.scene);
+        this.graphicOutput.drawBuffer();
     }
 
-    protected createRenderer(graphicOutput: GraphicOutput) : Renderer {
-        var renderOutput = new RendererOutput(graphicOutput.get_buffer(), graphicOutput.get_width(), graphicOutput.get_height());
-        return new Renderer3d(renderOutput);
+    private drawFps(fps: number) {
+        this.graphicOutput.drawText(fps.toString(), 10, 25);
     }
 
-    protected drawFrame(graphicOutput: GraphicOutput, scene: Scene, renderer: Renderer) {
-        renderer.output.clear();
-        (<Renderer3d>renderer).drawScene(this.scene);
-        graphicOutput.drawBuffer();
+    protected handleKeyboardEvent(eventArgs: KeyboardEventArgs) {
     }
 
-    private drawFps(graphicalOutput: GraphicOutput, fps: number) {
-        graphicalOutput.drawText(fps.toString(), 10, 25);
-    }
-
-    protected handleKeyboardEvent(eventArgs: KeyboardEventArgs, scene: Scene) {
-    }
-
-    protected handleMouseEvent(eventArgs: MouseEventArgs, scene: Scene) {
+    protected handleMouseEvent(eventArgs: MouseEventArgs) {
     }
 }

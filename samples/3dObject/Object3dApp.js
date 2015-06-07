@@ -4,14 +4,22 @@ var __extends = this.__extends || function (d, b) {
     __.prototype = b.prototype;
     d.prototype = new __();
 };
+var Settings = (function () {
+    function Settings() {
+    }
+    return Settings;
+})();
 var Object3dApp = (function (_super) {
     __extends(Object3dApp, _super);
     function Object3dApp(graphicOutput, inputControllerHandlers) {
+        var _this = this;
         _super.call(this, graphicOutput, inputControllerHandlers);
         this.rotateVector = new BABYLON.Vector3(0, Object3dApp.rotateDelta, 0);
+        var showTexturesCheckBox = document.getElementById("showTexturesCheckBox");
+        showTexturesCheckBox.addEventListener("click", function (ev) { return _this.renderer3d.renderSettings.showTextures = showTexturesCheckBox.checked; });
     }
     Object3dApp.prototype.createScene = function (continuation) {
-        var meshes = MeshFactory.createFromBabylonAndtextureBase64Data(Objects3dLib.monkey);
+        var meshes = MeshFactory.createFromBabylonAndTextureBase64Data(Objects3dLib.monkey);
         var scene = new Scene();
         scene.figures = meshes;
         scene.camera.position.z = 10;
@@ -25,8 +33,8 @@ var Object3dApp = (function (_super) {
         //    continuation((scene));
         //});
     };
-    Object3dApp.prototype.processScene = function (scene, phisics) {
-        this.rotateScene(scene, this.rotateVector);
+    Object3dApp.prototype.doLogicStep = function () {
+        this.rotateScene(this.scene, this.rotateVector);
     };
     Object3dApp.prototype.rotateScene = function (scene, rotationDelta) {
         for (var i = 0; i < scene.figures.length; i++) {
@@ -36,14 +44,14 @@ var Object3dApp = (function (_super) {
             m.rotation.z += rotationDelta.z;
         }
     };
-    Object3dApp.prototype.handleKeyboardEvent = function (eventArgs, scene) {
+    Object3dApp.prototype.handleKeyboardEvent = function (eventArgs) {
         var k = eventArgs.pressedKey;
         var cameraDelta = 3;
         if (k == 189) {
-            scene.camera.position.z += cameraDelta;
+            this.scene.camera.position.z += cameraDelta;
         }
         if (k == 187) {
-            scene.camera.position.z -= cameraDelta;
+            this.scene.camera.position.z -= cameraDelta;
         }
         var rotateDelta = 0.01;
         if (k == 37) {
@@ -62,12 +70,12 @@ var Object3dApp = (function (_super) {
             this.rotateVector = new BABYLON.Vector3(0, 0, 0);
         }
     };
-    Object3dApp.prototype.handleMouseEvent = function (eventArgs, scene) {
+    Object3dApp.prototype.handleMouseEvent = function (eventArgs) {
         if (eventArgs.leftButtonClicked) {
             this.rotateVector = new BABYLON.Vector3(-eventArgs.deltaY, -eventArgs.deltaX, 0);
             this.rotateVector = this.rotateVector.scale(0.003);
         }
-        scene.camera.position.z += eventArgs.wheelDelta / 100;
+        this.scene.camera.position.z += eventArgs.wheelDelta / 100;
     };
     Object3dApp.rotateDelta = 0.01;
     return Object3dApp;

@@ -12,8 +12,8 @@ var XBubbleApp = (function (_super) {
     XBubbleApp.prototype.createScene = function (continuation) {
         continuation(new XBubbleScene());
     };
-    XBubbleApp.prototype.processScene = function (scene, phisics) {
-        var xBubbleScene = scene;
+    XBubbleApp.prototype.doLogicStep = function () {
+        var xBubbleScene = this.scene;
         if (this.gameOver)
             return;
         if (xBubbleScene.player.isAnnihilated()) {
@@ -33,7 +33,7 @@ var XBubbleApp = (function (_super) {
                 b.color = xBubbleScene.player.canAbsorb(b) ? Bubble.canBeAbsorbedColor : xBubbleScene.player.canDamage(b) ? Bubble.canDamageColor : Bubble.canAnnihilateColor;
             }
         }
-        var collidedWith = phisics.detectCollision(xBubbleScene, xBubbleScene.player);
+        var collidedWith = this.phisics.detectCollision(xBubbleScene, xBubbleScene.player);
         for (var i = 0; i < collidedWith.length; i++) {
             var f = collidedWith[i];
             if (f instanceof Bubble) {
@@ -51,15 +51,15 @@ var XBubbleApp = (function (_super) {
             }
         }
     };
-    XBubbleApp.prototype.handleKeyboardEvent = function (eventArgs, scene) {
+    XBubbleApp.prototype.handleKeyboardEvent = function (eventArgs) {
         var k = eventArgs.pressedKey;
-        var xBubbleScene = scene;
+        var xBubbleScene = this.scene;
         var cameraDelta = 3;
         if (k == 189) {
-            scene.camera.position.z += cameraDelta;
+            this.scene.camera.position.z += cameraDelta;
         }
         if (k == 187) {
-            scene.camera.position.z -= cameraDelta;
+            this.scene.camera.position.z -= cameraDelta;
         }
         if (k == 37) {
             xBubbleScene.player.moveVector.x += xBubbleScene.player.moveDelta;
@@ -74,9 +74,9 @@ var XBubbleApp = (function (_super) {
             xBubbleScene.player.moveVector.y -= xBubbleScene.player.moveDelta;
         }
     };
-    XBubbleApp.prototype.handleMouseEvent = function (eventArgs, scene) {
-        var xBubbleScene = scene;
-        scene.camera.position.z += eventArgs.wheelDelta / 50;
+    XBubbleApp.prototype.handleMouseEvent = function (eventArgs) {
+        var xBubbleScene = this.scene;
+        this.scene.camera.position.z += eventArgs.wheelDelta / 50;
         if (eventArgs.leftButtonClicked) {
             var mv = new BABYLON.Vector3(eventArgs.x, eventArgs.y, 0);
             var dv = xBubbleScene.player.projectedPosition.subtract(mv);

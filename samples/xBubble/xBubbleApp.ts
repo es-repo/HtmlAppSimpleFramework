@@ -10,8 +10,8 @@
         continuation(new XBubbleScene());
     }
 
-    protected processScene(scene: Scene, phisics: Phisics) {
-        var xBubbleScene = <XBubbleScene>scene;
+    protected doLogicStep() {
+        var xBubbleScene = <XBubbleScene>this.scene;
 
         if (this.gameOver) return;
 
@@ -38,7 +38,7 @@
             }
         }
 
-        var collidedWith = phisics.detectCollision(xBubbleScene, xBubbleScene.player);
+        var collidedWith = this.phisics.detectCollision(xBubbleScene, xBubbleScene.player);
         for (var i = 0; i < collidedWith.length; i++) {
             var f = collidedWith[i];
             if (f instanceof Bubble) {
@@ -58,19 +58,19 @@
         }
     }
 
-    protected handleKeyboardEvent(eventArgs: KeyboardEventArgs, scene: Scene) {
+    protected handleKeyboardEvent(eventArgs: KeyboardEventArgs) {
 
         var k = eventArgs.pressedKey;
-        var xBubbleScene = <XBubbleScene>scene;
+        var xBubbleScene = <XBubbleScene>this.scene;
 
         var cameraDelta = 3;
 
         if (k == 189) {
-            scene.camera.position.z += cameraDelta;
+            this.scene.camera.position.z += cameraDelta;
         }
 
         if (k == 187) {
-            scene.camera.position.z -= cameraDelta;
+            this.scene.camera.position.z -= cameraDelta;
         }
 
         if (k == 37) {
@@ -90,11 +90,11 @@
         }
     }
 
-    protected handleMouseEvent(eventArgs: MouseEventArgs, scene: Scene) {
+    protected handleMouseEvent(eventArgs: MouseEventArgs) {
 
-        var xBubbleScene = <XBubbleScene>scene;
+        var xBubbleScene = <XBubbleScene>this.scene;
 
-        scene.camera.position.z += eventArgs.wheelDelta / 50;
+        this.scene.camera.position.z += eventArgs.wheelDelta / 50;
 
         if (eventArgs.leftButtonClicked) {
             var mv = new BABYLON.Vector3(eventArgs.x, eventArgs.y, 0);

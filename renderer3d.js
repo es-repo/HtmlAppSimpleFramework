@@ -5,10 +5,17 @@ var __extends = this.__extends || function (d, b) {
     __.prototype = b.prototype;
     d.prototype = new __();
 };
+var Renderer3dSettings = (function () {
+    function Renderer3dSettings() {
+        this.showTextures = true;
+    }
+    return Renderer3dSettings;
+})();
 var Renderer3d = (function (_super) {
     __extends(Renderer3d, _super);
     function Renderer3d(output) {
         _super.call(this, output);
+        this.renderSettings = new Renderer3dSettings();
         this.renderer2d = new Renderer2d(output);
     }
     Renderer3d.prototype.projectScene = function (scene) {
@@ -83,7 +90,7 @@ var Renderer3d = (function (_super) {
             var vb = m.projectedVertices[currentFace.b];
             var vc = m.projectedVertices[currentFace.c];
             var color = 1.0;
-            this.drawTriangle(va, vb, vc, new BABYLON.Color4(color, color, color, 1), m.texture);
+            this.drawTriangle(va, vb, vc, new BABYLON.Color4(color, color, color, 1), this.renderSettings.showTextures ? m.texture : null);
         }
     };
     Renderer3d.prototype.drawTriangle = function (v1, v2, v3, color, texture) {

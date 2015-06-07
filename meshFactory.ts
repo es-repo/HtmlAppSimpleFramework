@@ -2,7 +2,7 @@
 
 class MeshFactory {
 
-    public static loadFromJsonFileAsync(fileName: string, callback: (result: Mesh[]) => any): void {
+    public static loadFromBabylonJsonFileAsync(fileName: string, callback: (result: Mesh[]) => any): void {
         var jsonObject = {};
         var xmlhttp = new XMLHttpRequest();
         xmlhttp.open("GET", fileName, true);
@@ -10,7 +10,8 @@ class MeshFactory {
             if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
                 jsonObject = JSON.parse(xmlhttp.responseText);
                 var meshes = MeshFactory.createFromBabylonData(jsonObject);
-                callback(meshes);            }
+                callback(meshes);
+            }
         };
         xmlhttp.send(null);
     }
@@ -113,7 +114,7 @@ class MeshFactory {
         return meshes;
     }
 
-    public static createFromBabylonAndtextureBase64Data(json: {babylonData:any; textureBase64Data: string}): Mesh[] {
+    public static createFromBabylonAndTextureBase64Data(json: {babylonData:any; textureBase64Data: string}): Mesh[] {
         var meshes = MeshFactory.createFromBabylonData(json.babylonData, false);
         for (var i = 0; i < meshes.length; i++) {
             meshes[i].texture.load(json.textureBase64Data);
