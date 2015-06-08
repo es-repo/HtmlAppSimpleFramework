@@ -473,13 +473,67 @@
         }
     }
 }
+class Array1dAs2d<T> {
+    public array: T[];
+    public width: number;
+    public height: number;
+    private step: number;
+
+    constructor(array: T[], width: number, step: number = 1) {
+        this.array = array;
+        this.width = width;
+        this.height = array.length / width / step;
+        this.step = step;
+    }
+
+    public get_index(x: number, y: number) {
+        return (y * this.width + x) * this.step; 
+    }
+
+    public get(x: number, y: number) {
+        return this.array[this.get_index(x, y)];
+    }
+
+    public set(x: number, y: number, v: T) {
+        return this.array[this.get_index(x, y)] = v;
+    }
+
+    public setAll(v: T) {
+        for (var i = 0; i < this.array.length; i++)
+            this.array[i] = v;
+    }
+
+    public copy(source: Array1dAs2d<T>, sourceX: number, sourceY, sourceWidth: number, sourceHeight: number, destX: number, destY) {
+        for (var y = 0; y < sourceHeight; y++) {
+            var sourceIndex = this.get_index(sourceX, sourceY + y);
+            var destIndex = this.get_index(destX, destY + y);
+            for (var x = 0; x < sourceWidth * this.step; x++) {
+                this.array[destIndex + x] = source[sourceIndex + x];
+            } 
+        }
+    }
+}
+class ColorBuffer extends Array1dAs2d<number> {
+
+    constructor(array: number[], width: number) {
+        super(array, width, 4);
+    }
+
+    public setColor(x: number, y: number, c: BABYLON.Color4) {
+        var i = this.get_index(x, y);
+        this.array[i] = c.r * 255;
+        this.array[i + 1] = c.g * 255;
+        this.array[i + 2] = c.b * 255;
+        this.array[i + 3] = c.a * 255;
+    }
+}
 class GraphicOutput {
     
     public get_width(): number { throw new Error("Abstract method.");}
 
     public get_height(): number { throw new Error("Abstract method."); }
 
-    public get_buffer(): number[] { throw new Error("Abstract method."); }
+    public get_buffer(): ColorBuffer { throw new Error("Abstract method."); }
 
     public drawBuffer() { throw new Error("Abstract method."); }
 
@@ -488,23 +542,25 @@ class GraphicOutput {
 class HtmlCanvasOutput extends GraphicOutput {
     
     private canvasContext: CanvasRenderingContext2D;
-    private outputBuffer: ImageData;
+    private canvasImageData: ImageData;
+    private colorBuffer: ColorBuffer;
 
     constructor(canvasId: string) {
         super();
         var canvas = <HTMLCanvasElement> document.getElementById(canvasId);
         this.canvasContext = canvas.getContext("2d");
-        this.outputBuffer = this.canvasContext.getImageData(0, 0, canvas.width, canvas.height);
+        this.canvasImageData = this.canvasContext.getImageData(0, 0, canvas.width, canvas.height);
+        this.colorBuffer = new ColorBuffer(this.canvasImageData.data, canvas.width);
     }
 
     public get_width() { return this.canvasContext.canvas.width; }
 
     public get_height() { return this.canvasContext.canvas.height; }
 
-    public get_buffer(): number[] { return this.outputBuffer.data; }
+    public get_buffer(): ColorBuffer { return this.colorBuffer; }
 
     public drawBuffer() {
-        this.canvasContext.putImageData(this.outputBuffer, 0, 0);
+        this.canvasContext.putImageData(this.canvasImageData, 0, 0);
     }
 
     public drawText(text: string, x: number, y: number, color: string = "ffffff", size: number = 20, font: string = "Verdana") {
@@ -750,25 +806,26 @@ class Camera {
  }
 class RendererOutput {
     
-    public colorBuffer: number[];
-    public depthBuffer: number[];
+    public colorBuffer: ColorBuffer;
+    public depthBuffer: Array1dAs2d<number>;
     public width: number;
     public height: number;
 
-    constructor(colorBuffer: number[], w: number, h: number) {
+    constructor(colorBuffer: ColorBuffer) {
         this.colorBuffer = colorBuffer;
-        this.width = w;
-        this.height = h;
-        this.depthBuffer = new Array(w * h);
+        this.width = colorBuffer.width;
+        this.height = colorBuffer.height;
+        this.depthBuffer = new Array1dAs2d(new Array(colorBuffer.width * colorBuffer.height), colorBuffer.width);
         this.clear();
     }
 
     public clear() {
-        for (var i = 0; i < this.depthBuffer.length; i++) {
-            var i4: number = i * 4;
-            this.colorBuffer[i4] = this.colorBuffer[i4 + 1] = this.colorBuffer[i4 + 2]   = 0;
-            this.colorBuffer[i4 + 3] = 1;
-            this.depthBuffer[i] = 10000000; // Max possible value 
+        for (var i = 0; i < this.colorBuffer.array.length; i++) {
+            this.colorBuffer.array[i] = 0;  
+        }
+
+        for (var i = 0; i < this.depthBuffer.array.length; i++) {
+            this.depthBuffer.array[i] = 10000000; // Max possible value 
         }
     }
 }
@@ -786,19 +843,13 @@ class Renderer2d extends Renderer {
     }
 
     public drawPoint(x: number, y: number, z: number, color: BABYLON.Color4): void {
-
+        x = x >> 0;
+        y = y >> 0;
         if (x >= 0 && y >= 0 && x < this.output.width && y < this.output.height) {
 
-            var index: number = ((x >> 0) + (y >> 0) * this.output.width);
-
-            if (this.output.depthBuffer[index] >= z) {
-                this.output.depthBuffer[index] = z;
-
-                var index4: number = index * 4;
-                this.output.colorBuffer[index4] = color.r * 255;
-                this.output.colorBuffer[index4 + 1] = color.g * 255;
-                this.output.colorBuffer[index4 + 2] = color.b * 255;
-                this.output.colorBuffer[index4 + 3] = color.a * 255;
+            if (this.output.depthBuffer.get(x, y) >= z) {
+                this.output.depthBuffer.set(x, y, z);
+                this.output.colorBuffer.setColor(x, y, color);
             }
         }
     }
@@ -1375,11 +1426,11 @@ class App {
         this.graphicOutput = graphicOutput;
         this.phisics = new Phisics();
         this.inputDevices = inputDevices;
-        var rendererOutput = new RendererOutput(this.graphicOutput.get_buffer(), this.graphicOutput.get_width(), this.graphicOutput.get_height());
-        this.renderer3d = new Renderer3d(rendererOutput);
+        this.renderer3d = new Renderer3d(this.createRendererOutput());
     }
 
     private start() {
+        this.onStart();
         this.createScene((scene) => {
             this.scene = scene;
 
@@ -1395,6 +1446,12 @@ class App {
                     this.handleMouseEvent(args);
                 });
         });
+    }
+
+    protected onStart() {}
+
+    protected createRendererOutput(): RendererOutput {
+        return new RendererOutput(this.graphicOutput.get_buffer());
     }
 
     protected createScene(continuation: (scene: Scene) => void) {

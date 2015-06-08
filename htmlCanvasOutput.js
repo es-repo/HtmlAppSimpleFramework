@@ -10,7 +10,8 @@ var HtmlCanvasOutput = (function (_super) {
         _super.call(this);
         var canvas = document.getElementById(canvasId);
         this.canvasContext = canvas.getContext("2d");
-        this.outputBuffer = this.canvasContext.getImageData(0, 0, canvas.width, canvas.height);
+        this.canvasImageData = this.canvasContext.getImageData(0, 0, canvas.width, canvas.height);
+        this.colorBuffer = new ColorBuffer(this.canvasImageData.data, canvas.width);
     }
     HtmlCanvasOutput.prototype.get_width = function () {
         return this.canvasContext.canvas.width;
@@ -19,10 +20,10 @@ var HtmlCanvasOutput = (function (_super) {
         return this.canvasContext.canvas.height;
     };
     HtmlCanvasOutput.prototype.get_buffer = function () {
-        return this.outputBuffer.data;
+        return this.colorBuffer;
     };
     HtmlCanvasOutput.prototype.drawBuffer = function () {
-        this.canvasContext.putImageData(this.outputBuffer, 0, 0);
+        this.canvasContext.putImageData(this.canvasImageData, 0, 0);
     };
     HtmlCanvasOutput.prototype.drawText = function (text, x, y, color, size, font) {
         if (color === void 0) { color = "ffffff"; }

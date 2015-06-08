@@ -1,8 +1,4 @@
-﻿class Settings {
-
-}
-
-class Object3dApp extends App {
+﻿class Object3dApp extends App {
 
     private static rotateDelta: number = 0.01; 
     private rotateVector: BABYLON.Vector3;

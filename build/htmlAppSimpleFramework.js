@@ -466,6 +466,52 @@ var BABYLON;
     })();
     BABYLON.Matrix = Matrix;
 })(BABYLON || (BABYLON = {}));
+var Array1dAs2d = (function () {
+    function Array1dAs2d(array, width, step) {
+        if (step === void 0) { step = 1; }
+        this.array = array;
+        this.width = width;
+        this.height = array.length / width / step;
+        this.step = step;
+    }
+    Array1dAs2d.prototype.get_index = function (x, y) {
+        return (y * this.width + x) * this.step;
+    };
+    Array1dAs2d.prototype.get = function (x, y) {
+        return this.array[this.get_index(x, y)];
+    };
+    Array1dAs2d.prototype.set = function (x, y, v) {
+        return this.array[this.get_index(x, y)] = v;
+    };
+    Array1dAs2d.prototype.setAll = function (v) {
+        for (var i = 0; i < this.array.length; i++)
+            this.array[i] = v;
+    };
+    Array1dAs2d.prototype.copy = function (source, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY) {
+        for (var y = 0; y < sourceHeight; y++) {
+            var sourceIndex = this.get_index(sourceX, sourceY + y);
+            var destIndex = this.get_index(destX, destY + y);
+            for (var x = 0; x < sourceWidth * this.step; x++) {
+                this.array[destIndex + x] = source[sourceIndex + x];
+            }
+        }
+    };
+    return Array1dAs2d;
+})();
+var ColorBuffer = (function (_super) {
+    __extends(ColorBuffer, _super);
+    function ColorBuffer(array, width) {
+        _super.call(this, array, width, 4);
+    }
+    ColorBuffer.prototype.setColor = function (x, y, c) {
+        var i = this.get_index(x, y);
+        this.array[i] = c.r * 255;
+        this.array[i + 1] = c.g * 255;
+        this.array[i + 2] = c.b * 255;
+        this.array[i + 3] = c.a * 255;
+    };
+    return ColorBuffer;
+})(Array1dAs2d);
 var GraphicOutput = (function () {
     function GraphicOutput() {
     }
@@ -495,7 +541,8 @@ var HtmlCanvasOutput = (function (_super) {
         _super.call(this);
         var canvas = document.getElementById(canvasId);
         this.canvasContext = canvas.getContext("2d");
-        this.outputBuffer = this.canvasContext.getImageData(0, 0, canvas.width, canvas.height);
+        this.canvasImageData = this.canvasContext.getImageData(0, 0, canvas.width, canvas.height);
+        this.colorBuffer = new ColorBuffer(this.canvasImageData.data, canvas.width);
     }
     HtmlCanvasOutput.prototype.get_width = function () {
         return this.canvasContext.canvas.width;
@@ -504,10 +551,10 @@ var HtmlCanvasOutput = (function (_super) {
         return this.canvasContext.canvas.height;
     };
     HtmlCanvasOutput.prototype.get_buffer = function () {
-        return this.outputBuffer.data;
+        return this.colorBuffer;
     };
     HtmlCanvasOutput.prototype.drawBuffer = function () {
-        this.canvasContext.putImageData(this.outputBuffer, 0, 0);
+        this.canvasContext.putImageData(this.canvasImageData, 0, 0);
     };
     HtmlCanvasOutput.prototype.drawText = function (text, x, y, color, size, font) {
         if (color === void 0) { color = "ffffff"; }
@@ -734,19 +781,19 @@ var Scene = (function () {
     return Scene;
 })();
 var RendererOutput = (function () {
-    function RendererOutput(colorBuffer, w, h) {
+    function RendererOutput(colorBuffer) {
         this.colorBuffer = colorBuffer;
-        this.width = w;
-        this.height = h;
-        this.depthBuffer = new Array(w * h);
+        this.width = colorBuffer.width;
+        this.height = colorBuffer.height;
+        this.depthBuffer = new Array1dAs2d(new Array(colorBuffer.width * colorBuffer.height), colorBuffer.width);
         this.clear();
     }
     RendererOutput.prototype.clear = function () {
-        for (var i = 0; i < this.depthBuffer.length; i++) {
-            var i4 = i * 4;
-            this.colorBuffer[i4] = this.colorBuffer[i4 + 1] = this.colorBuffer[i4 + 2] = 0;
-            this.colorBuffer[i4 + 3] = 1;
-            this.depthBuffer[i] = 10000000; // Max possible value 
+        for (var i = 0; i < this.colorBuffer.array.length; i++) {
+            this.colorBuffer.array[i] = 0;
+        }
+        for (var i = 0; i < this.depthBuffer.array.length; i++) {
+            this.depthBuffer.array[i] = 10000000; // Max possible value 
         }
     };
     return RendererOutput;
@@ -763,15 +810,12 @@ var Renderer2d = (function (_super) {
         _super.call(this, output);
     }
     Renderer2d.prototype.drawPoint = function (x, y, z, color) {
+        x = x >> 0;
+        y = y >> 0;
         if (x >= 0 && y >= 0 && x < this.output.width && y < this.output.height) {
-            var index = ((x >> 0) + (y >> 0) * this.output.width);
-            if (this.output.depthBuffer[index] >= z) {
-                this.output.depthBuffer[index] = z;
-                var index4 = index * 4;
-                this.output.colorBuffer[index4] = color.r * 255;
-                this.output.colorBuffer[index4 + 1] = color.g * 255;
-                this.output.colorBuffer[index4 + 2] = color.b * 255;
-                this.output.colorBuffer[index4 + 3] = color.a * 255;
+            if (this.output.depthBuffer.get(x, y) >= z) {
+                this.output.depthBuffer.set(x, y, z);
+                this.output.colorBuffer.setColor(x, y, color);
             }
         }
     };
@@ -1252,11 +1296,11 @@ var App = (function () {
         this.graphicOutput = graphicOutput;
         this.phisics = new Phisics();
         this.inputDevices = inputDevices;
-        var rendererOutput = new RendererOutput(this.graphicOutput.get_buffer(), this.graphicOutput.get_width(), this.graphicOutput.get_height());
-        this.renderer3d = new Renderer3d(rendererOutput);
+        this.renderer3d = new Renderer3d(this.createRendererOutput());
     }
     App.prototype.start = function () {
         var _this = this;
+        this.onStart();
         this.createScene(function (scene) {
             _this.scene = scene;
             requestAnimationFrame(function () { return _this.loopAnimation(); });
@@ -1269,6 +1313,11 @@ var App = (function () {
                     _this.handleMouseEvent(args);
                 });
         });
+    };
+    App.prototype.onStart = function () {
+    };
+    App.prototype.createRendererOutput = function () {
+        return new RendererOutput(this.graphicOutput.get_buffer());
     };
     App.prototype.createScene = function (continuation) {
         continuation(new Scene());

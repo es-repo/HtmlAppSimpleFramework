@@ -1,6 +1,8 @@
 Set-Location -Path ..\
 
 Get-Content babylon.math.ts, `
+ array1dAs2d.ts, `
+ colorBuffer.ts, `
  graphicOutput.ts, `
  htmlCanvasOutput.ts, `
  figure.ts, `

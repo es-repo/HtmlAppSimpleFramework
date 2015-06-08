@@ -5,19 +5,13 @@
     }
 
     public drawPoint(x: number, y: number, z: number, color: BABYLON.Color4): void {
-
+        x = x >> 0;
+        y = y >> 0;
         if (x >= 0 && y >= 0 && x < this.output.width && y < this.output.height) {
 
-            var index: number = ((x >> 0) + (y >> 0) * this.output.width);
-
-            if (this.output.depthBuffer[index] >= z) {
-                this.output.depthBuffer[index] = z;
-
-                var index4: number = index * 4;
-                this.output.colorBuffer[index4] = color.r * 255;
-                this.output.colorBuffer[index4 + 1] = color.g * 255;
-                this.output.colorBuffer[index4 + 2] = color.b * 255;
-                this.output.colorBuffer[index4 + 3] = color.a * 255;
+            if (this.output.depthBuffer.get(x, y) >= z) {
+                this.output.depthBuffer.set(x, y, z);
+                this.output.colorBuffer.setColor(x, y, color);
             }
         }
     }

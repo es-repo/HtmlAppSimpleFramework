@@ -3,11 +3,11 @@ var App = (function () {
         this.graphicOutput = graphicOutput;
         this.phisics = new Phisics();
         this.inputDevices = inputDevices;
-        var rendererOutput = new RendererOutput(this.graphicOutput.get_buffer(), this.graphicOutput.get_width(), this.graphicOutput.get_height());
-        this.renderer3d = new Renderer3d(rendererOutput);
+        this.renderer3d = new Renderer3d(this.createRendererOutput());
     }
     App.prototype.start = function () {
         var _this = this;
+        this.onStart();
         this.createScene(function (scene) {
             _this.scene = scene;
             requestAnimationFrame(function () { return _this.loopAnimation(); });
@@ -20,6 +20,11 @@ var App = (function () {
                     _this.handleMouseEvent(args);
                 });
         });
+    };
+    App.prototype.onStart = function () {
+    };
+    App.prototype.createRendererOutput = function () {
+        return new RendererOutput(this.graphicOutput.get_buffer());
     };
     App.prototype.createScene = function (continuation) {
         continuation(new Scene());

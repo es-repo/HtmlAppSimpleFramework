@@ -4,11 +4,6 @@ var __extends = this.__extends || function (d, b) {
     __.prototype = b.prototype;
     d.prototype = new __();
 };
-var Settings = (function () {
-    function Settings() {
-    }
-    return Settings;
-})();
 var Object3dApp = (function (_super) {
     __extends(Object3dApp, _super);
     function Object3dApp(graphicOutput, inputControllerHandlers) {

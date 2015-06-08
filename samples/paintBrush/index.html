@@ -1,0 +1,25 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Paint Brush</title>
+    <link rel="stylesheet" href="../../app.css" type="text/css" />
+    <script src="../../build/htmlAppSimpleFramework.js"></script>
+    <script src="array1dAs2d.js"></script><script src="colorBuffer.js"></script><script src="paintBrushdApp.js"></script>
+</head>
+<body>
+<canvas id="canvas" width="1000" height="750"></canvas>
+<div>
+</div>
+</body>
+<script>
+    window.onload = function () {
+        var inputDevices = new InputDevices();
+        inputDevices.keyboard = new HtmlKeyboard();
+        inputDevices.mouse = new HtmlMouse("canvas");
+        var app = new PaintBrushApp(new HtmlCanvasOutput("canvas"), inputDevices);
+        app.start();
+    };
+</script>
+</html>

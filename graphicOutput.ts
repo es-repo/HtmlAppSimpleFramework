@@ -4,7 +4,7 @@
 
     public get_height(): number { throw new Error("Abstract method."); }
 
-    public get_buffer(): number[] { throw new Error("Abstract method."); }
+    public get_buffer(): ColorBuffer { throw new Error("Abstract method."); }
 
     public drawBuffer() { throw new Error("Abstract method."); }
 

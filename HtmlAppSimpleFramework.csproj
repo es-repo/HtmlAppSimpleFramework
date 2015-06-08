@@ -23,6 +23,7 @@
     <Content Include="app.css" />
     <Content Include="index.html" />
     <Content Include="samples\3dObject\monkey.jpg" />
+    <Content Include="samples\paintBrush\index.html" />
     <Content Include="web.config" />
     <Content Include="samples\xBubble\index.html" />
   </ItemGroup>
@@ -50,6 +51,9 @@
     <TypeScriptCompile Include="meshFactory.ts" />
     <TypeScriptCompile Include="phisics.ts" />
     <TypeScriptCompile Include="renderer3d.ts" />
+    <TypeScriptCompile Include="array1dAs2d.ts" />
+    <TypeScriptCompile Include="colorBuffer.ts" />
+    <TypeScriptCompile Include="samples\paintBrush\paintBrushdApp.ts" />
     <TypeScriptCompile Include="scanLineData.ts" />
     <TypeScriptCompile Include="scene.ts" />
     <TypeScriptCompile Include="texture.ts" />

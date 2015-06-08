@@ -11,11 +11,11 @@
         this.graphicOutput = graphicOutput;
         this.phisics = new Phisics();
         this.inputDevices = inputDevices;
-        var rendererOutput = new RendererOutput(this.graphicOutput.get_buffer(), this.graphicOutput.get_width(), this.graphicOutput.get_height());
-        this.renderer3d = new Renderer3d(rendererOutput);
+        this.renderer3d = new Renderer3d(this.createRendererOutput());
     }
 
     private start() {
+        this.onStart();
         this.createScene((scene) => {
             this.scene = scene;
 
@@ -31,6 +31,12 @@
                     this.handleMouseEvent(args);
                 });
         });
+    }
+
+    protected onStart() {}
+
+    protected createRendererOutput(): RendererOutput {
+        return new RendererOutput(this.graphicOutput.get_buffer());
     }
 
     protected createScene(continuation: (scene: Scene) => void) {
