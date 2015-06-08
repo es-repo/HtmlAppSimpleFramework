@@ -731,7 +731,6 @@ class MeshFactory {
     public static createFromBabylonAndTextureBase64Data(json: {babylonData:any; textureBase64Data: string}): Mesh[] {
         var meshes = MeshFactory.createFromBabylonData(json.babylonData, false);
         for (var i = 0; i < meshes.length; i++) {
-            debugger
             meshes[i].texture.load(json.textureBase64Data);
         }
         return meshes;

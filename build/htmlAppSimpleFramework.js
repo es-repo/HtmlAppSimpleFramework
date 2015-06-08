@@ -709,7 +709,6 @@ var MeshFactory = (function () {
     MeshFactory.createFromBabylonAndTextureBase64Data = function (json) {
         var meshes = MeshFactory.createFromBabylonData(json.babylonData, false);
         for (var i = 0; i < meshes.length; i++) {
-            debugger;
             meshes[i].texture.load(json.textureBase64Data);
         }
         return meshes;
