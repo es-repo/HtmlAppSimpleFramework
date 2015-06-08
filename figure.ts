@@ -18,3 +18,13 @@ class Circle extends Figure {
     public get_square() { return this.get_radius() * this.get_radius() * Math.PI; }
     public get_projectedRadius(): number { return this.get_projectedDiameter() / 2.0; }
 }
+
+class Sprite extends Figure {
+    public image: ColorBuffer;
+
+    constructor(image) {
+        super();
+        this.image = image;
+        this.size = new BABYLON.Vector3(image.width, image.height, 0);
+    }
+}

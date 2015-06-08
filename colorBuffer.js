@@ -16,5 +16,8 @@ var ColorBuffer = (function (_super) {
         this.array[i + 2] = c.b * 255;
         this.array[i + 3] = c.a * 255;
     };
+    ColorBuffer.create = function (width, height) {
+        return new ColorBuffer(new Array(width * height * 4), width);
+    };
     return ColorBuffer;
 })(Array1dAs2d);

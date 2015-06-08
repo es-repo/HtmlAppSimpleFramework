@@ -53,8 +53,20 @@ var App = (function () {
         this.graphicOutput.drawText(fps.toString(), 10, 25);
     };
     App.prototype.handleKeyboardEvent = function (eventArgs) {
+        var k = eventArgs.pressedKey;
+        var cameraDelta = 3;
+        if (this.scene) {
+            if (k == 189) {
+                this.scene.camera.position.z += cameraDelta;
+            }
+            if (k == 187) {
+                this.scene.camera.position.z -= cameraDelta;
+            }
+        }
     };
     App.prototype.handleMouseEvent = function (eventArgs) {
+        if (this.scene)
+            this.scene.camera.position.z += eventArgs.wheelDelta / 50;
     };
     return App;
 })();

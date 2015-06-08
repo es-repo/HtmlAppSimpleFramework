@@ -40,14 +40,8 @@ var Object3dApp = (function (_super) {
         }
     };
     Object3dApp.prototype.handleKeyboardEvent = function (eventArgs) {
+        _super.prototype.handleKeyboardEvent.call(this, eventArgs);
         var k = eventArgs.pressedKey;
-        var cameraDelta = 3;
-        if (k == 189) {
-            this.scene.camera.position.z += cameraDelta;
-        }
-        if (k == 187) {
-            this.scene.camera.position.z -= cameraDelta;
-        }
         var rotateDelta = 0.01;
         if (k == 37) {
             this.rotateVector.y += rotateDelta;
@@ -66,11 +60,11 @@ var Object3dApp = (function (_super) {
         }
     };
     Object3dApp.prototype.handleMouseEvent = function (eventArgs) {
+        _super.prototype.handleMouseEvent.call(this, eventArgs);
         if (eventArgs.leftButtonClicked) {
             this.rotateVector = new BABYLON.Vector3(-eventArgs.deltaY, -eventArgs.deltaX, 0);
             this.rotateVector = this.rotateVector.scale(0.003);
         }
-        this.scene.camera.position.z += eventArgs.wheelDelta / 100;
     };
     Object3dApp.rotateDelta = 0.01;
     return Object3dApp;

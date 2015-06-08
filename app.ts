@@ -70,9 +70,26 @@
         this.graphicOutput.drawText(fps.toString(), 10, 25);
     }
 
-    protected handleKeyboardEvent(eventArgs: KeyboardEventArgs) {
+    public handleKeyboardEvent(eventArgs: KeyboardEventArgs) {
+
+        var k = eventArgs.pressedKey;
+        var cameraDelta = 3;
+
+        if (this.scene) {
+            if (k == 189) {
+                this.scene.camera.position.z += cameraDelta;
+            }
+
+            if (k == 187) {
+                this.scene.camera.position.z -= cameraDelta;
+            }
+        }
+
     }
 
-    protected handleMouseEvent(eventArgs: MouseEventArgs) {
+    public handleMouseEvent(eventArgs: MouseEventArgs) {
+
+        if (this.scene)
+            this.scene.camera.position.z += eventArgs.wheelDelta / 50;
     }
 }

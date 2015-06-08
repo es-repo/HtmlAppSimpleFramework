@@ -9,13 +9,21 @@ var Renderer2d = (function (_super) {
     function Renderer2d(output) {
         _super.call(this, output);
     }
-    Renderer2d.prototype.drawPoint = function (x, y, z, color) {
+    Renderer2d.prototype.drawPoint = function (x, y, z, c) {
+        this.drawPointInternal(x, y, z, c.r * 255, c.g * 255, c.b * 255, c.a * 255);
+    };
+    Renderer2d.prototype.drawPointInternal = function (x, y, z, r, g, b, a) {
         x = x >> 0;
         y = y >> 0;
         if (x >= 0 && y >= 0 && x < this.output.width && y < this.output.height) {
-            if (this.output.depthBuffer.get(x, y) >= z) {
-                this.output.depthBuffer.set(x, y, z);
-                this.output.colorBuffer.setColor(x, y, color);
+            var i = this.output.depthBuffer.get_index(x, y);
+            if (this.output.depthBuffer.array[i] >= z) {
+                this.output.depthBuffer.array[i] = z;
+                var i4 = i * 4;
+                this.output.colorBuffer.array[i4] = r;
+                this.output.colorBuffer.array[i4 + 1] = g;
+                this.output.colorBuffer.array[i4 + 2] = b;
+                this.output.colorBuffer.array[i4 + 3] = a;
             }
         }
     };
@@ -72,6 +80,17 @@ var Renderer2d = (function (_super) {
             for (var x = -radius; x <= radius; x++)
                 if (x * x + y * y <= radius * radius)
                     this.drawPoint(cx + x, cy + y, z, color);
+    };
+    Renderer2d.prototype.drawImage = function (x, y, z, image, scale) {
+        if (scale === void 0) { scale = 1; }
+        for (var i = 0; i < image.height; i++) {
+            var py = y + i;
+            for (var j = 0; j < image.width; j++) {
+                var px = x + j;
+                var bi = image.get_index(j, i);
+                this.drawPointInternal(px, py, z, image.array[bi], image.array[bi + 1], image.array[bi + 2], image.array[bi + 3]);
+            }
+        }
     };
     return Renderer2d;
 })(Renderer);

@@ -27,14 +27,4 @@ class Array1dAs2d<T> {
         for (var i = 0; i < this.array.length; i++)
             this.array[i] = v;
     }
-
-    public copy(source: Array1dAs2d<T>, sourceX: number, sourceY, sourceWidth: number, sourceHeight: number, destX: number, destY) {
-        for (var y = 0; y < sourceHeight; y++) {
-            var sourceIndex = this.get_index(sourceX, sourceY + y);
-            var destIndex = this.get_index(destX, destY + y);
-            for (var x = 0; x < sourceWidth * this.step; x++) {
-                this.array[destIndex + x] = source[sourceIndex + x];
-            } 
-        }
-    }
 }

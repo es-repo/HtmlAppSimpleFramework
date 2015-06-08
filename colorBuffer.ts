@@ -11,4 +11,8 @@ class ColorBuffer extends Array1dAs2d<number> {
         this.array[i + 2] = c.b * 255;
         this.array[i + 3] = c.a * 255;
     }
+
+    public static create(width: number, height: number): ColorBuffer {
+        return new ColorBuffer(new Array(width * height * 4), width);
+    }
 }

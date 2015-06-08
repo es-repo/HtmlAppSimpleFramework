@@ -502,16 +502,6 @@ class Array1dAs2d<T> {
         for (var i = 0; i < this.array.length; i++)
             this.array[i] = v;
     }
-
-    public copy(source: Array1dAs2d<T>, sourceX: number, sourceY, sourceWidth: number, sourceHeight: number, destX: number, destY) {
-        for (var y = 0; y < sourceHeight; y++) {
-            var sourceIndex = this.get_index(sourceX, sourceY + y);
-            var destIndex = this.get_index(destX, destY + y);
-            for (var x = 0; x < sourceWidth * this.step; x++) {
-                this.array[destIndex + x] = source[sourceIndex + x];
-            } 
-        }
-    }
 }
 class ColorBuffer extends Array1dAs2d<number> {
 
@@ -525,6 +515,10 @@ class ColorBuffer extends Array1dAs2d<number> {
         this.array[i + 1] = c.g * 255;
         this.array[i + 2] = c.b * 255;
         this.array[i + 3] = c.a * 255;
+    }
+
+    public static create(width: number, height: number): ColorBuffer {
+        return new ColorBuffer(new Array(width * height * 4), width);
     }
 }
 class GraphicOutput {
@@ -588,6 +582,16 @@ class Circle extends Figure {
     public set_radius(r: number) { this.set_diameter(r * 2); }
     public get_square() { return this.get_radius() * this.get_radius() * Math.PI; }
     public get_projectedRadius(): number { return this.get_projectedDiameter() / 2.0; }
+}
+
+class Sprite extends Figure {
+    public image: ColorBuffer;
+
+    constructor(image) {
+        super();
+        this.image = image;
+        this.size = new BABYLON.Vector3(image.width, image.height, 0);
+    }
 }
 interface Vertex {
     normal: BABYLON.Vector3;
@@ -842,14 +846,22 @@ class Renderer2d extends Renderer {
         super(output);
     }
 
-    public drawPoint(x: number, y: number, z: number, color: BABYLON.Color4): void {
+    public drawPoint(x: number, y: number, z: number, c: BABYLON.Color4): void {
+        this.drawPointInternal(x, y, z, c.r * 255, c.g * 255, c.b * 255, c.a * 255);
+    }
+
+    private drawPointInternal(x: number, y: number, z: number, r: number, g: number, b: number, a: number) {
         x = x >> 0;
         y = y >> 0;
         if (x >= 0 && y >= 0 && x < this.output.width && y < this.output.height) {
-
-            if (this.output.depthBuffer.get(x, y) >= z) {
-                this.output.depthBuffer.set(x, y, z);
-                this.output.colorBuffer.setColor(x, y, color);
+            var i = this.output.depthBuffer.get_index(x, y);
+            if (this.output.depthBuffer.array[i] >= z) {
+                this.output.depthBuffer.array[i] = z;
+                var i4 = i * 4;
+                this.output.colorBuffer.array[i4] = r;
+                this.output.colorBuffer.array[i4 + 1] = g;
+                this.output.colorBuffer.array[i4 + 2] = b;
+                this.output.colorBuffer.array[i4 + 3] = a;
             }
         }
     }
@@ -914,6 +926,17 @@ class Renderer2d extends Renderer {
             for (var x = -radius; x <= radius; x++)
                 if (x * x + y * y <= radius * radius)
                     this.drawPoint(cx + x, cy + y, z, color);
+    }
+
+    public drawImage(x: number, y: number, z: number, image: ColorBuffer, scale: number = 1) {
+        for (var i = 0; i < image.height; i++) {
+            var py = y + i;
+            for (var j = 0; j < image.width; j++) {
+                var px = x + j;
+                var bi = image.get_index(j, i);
+                this.drawPointInternal(px, py, z, image.array[bi], image.array[bi + 1], image.array[bi + 2], image.array[bi + 3]);
+            }
+        }
     }
 }
 // THE CODE IS BASED ON http://blogs.msdn.com/b/davrous/archive/2013/06/13/tutorial-series-learning-how-to-write-a-3d-soft-engine-from-scratch-in-c-typescript-or-javascript.aspx
@@ -1012,7 +1035,11 @@ class Renderer3d extends Renderer {
 
     public drawFigure(f: Figure) {
         if (f instanceof Circle) {
+            debugger 
             this.drawCircle(<Circle>f);
+        }
+        else if (f instanceof Sprite) {
+            this.drawSprite(<Sprite>f);
         }
         else if (f instanceof Mesh) {
             this.drawMesh(<Mesh>f);
@@ -1021,6 +1048,10 @@ class Renderer3d extends Renderer {
 
     private drawCircle(circle: Circle) {
         this.renderer2d.drawFilledCircle(circle.projectedPosition.x, circle.projectedPosition.y, circle.projectedPosition.z, circle.get_projectedRadius(), circle.color);
+    }
+
+    private drawSprite(sprite: Sprite) {
+        this.renderer2d.drawImage(sprite.projectedPosition.x, sprite.projectedPosition.y, sprite.projectedPosition.z, sprite.image);
     }
 
     private drawMesh(m: Mesh) {
@@ -1485,9 +1516,26 @@ class App {
         this.graphicOutput.drawText(fps.toString(), 10, 25);
     }
 
-    protected handleKeyboardEvent(eventArgs: KeyboardEventArgs) {
+    public handleKeyboardEvent(eventArgs: KeyboardEventArgs) {
+
+        var k = eventArgs.pressedKey;
+        var cameraDelta = 3;
+
+        if (this.scene) {
+            if (k == 189) {
+                this.scene.camera.position.z += cameraDelta;
+            }
+
+            if (k == 187) {
+                this.scene.camera.position.z -= cameraDelta;
+            }
+        }
+
     }
 
-    protected handleMouseEvent(eventArgs: MouseEventArgs) {
+    public handleMouseEvent(eventArgs: MouseEventArgs) {
+
+        if (this.scene)
+            this.scene.camera.position.z += eventArgs.wheelDelta / 50;
     }
 }

@@ -487,15 +487,6 @@ var Array1dAs2d = (function () {
         for (var i = 0; i < this.array.length; i++)
             this.array[i] = v;
     };
-    Array1dAs2d.prototype.copy = function (source, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY) {
-        for (var y = 0; y < sourceHeight; y++) {
-            var sourceIndex = this.get_index(sourceX, sourceY + y);
-            var destIndex = this.get_index(destX, destY + y);
-            for (var x = 0; x < sourceWidth * this.step; x++) {
-                this.array[destIndex + x] = source[sourceIndex + x];
-            }
-        }
-    };
     return Array1dAs2d;
 })();
 var ColorBuffer = (function (_super) {
@@ -509,6 +500,9 @@ var ColorBuffer = (function (_super) {
         this.array[i + 1] = c.g * 255;
         this.array[i + 2] = c.b * 255;
         this.array[i + 3] = c.a * 255;
+    };
+    ColorBuffer.create = function (width, height) {
+        return new ColorBuffer(new Array(width * height * 4), width);
     };
     return ColorBuffer;
 })(Array1dAs2d);
@@ -604,6 +598,15 @@ var Circle = (function (_super) {
         return this.get_projectedDiameter() / 2.0;
     };
     return Circle;
+})(Figure);
+var Sprite = (function (_super) {
+    __extends(Sprite, _super);
+    function Sprite(image) {
+        _super.call(this);
+        this.image = image;
+        this.size = new BABYLON.Vector3(image.width, image.height, 0);
+    }
+    return Sprite;
 })(Figure);
 var Texture = (function () {
     // Working with a fix sized texture (512x512, 1024x1024, etc.).
@@ -809,13 +812,21 @@ var Renderer2d = (function (_super) {
     function Renderer2d(output) {
         _super.call(this, output);
     }
-    Renderer2d.prototype.drawPoint = function (x, y, z, color) {
+    Renderer2d.prototype.drawPoint = function (x, y, z, c) {
+        this.drawPointInternal(x, y, z, c.r * 255, c.g * 255, c.b * 255, c.a * 255);
+    };
+    Renderer2d.prototype.drawPointInternal = function (x, y, z, r, g, b, a) {
         x = x >> 0;
         y = y >> 0;
         if (x >= 0 && y >= 0 && x < this.output.width && y < this.output.height) {
-            if (this.output.depthBuffer.get(x, y) >= z) {
-                this.output.depthBuffer.set(x, y, z);
-                this.output.colorBuffer.setColor(x, y, color);
+            var i = this.output.depthBuffer.get_index(x, y);
+            if (this.output.depthBuffer.array[i] >= z) {
+                this.output.depthBuffer.array[i] = z;
+                var i4 = i * 4;
+                this.output.colorBuffer.array[i4] = r;
+                this.output.colorBuffer.array[i4 + 1] = g;
+                this.output.colorBuffer.array[i4 + 2] = b;
+                this.output.colorBuffer.array[i4 + 3] = a;
             }
         }
     };
@@ -872,6 +883,17 @@ var Renderer2d = (function (_super) {
             for (var x = -radius; x <= radius; x++)
                 if (x * x + y * y <= radius * radius)
                     this.drawPoint(cx + x, cy + y, z, color);
+    };
+    Renderer2d.prototype.drawImage = function (x, y, z, image, scale) {
+        if (scale === void 0) { scale = 1; }
+        for (var i = 0; i < image.height; i++) {
+            var py = y + i;
+            for (var j = 0; j < image.width; j++) {
+                var px = x + j;
+                var bi = image.get_index(j, i);
+                this.drawPointInternal(px, py, z, image.array[bi], image.array[bi + 1], image.array[bi + 2], image.array[bi + 3]);
+            }
+        }
     };
     return Renderer2d;
 })(Renderer);
@@ -945,7 +967,11 @@ var Renderer3d = (function (_super) {
     };
     Renderer3d.prototype.drawFigure = function (f) {
         if (f instanceof Circle) {
+            debugger;
             this.drawCircle(f);
+        }
+        else if (f instanceof Sprite) {
+            this.drawSprite(f);
         }
         else if (f instanceof Mesh) {
             this.drawMesh(f);
@@ -953,6 +979,9 @@ var Renderer3d = (function (_super) {
     };
     Renderer3d.prototype.drawCircle = function (circle) {
         this.renderer2d.drawFilledCircle(circle.projectedPosition.x, circle.projectedPosition.y, circle.projectedPosition.z, circle.get_projectedRadius(), circle.color);
+    };
+    Renderer3d.prototype.drawSprite = function (sprite) {
+        this.renderer2d.drawImage(sprite.projectedPosition.x, sprite.projectedPosition.y, sprite.projectedPosition.z, sprite.image);
     };
     Renderer3d.prototype.drawMesh = function (m) {
         for (var indexFaces = 0; indexFaces < m.faces.length; indexFaces++) {
@@ -1346,8 +1375,20 @@ var App = (function () {
         this.graphicOutput.drawText(fps.toString(), 10, 25);
     };
     App.prototype.handleKeyboardEvent = function (eventArgs) {
+        var k = eventArgs.pressedKey;
+        var cameraDelta = 3;
+        if (this.scene) {
+            if (k == 189) {
+                this.scene.camera.position.z += cameraDelta;
+            }
+            if (k == 187) {
+                this.scene.camera.position.z -= cameraDelta;
+            }
+        }
     };
     App.prototype.handleMouseEvent = function (eventArgs) {
+        if (this.scene)
+            this.scene.camera.position.z += eventArgs.wheelDelta / 50;
     };
     return App;
 })();

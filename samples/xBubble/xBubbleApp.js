@@ -52,15 +52,9 @@ var XBubbleApp = (function (_super) {
         }
     };
     XBubbleApp.prototype.handleKeyboardEvent = function (eventArgs) {
+        _super.prototype.handleKeyboardEvent.call(this, eventArgs);
         var k = eventArgs.pressedKey;
         var xBubbleScene = this.scene;
-        var cameraDelta = 3;
-        if (k == 189) {
-            this.scene.camera.position.z += cameraDelta;
-        }
-        if (k == 187) {
-            this.scene.camera.position.z -= cameraDelta;
-        }
         if (k == 37) {
             xBubbleScene.player.moveVector.x += xBubbleScene.player.moveDelta;
         }
@@ -75,8 +69,8 @@ var XBubbleApp = (function (_super) {
         }
     };
     XBubbleApp.prototype.handleMouseEvent = function (eventArgs) {
+        _super.prototype.handleMouseEvent.call(this, eventArgs);
         var xBubbleScene = this.scene;
-        this.scene.camera.position.z += eventArgs.wheelDelta / 50;
         if (eventArgs.leftButtonClicked) {
             var mv = new BABYLON.Vector3(eventArgs.x, eventArgs.y, 0);
             var dv = xBubbleScene.player.projectedPosition.subtract(mv);

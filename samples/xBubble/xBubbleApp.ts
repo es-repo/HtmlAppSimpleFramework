@@ -58,20 +58,12 @@
         }
     }
 
-    protected handleKeyboardEvent(eventArgs: KeyboardEventArgs) {
+    public handleKeyboardEvent(eventArgs: KeyboardEventArgs) {
+
+        super.handleKeyboardEvent(eventArgs);
 
         var k = eventArgs.pressedKey;
         var xBubbleScene = <XBubbleScene>this.scene;
-
-        var cameraDelta = 3;
-
-        if (k == 189) {
-            this.scene.camera.position.z += cameraDelta;
-        }
-
-        if (k == 187) {
-            this.scene.camera.position.z -= cameraDelta;
-        }
 
         if (k == 37) {
             xBubbleScene.player.moveVector.x += xBubbleScene.player.moveDelta;
@@ -90,11 +82,10 @@
         }
     }
 
-    protected handleMouseEvent(eventArgs: MouseEventArgs) {
+    public handleMouseEvent(eventArgs: MouseEventArgs) {
+        super.handleMouseEvent(eventArgs);
 
         var xBubbleScene = <XBubbleScene>this.scene;
-
-        this.scene.camera.position.z += eventArgs.wheelDelta / 50;
 
         if (eventArgs.leftButtonClicked) {
             var mv = new BABYLON.Vector3(eventArgs.x, eventArgs.y, 0);

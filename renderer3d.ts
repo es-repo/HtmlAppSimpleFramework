@@ -94,7 +94,11 @@ class Renderer3d extends Renderer {
 
     public drawFigure(f: Figure) {
         if (f instanceof Circle) {
+            debugger 
             this.drawCircle(<Circle>f);
+        }
+        else if (f instanceof Sprite) {
+            this.drawSprite(<Sprite>f);
         }
         else if (f instanceof Mesh) {
             this.drawMesh(<Mesh>f);
@@ -103,6 +107,10 @@ class Renderer3d extends Renderer {
 
     private drawCircle(circle: Circle) {
         this.renderer2d.drawFilledCircle(circle.projectedPosition.x, circle.projectedPosition.y, circle.projectedPosition.z, circle.get_projectedRadius(), circle.color);
+    }
+
+    private drawSprite(sprite: Sprite) {
+        this.renderer2d.drawImage(sprite.projectedPosition.x, sprite.projectedPosition.y, sprite.projectedPosition.z, sprite.image);
     }
 
     private drawMesh(m: Mesh) {

@@ -42,18 +42,11 @@
         }
     }
 
-    protected handleKeyboardEvent(eventArgs: KeyboardEventArgs) {
+    public handleKeyboardEvent(eventArgs: KeyboardEventArgs) {
+
+        super.handleKeyboardEvent(eventArgs);
 
         var k = eventArgs.pressedKey; 
-        var cameraDelta = 3;
-
-        if (k == 189) {
-            this.scene.camera.position.z += cameraDelta;
-        }
-
-        if (k == 187) {
-            this.scene.camera.position.z -= cameraDelta;
-        }
 
         var rotateDelta = 0.01;
 
@@ -78,14 +71,13 @@
         }
     }
 
-    protected handleMouseEvent(eventArgs: MouseEventArgs) {
-
+    public handleMouseEvent(eventArgs: MouseEventArgs) {
+        super.handleMouseEvent(eventArgs);
+        
         if (eventArgs.leftButtonClicked) {
             this.rotateVector = new BABYLON.Vector3(-eventArgs.deltaY, -eventArgs.deltaX, 0);
             this.rotateVector = this.rotateVector.scale(0.003);
         }
-        
-        this.scene.camera.position.z += eventArgs.wheelDelta / 100;
     }
 }
 

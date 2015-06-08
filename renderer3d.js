@@ -74,7 +74,11 @@ var Renderer3d = (function (_super) {
     };
     Renderer3d.prototype.drawFigure = function (f) {
         if (f instanceof Circle) {
+            debugger;
             this.drawCircle(f);
+        }
+        else if (f instanceof Sprite) {
+            this.drawSprite(f);
         }
         else if (f instanceof Mesh) {
             this.drawMesh(f);
@@ -82,6 +86,9 @@ var Renderer3d = (function (_super) {
     };
     Renderer3d.prototype.drawCircle = function (circle) {
         this.renderer2d.drawFilledCircle(circle.projectedPosition.x, circle.projectedPosition.y, circle.projectedPosition.z, circle.get_projectedRadius(), circle.color);
+    };
+    Renderer3d.prototype.drawSprite = function (sprite) {
+        this.renderer2d.drawImage(sprite.projectedPosition.x, sprite.projectedPosition.y, sprite.projectedPosition.z, sprite.image);
     };
     Renderer3d.prototype.drawMesh = function (m) {
         for (var indexFaces = 0; indexFaces < m.faces.length; indexFaces++) {
