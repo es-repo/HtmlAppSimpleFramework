@@ -67,6 +67,7 @@
     }
 
     private drawFps(fps: number) {
+        this.graphicOutput.drawText(fps.toString(), 11, 26, "000000");
         this.graphicOutput.drawText(fps.toString(), 10, 25);
     }
 

@@ -22,6 +22,7 @@ class Renderer3d extends Renderer {
             scene.camera.zNear, scene.camera.zFar);
 
         for (var i = 0; i < scene.figures.length; i++) {
+             
             var f = scene.figures[i];
 
             var worldMatrix = BABYLON.Matrix.RotationYawPitchRoll(
@@ -43,7 +44,7 @@ class Renderer3d extends Renderer {
     }
 
     private projectVertex(vertex: Vertex, transMat: BABYLON.Matrix, worldMat: BABYLON.Matrix): Vertex {
-
+        
         var point3DWorld = BABYLON.Vector3.TransformCoordinates(vertex.coordinates, worldMat);
         var normal3DWorld = BABYLON.Vector3.TransformCoordinates(vertex.normal, worldMat);
         var coord = this.projectVector(vertex.coordinates, transMat);
@@ -57,12 +58,12 @@ class Renderer3d extends Renderer {
     }
 
     private projectFigure(f: Figure, worldMatrix: BABYLON.Matrix, transformMatrix: BABYLON.Matrix) {
-
+           
         f.projectedPosition = this.projectVector(f.position, transformMatrix);
-        var left = f.position.subtract(f.size);
-        var right = f.position.add(f.size);
-        var projectedSizeX = (this.projectVector(left, transformMatrix).x - this.projectVector(right, transformMatrix).x);
-        f.projectedSize.x = projectedSizeX;
+        var posPlusSize = f.position.add(f.size);
+        var posPlusSizeProjected = this.projectVector(posPlusSize, transformMatrix);
+        f.projectedSize.x = (-posPlusSizeProjected.x + f.projectedPosition.x) * 2;
+        f.projectedSize.y = (-posPlusSizeProjected.y + f.projectedPosition.y) * 2;
 
         if (f instanceof Mesh) {
             this.projectMesh(<Mesh>f, worldMatrix, transformMatrix);
@@ -94,7 +95,6 @@ class Renderer3d extends Renderer {
 
     public drawFigure(f: Figure) {
         if (f instanceof Circle) {
-            debugger 
             this.drawCircle(<Circle>f);
         }
         else if (f instanceof Sprite) {
@@ -110,7 +110,12 @@ class Renderer3d extends Renderer {
     }
 
     private drawSprite(sprite: Sprite) {
-        this.renderer2d.drawImage(sprite.projectedPosition.x, sprite.projectedPosition.y, sprite.projectedPosition.z, sprite.image);
+        var scale = new BABYLON.Vector2(1, 1);
+        scale.x = sprite.projectedSize.x / sprite.image.width;
+        scale.y = sprite.projectedSize.y / sprite.image.height;
+        var x = sprite.projectedPosition.x - sprite.projectedSize.x / 2;
+        var y = sprite.projectedPosition.y - sprite.projectedSize.y / 2;
+        this.renderer2d.drawImage(x, y, sprite.projectedPosition.z, sprite.image, scale);
     }
 
     private drawMesh(m: Mesh) {

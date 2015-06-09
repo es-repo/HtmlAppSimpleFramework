@@ -50,6 +50,7 @@ var App = (function () {
         this.graphicOutput.drawBuffer();
     };
     App.prototype.drawFps = function (fps) {
+        this.graphicOutput.drawText(fps.toString(), 11, 26, "000000");
         this.graphicOutput.drawText(fps.toString(), 10, 25);
     };
     App.prototype.handleKeyboardEvent = function (eventArgs) {

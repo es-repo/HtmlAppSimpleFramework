@@ -47,10 +47,10 @@ var Renderer3d = (function (_super) {
     };
     Renderer3d.prototype.projectFigure = function (f, worldMatrix, transformMatrix) {
         f.projectedPosition = this.projectVector(f.position, transformMatrix);
-        var left = f.position.subtract(f.size);
-        var right = f.position.add(f.size);
-        var projectedSizeX = (this.projectVector(left, transformMatrix).x - this.projectVector(right, transformMatrix).x);
-        f.projectedSize.x = projectedSizeX;
+        var posPlusSize = f.position.add(f.size);
+        var posPlusSizeProjected = this.projectVector(posPlusSize, transformMatrix);
+        f.projectedSize.x = (-posPlusSizeProjected.x + f.projectedPosition.x) * 2;
+        f.projectedSize.y = (-posPlusSizeProjected.y + f.projectedPosition.y) * 2;
         if (f instanceof Mesh) {
             this.projectMesh(f, worldMatrix, transformMatrix);
         }
@@ -74,7 +74,6 @@ var Renderer3d = (function (_super) {
     };
     Renderer3d.prototype.drawFigure = function (f) {
         if (f instanceof Circle) {
-            debugger;
             this.drawCircle(f);
         }
         else if (f instanceof Sprite) {
@@ -88,7 +87,12 @@ var Renderer3d = (function (_super) {
         this.renderer2d.drawFilledCircle(circle.projectedPosition.x, circle.projectedPosition.y, circle.projectedPosition.z, circle.get_projectedRadius(), circle.color);
     };
     Renderer3d.prototype.drawSprite = function (sprite) {
-        this.renderer2d.drawImage(sprite.projectedPosition.x, sprite.projectedPosition.y, sprite.projectedPosition.z, sprite.image);
+        var scale = new BABYLON.Vector2(1, 1);
+        scale.x = sprite.projectedSize.x / sprite.image.width;
+        scale.y = sprite.projectedSize.y / sprite.image.height;
+        var x = sprite.projectedPosition.x - sprite.projectedSize.x / 2;
+        var y = sprite.projectedPosition.y - sprite.projectedSize.y / 2;
+        this.renderer2d.drawImage(x, y, sprite.projectedPosition.z, sprite.image, scale);
     };
     Renderer3d.prototype.drawMesh = function (m) {
         for (var indexFaces = 0; indexFaces < m.faces.length; indexFaces++) {

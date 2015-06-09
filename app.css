@@ -8,5 +8,6 @@ span {
 
 canvas {
     background-color: black; 
+    border:1px solid #000000;
 }
 

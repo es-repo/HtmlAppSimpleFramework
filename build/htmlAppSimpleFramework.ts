@@ -590,7 +590,6 @@ class Sprite extends Figure {
     constructor(image) {
         super();
         this.image = image;
-        this.size = new BABYLON.Vector3(image.width, image.height, 0);
     }
 }
 interface Vertex {
@@ -866,7 +865,7 @@ class Renderer2d extends Renderer {
         }
     }
 
-    public drawLine(x0: number, y0: number, x1: number, y1, z: number, c: BABYLON.Color4): void {
+    public drawLine(x0: number, y0: number, x1: number, y1: number, z: number, c: BABYLON.Color4): void {
         x0 = x0 >> 0;
         y0 = y0 >> 0;
         x1 = x1 >> 0;
@@ -928,13 +927,29 @@ class Renderer2d extends Renderer {
                     this.drawPoint(cx + x, cy + y, z, color);
     }
 
-    public drawImage(x: number, y: number, z: number, image: ColorBuffer, scale: number = 1) {
-        for (var i = 0; i < image.height; i++) {
-            var py = y + i;
-            for (var j = 0; j < image.width; j++) {
-                var px = x + j;
-                var bi = image.get_index(j, i);
-                this.drawPointInternal(px, py, z, image.array[bi], image.array[bi + 1], image.array[bi + 2], image.array[bi + 3]);
+    public drawImage(x: number, y: number, z: number, image: ColorBuffer, scale: BABYLON.Vector2 = null) {
+        if (scale == null)
+            scale = new BABYLON.Vector2(0, 0);
+        
+        
+        for (var i = 0, py = y, fullpy = 0; i < image.height; i++) {
+            fullpy += scale.y;
+            if (fullpy >= 1) {
+                while (fullpy >= 1) {
+                    for (var j = 0, px = x, fullpx = 0; j < image.width; j++) {
+                        fullpx += scale.x;
+                        if (fullpx >= 1) {
+                            while (fullpx >= 1) {
+                                var bi = image.get_index(j, i);
+                                this.drawPointInternal(px, py, z, image.array[bi], image.array[bi + 1], image.array[bi + 2], image.array[bi + 3]);
+                                fullpx--;
+                                px++;
+                            }
+                        }
+                    }
+                    fullpy--;
+                    py++;
+                }
             }
         }
     }
@@ -963,6 +978,7 @@ class Renderer3d extends Renderer {
             scene.camera.zNear, scene.camera.zFar);
 
         for (var i = 0; i < scene.figures.length; i++) {
+             
             var f = scene.figures[i];
 
             var worldMatrix = BABYLON.Matrix.RotationYawPitchRoll(
@@ -984,7 +1000,7 @@ class Renderer3d extends Renderer {
     }
 
     private projectVertex(vertex: Vertex, transMat: BABYLON.Matrix, worldMat: BABYLON.Matrix): Vertex {
-
+        
         var point3DWorld = BABYLON.Vector3.TransformCoordinates(vertex.coordinates, worldMat);
         var normal3DWorld = BABYLON.Vector3.TransformCoordinates(vertex.normal, worldMat);
         var coord = this.projectVector(vertex.coordinates, transMat);
@@ -998,12 +1014,12 @@ class Renderer3d extends Renderer {
     }
 
     private projectFigure(f: Figure, worldMatrix: BABYLON.Matrix, transformMatrix: BABYLON.Matrix) {
-
+           
         f.projectedPosition = this.projectVector(f.position, transformMatrix);
-        var left = f.position.subtract(f.size);
-        var right = f.position.add(f.size);
-        var projectedSizeX = (this.projectVector(left, transformMatrix).x - this.projectVector(right, transformMatrix).x);
-        f.projectedSize.x = projectedSizeX;
+        var posPlusSize = f.position.add(f.size);
+        var posPlusSizeProjected = this.projectVector(posPlusSize, transformMatrix);
+        f.projectedSize.x = (-posPlusSizeProjected.x + f.projectedPosition.x) * 2;
+        f.projectedSize.y = (-posPlusSizeProjected.y + f.projectedPosition.y) * 2;
 
         if (f instanceof Mesh) {
             this.projectMesh(<Mesh>f, worldMatrix, transformMatrix);
@@ -1035,7 +1051,6 @@ class Renderer3d extends Renderer {
 
     public drawFigure(f: Figure) {
         if (f instanceof Circle) {
-            debugger 
             this.drawCircle(<Circle>f);
         }
         else if (f instanceof Sprite) {
@@ -1051,7 +1066,12 @@ class Renderer3d extends Renderer {
     }
 
     private drawSprite(sprite: Sprite) {
-        this.renderer2d.drawImage(sprite.projectedPosition.x, sprite.projectedPosition.y, sprite.projectedPosition.z, sprite.image);
+        var scale = new BABYLON.Vector2(1, 1);
+        scale.x = sprite.projectedSize.x / sprite.image.width;
+        scale.y = sprite.projectedSize.y / sprite.image.height;
+        var x = sprite.projectedPosition.x - sprite.projectedSize.x / 2;
+        var y = sprite.projectedPosition.y - sprite.projectedSize.y / 2;
+        this.renderer2d.drawImage(x, y, sprite.projectedPosition.z, sprite.image, scale);
     }
 
     private drawMesh(m: Mesh) {
@@ -1513,6 +1533,7 @@ class App {
     }
 
     private drawFps(fps: number) {
+        this.graphicOutput.drawText(fps.toString(), 11, 26, "000000");
         this.graphicOutput.drawText(fps.toString(), 10, 25);
     }
 

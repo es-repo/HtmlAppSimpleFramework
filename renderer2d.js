@@ -82,13 +82,27 @@ var Renderer2d = (function (_super) {
                     this.drawPoint(cx + x, cy + y, z, color);
     };
     Renderer2d.prototype.drawImage = function (x, y, z, image, scale) {
-        if (scale === void 0) { scale = 1; }
-        for (var i = 0; i < image.height; i++) {
-            var py = y + i;
-            for (var j = 0; j < image.width; j++) {
-                var px = x + j;
-                var bi = image.get_index(j, i);
-                this.drawPointInternal(px, py, z, image.array[bi], image.array[bi + 1], image.array[bi + 2], image.array[bi + 3]);
+        if (scale === void 0) { scale = null; }
+        if (scale == null)
+            scale = new BABYLON.Vector2(0, 0);
+        for (var i = 0, py = y, fullpy = 0; i < image.height; i++) {
+            fullpy += scale.y;
+            if (fullpy >= 1) {
+                while (fullpy >= 1) {
+                    for (var j = 0, px = x, fullpx = 0; j < image.width; j++) {
+                        fullpx += scale.x;
+                        if (fullpx >= 1) {
+                            while (fullpx >= 1) {
+                                var bi = image.get_index(j, i);
+                                this.drawPointInternal(px, py, z, image.array[bi], image.array[bi + 1], image.array[bi + 2], image.array[bi + 3]);
+                                fullpx--;
+                                px++;
+                            }
+                        }
+                    }
+                    fullpy--;
+                    py++;
+                }
             }
         }
     };

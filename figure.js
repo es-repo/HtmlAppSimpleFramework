@@ -48,7 +48,6 @@ var Sprite = (function (_super) {
     function Sprite(image) {
         _super.call(this);
         this.image = image;
-        this.size = new BABYLON.Vector3(image.width, image.height, 0);
     }
     return Sprite;
 })(Figure);

@@ -25,6 +25,5 @@ class Sprite extends Figure {
     constructor(image) {
         super();
         this.image = image;
-        this.size = new BABYLON.Vector3(image.width, image.height, 0);
     }
 }

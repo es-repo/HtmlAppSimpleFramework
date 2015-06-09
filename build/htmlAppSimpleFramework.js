@@ -604,7 +604,6 @@ var Sprite = (function (_super) {
     function Sprite(image) {
         _super.call(this);
         this.image = image;
-        this.size = new BABYLON.Vector3(image.width, image.height, 0);
     }
     return Sprite;
 })(Figure);
@@ -885,13 +884,27 @@ var Renderer2d = (function (_super) {
                     this.drawPoint(cx + x, cy + y, z, color);
     };
     Renderer2d.prototype.drawImage = function (x, y, z, image, scale) {
-        if (scale === void 0) { scale = 1; }
-        for (var i = 0; i < image.height; i++) {
-            var py = y + i;
-            for (var j = 0; j < image.width; j++) {
-                var px = x + j;
-                var bi = image.get_index(j, i);
-                this.drawPointInternal(px, py, z, image.array[bi], image.array[bi + 1], image.array[bi + 2], image.array[bi + 3]);
+        if (scale === void 0) { scale = null; }
+        if (scale == null)
+            scale = new BABYLON.Vector2(0, 0);
+        for (var i = 0, py = y, fullpy = 0; i < image.height; i++) {
+            fullpy += scale.y;
+            if (fullpy >= 1) {
+                while (fullpy >= 1) {
+                    for (var j = 0, px = x, fullpx = 0; j < image.width; j++) {
+                        fullpx += scale.x;
+                        if (fullpx >= 1) {
+                            while (fullpx >= 1) {
+                                var bi = image.get_index(j, i);
+                                this.drawPointInternal(px, py, z, image.array[bi], image.array[bi + 1], image.array[bi + 2], image.array[bi + 3]);
+                                fullpx--;
+                                px++;
+                            }
+                        }
+                    }
+                    fullpy--;
+                    py++;
+                }
             }
         }
     };
@@ -940,10 +953,10 @@ var Renderer3d = (function (_super) {
     };
     Renderer3d.prototype.projectFigure = function (f, worldMatrix, transformMatrix) {
         f.projectedPosition = this.projectVector(f.position, transformMatrix);
-        var left = f.position.subtract(f.size);
-        var right = f.position.add(f.size);
-        var projectedSizeX = (this.projectVector(left, transformMatrix).x - this.projectVector(right, transformMatrix).x);
-        f.projectedSize.x = projectedSizeX;
+        var posPlusSize = f.position.add(f.size);
+        var posPlusSizeProjected = this.projectVector(posPlusSize, transformMatrix);
+        f.projectedSize.x = (-posPlusSizeProjected.x + f.projectedPosition.x) * 2;
+        f.projectedSize.y = (-posPlusSizeProjected.y + f.projectedPosition.y) * 2;
         if (f instanceof Mesh) {
             this.projectMesh(f, worldMatrix, transformMatrix);
         }
@@ -967,7 +980,6 @@ var Renderer3d = (function (_super) {
     };
     Renderer3d.prototype.drawFigure = function (f) {
         if (f instanceof Circle) {
-            debugger;
             this.drawCircle(f);
         }
         else if (f instanceof Sprite) {
@@ -981,7 +993,12 @@ var Renderer3d = (function (_super) {
         this.renderer2d.drawFilledCircle(circle.projectedPosition.x, circle.projectedPosition.y, circle.projectedPosition.z, circle.get_projectedRadius(), circle.color);
     };
     Renderer3d.prototype.drawSprite = function (sprite) {
-        this.renderer2d.drawImage(sprite.projectedPosition.x, sprite.projectedPosition.y, sprite.projectedPosition.z, sprite.image);
+        var scale = new BABYLON.Vector2(1, 1);
+        scale.x = sprite.projectedSize.x / sprite.image.width;
+        scale.y = sprite.projectedSize.y / sprite.image.height;
+        var x = sprite.projectedPosition.x - sprite.projectedSize.x / 2;
+        var y = sprite.projectedPosition.y - sprite.projectedSize.y / 2;
+        this.renderer2d.drawImage(x, y, sprite.projectedPosition.z, sprite.image, scale);
     };
     Renderer3d.prototype.drawMesh = function (m) {
         for (var indexFaces = 0; indexFaces < m.faces.length; indexFaces++) {
@@ -1372,6 +1389,7 @@ var App = (function () {
         this.graphicOutput.drawBuffer();
     };
     App.prototype.drawFps = function (fps) {
+        this.graphicOutput.drawText(fps.toString(), 11, 26, "000000");
         this.graphicOutput.drawText(fps.toString(), 10, 25);
     };
     App.prototype.handleKeyboardEvent = function (eventArgs) {
