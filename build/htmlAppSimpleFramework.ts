@@ -568,7 +568,8 @@ class Figure {
     public projectedSize:BABYLON.Vector3 = BABYLON.Vector3.Zero();
     public position: BABYLON.Vector3 = BABYLON.Vector3.Zero();
     public projectedPosition: BABYLON.Vector3 = BABYLON.Vector3.Zero();
-    public rotation: BABYLON.Vector3 = new BABYLON.Vector3(0, 0, 0);
+    public rotation: BABYLON.Vector3 = BABYLON.Vector3.Zero();
+    public velocity: BABYLON.Vector3 = BABYLON.Vector3.Zero();
     public color: BABYLON.Color4 = new BABYLON.Color4(0, 0, 0, 0);
 }
 
@@ -1524,6 +1525,11 @@ class App {
     }
 
     protected doLogicStep() {
+        for (var i = 0; i < this.scene.figures.length; i++) {
+            var f = this.scene.figures[i];
+            f.position.x += f.velocity.x;
+            f.position.y += f.velocity.y;
+        }
     }
 
     protected drawFrame() {

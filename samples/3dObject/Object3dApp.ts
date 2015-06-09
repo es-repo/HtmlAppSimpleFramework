@@ -30,6 +30,7 @@
     }
 
     protected doLogicStep() {
+        super.doLogicStep();
         this.rotateScene(this.scene, this.rotateVector);
     }
 

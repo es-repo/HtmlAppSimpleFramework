@@ -566,7 +566,8 @@ var Figure = (function () {
         this.projectedSize = BABYLON.Vector3.Zero();
         this.position = BABYLON.Vector3.Zero();
         this.projectedPosition = BABYLON.Vector3.Zero();
-        this.rotation = new BABYLON.Vector3(0, 0, 0);
+        this.rotation = BABYLON.Vector3.Zero();
+        this.velocity = BABYLON.Vector3.Zero();
         this.color = new BABYLON.Color4(0, 0, 0, 0);
     }
     return Figure;
@@ -1382,6 +1383,11 @@ var App = (function () {
         this.drawFps(fps);
     };
     App.prototype.doLogicStep = function () {
+        for (var i = 0; i < this.scene.figures.length; i++) {
+            var f = this.scene.figures[i];
+            f.position.x += f.velocity.x;
+            f.position.y += f.velocity.y;
+        }
     };
     App.prototype.drawFrame = function () {
         this.renderer3d.output.clear();

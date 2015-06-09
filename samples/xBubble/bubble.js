@@ -8,7 +8,6 @@ var Bubble = (function (_super) {
     __extends(Bubble, _super);
     function Bubble() {
         _super.apply(this, arguments);
-        this.moveVector = new BABYLON.Vector2(0, 0);
     }
     Bubble.prototype.canAbsorb = function (b) {
         var r1 = this.get_radius();

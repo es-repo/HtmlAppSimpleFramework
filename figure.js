@@ -10,7 +10,8 @@ var Figure = (function () {
         this.projectedSize = BABYLON.Vector3.Zero();
         this.position = BABYLON.Vector3.Zero();
         this.projectedPosition = BABYLON.Vector3.Zero();
-        this.rotation = new BABYLON.Vector3(0, 0, 0);
+        this.rotation = BABYLON.Vector3.Zero();
+        this.velocity = BABYLON.Vector3.Zero();
         this.color = new BABYLON.Color4(0, 0, 0, 0);
     }
     return Figure;

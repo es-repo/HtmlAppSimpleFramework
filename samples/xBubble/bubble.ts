@@ -3,9 +3,7 @@
     public static canBeAbsorbedColor: BABYLON.Color4 = new BABYLON.Color4(0, 0, 1, 1);
     public static canDamageColor: BABYLON.Color4 = new BABYLON.Color4(1, 0, 1, 1);
     public static canAnnihilateColor: BABYLON.Color4 = new BABYLON.Color4(1, 0, 0, 1);
-
-    public moveVector: BABYLON.Vector2 = new BABYLON.Vector2(0, 0);
-
+    
     public canAbsorb(b: Bubble) {
         var r1 = this.get_radius();
         var r2 = b.get_radius();

@@ -58,6 +58,11 @@
     }
 
     protected doLogicStep() {
+        for (var i = 0; i < this.scene.figures.length; i++) {
+            var f = this.scene.figures[i];
+            f.position.x += f.velocity.x;
+            f.position.y += f.velocity.y;
+        }
     }
 
     protected drawFrame() {

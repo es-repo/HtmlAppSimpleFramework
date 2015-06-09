@@ -43,6 +43,11 @@ var App = (function () {
         this.drawFps(fps);
     };
     App.prototype.doLogicStep = function () {
+        for (var i = 0; i < this.scene.figures.length; i++) {
+            var f = this.scene.figures[i];
+            f.position.x += f.velocity.x;
+            f.position.y += f.velocity.y;
+        }
     };
     App.prototype.drawFrame = function () {
         this.renderer3d.output.clear();

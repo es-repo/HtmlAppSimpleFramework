@@ -1,3 +1,3 @@
 ﻿class Player extends Bubble {
-    public moveDelta: number = 0.01;
+    public velocityDelta: number = 0.01;
 } 

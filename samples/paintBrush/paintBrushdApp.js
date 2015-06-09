@@ -81,12 +81,13 @@ var PaintBrushApp = (function (_super) {
         continuation(scene);
     };
     PaintBrushApp.prototype.doLogicStep = function () {
+        _super.prototype.doLogicStep.call(this);
         if (this.isDrunkMode) {
             var v = new BABYLON.Vector3(Math.sin(this.drunkModeShift) * 0.1, Math.cos(this.drunkModeShift) * 0.1, Math.sin(this.drunkModeShift - Math.PI / 2) * 0.4);
             this.sprite.position.x += v.x;
             this.sprite.position.y += v.y;
             this.scene.camera.position.z += v.z;
-            this.drunkModeShift -= 0.1;
+            this.drunkModeShift -= 0.05;
         }
     };
     PaintBrushApp.prototype.handleKeyboardEvent = function (eventArgs) {

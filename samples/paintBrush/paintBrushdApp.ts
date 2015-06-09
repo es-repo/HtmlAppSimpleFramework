@@ -87,6 +87,7 @@ class PaintBrushApp extends App {
     }
 
     protected doLogicStep() {
+        super.doLogicStep();
 
         if (this.isDrunkMode) {
             var v = new BABYLON.Vector3(
@@ -96,7 +97,7 @@ class PaintBrushApp extends App {
             this.sprite.position.x += v.x;
             this.sprite.position.y += v.y;
             this.scene.camera.position.z += v.z;
-            this.drunkModeShift -= 0.1;
+            this.drunkModeShift -= 0.05;
         }
     }
 

@@ -113,6 +113,6 @@
     </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>powershell -file "$(ProjectDir)\build\postbuild.ps1"</PostBuildEvent>
+    <PostBuildEvent>powershell -ExecutionPolicy ByPass -file "$(ProjectDir)\build\postbuild.ps1"</PostBuildEvent>
   </PropertyGroup>
 </Project>

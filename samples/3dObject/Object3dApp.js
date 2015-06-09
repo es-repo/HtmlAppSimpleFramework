@@ -29,6 +29,7 @@ var Object3dApp = (function (_super) {
         //});
     };
     Object3dApp.prototype.doLogicStep = function () {
+        _super.prototype.doLogicStep.call(this);
         this.rotateScene(this.scene, this.rotateVector);
     };
     Object3dApp.prototype.rotateScene = function (scene, rotationDelta) {
