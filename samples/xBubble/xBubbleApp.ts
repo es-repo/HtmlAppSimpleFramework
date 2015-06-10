@@ -38,9 +38,11 @@
             var changeBubbleVelocity = Math.random() < 0.05;
             if (changeBubbleVelocity) {
                 var maxSpeed = 0.1;
-                b.velocity.x = (-0.5 + Math.random()) * maxSpeed;
-                b.velocity.y = (-0.5 + Math.random()) * maxSpeed;
+                b.nextVelocity = new BABYLON.Vector3((-0.5 + Math.random()) * maxSpeed, (-0.5 + Math.random()) * maxSpeed, 0);
             }
+
+            var velocityDelta = 0.001;
+            XBubbleApp.tendVectorTo(b.velocity, b.nextVelocity, velocityDelta);
         }
 
         var collidedWith = this.phisics.detectCollision(xBubbleScene, xBubbleScene.player);
@@ -61,6 +63,29 @@
                 }
             }
         }
+    }
+
+    private static tendVectorTo(v: BABYLON.Vector3, to: BABYLON.Vector3, delta: number) {
+        v.x = XBubbleApp.tendValueTo(v.x, to.x, delta);
+        v.y = XBubbleApp.tendValueTo(v.y, to.y, delta);
+        v.z = XBubbleApp.tendValueTo(v.z, to.z, delta);
+    }
+
+    private static tendValueTo(v: number, to: number, delta: number): number {
+        var r = v;
+        if (Math.abs(v - to) > 0.0001) {
+            if (v < to) {
+                r = v + delta;
+                if (r > to)
+                    r = to;
+            } else {
+                r = v - delta;
+                if (r < to) {
+                    r = to;
+                }
+            }
+        }
+        return r;
     }
 
     protected drawFrame() {

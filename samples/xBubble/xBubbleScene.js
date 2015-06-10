@@ -14,7 +14,7 @@ var XBubbleScene = (function (_super) {
                 var bubble = new Bubble();
                 bubble.position.x = -12 + i * 6;
                 bubble.position.y = -12 + j * 6;
-                bubble.set_radius(Math.random() * 3);
+                bubble.set_radius(Math.random() * 2.5 + 0.5);
                 bubble.color = new BABYLON.Color4(1, 0, 0, 1);
                 this.figures.push(bubble);
                 this.bubbles.push(bubble);
