@@ -19,11 +19,17 @@
   </PropertyGroup>
   <ItemGroup>
     <TypeScriptCompile Include="samples\3dObject\monkey.ts" />
+    <Content Include="css\jasmine.css" />
     <Content Include="samples\3dObject\index.html" />
     <Content Include="app.css" />
     <Content Include="index.html" />
     <Content Include="samples\3dObject\monkey.jpg" />
+    <Content Include="samples\stencil\index.html" />
     <Content Include="samples\paintBrush\index.html" />
+    <Content Include="samples\stencil\maze512.png" />
+    <Content Include="tests\jasmine\jasmine-html.js" />
+    <Content Include="tests\jasmine\jasmine.js" />
+    <Content Include="samples\stencil\tests\outlinerTests.js" />
     <Content Include="web.config" />
     <Content Include="samples\xBubble\index.html" />
   </ItemGroup>
@@ -53,7 +59,10 @@
     <TypeScriptCompile Include="renderer3d.ts" />
     <TypeScriptCompile Include="array1dAs2d.ts" />
     <TypeScriptCompile Include="colorBuffer.ts" />
+    <TypeScriptCompile Include="samples\stencil\stencilApp.ts" />
     <TypeScriptCompile Include="samples\paintBrush\paintBrushdApp.ts" />
+    <TypeScriptCompile Include="samples\stencil\outliner.ts" />
+    <TypeScriptCompile Include="samples\stencil\vectorizer.ts" />
     <TypeScriptCompile Include="scanLineData.ts" />
     <TypeScriptCompile Include="scene.ts" />
     <TypeScriptCompile Include="texture.ts" />
@@ -73,6 +82,7 @@
       <DependentUpon>web.config</DependentUpon>
     </None>
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">12.0</VisualStudioVersion>
   </PropertyGroup>

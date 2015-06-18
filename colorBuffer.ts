@@ -15,4 +15,20 @@ class ColorBuffer extends Array1dAs2d<number> {
     public static create(width: number, height: number): ColorBuffer {
         return new ColorBuffer(new Array(width * height * 4), width);
     }
+
+    public static fromHtmlImage(urlOrData64: string, continuation: (cb: ColorBuffer) => void) {
+        var image = new Image();
+        image.onload = () => {
+            var canvas: HTMLCanvasElement = document.createElement("canvas");
+            canvas.width = image.width;
+            canvas.height = image.height;
+            var internalContext: CanvasRenderingContext2D = canvas.getContext("2d");
+            internalContext.drawImage(image, 0, 0);
+            var data = internalContext.getImageData(0, 0, image.width, image.height).data;
+            var cb = new ColorBuffer(data, image.width);
+            continuation(cb);
+        };
+        image.src = urlOrData64;
+    }
+
 }

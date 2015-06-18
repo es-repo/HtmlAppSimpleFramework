@@ -4,24 +4,27 @@ var App = (function () {
         this.phisics = new Phisics();
         this.inputDevices = inputDevices;
         this.renderer3d = new Renderer3d(this.createRendererOutput());
+        this.renderer2d = this.renderer3d.renderer2d;
     }
     App.prototype.start = function () {
         var _this = this;
-        this.onStart();
-        this.createScene(function (scene) {
-            _this.scene = scene;
-            requestAnimationFrame(function () { return _this.loopAnimation(); });
-            if (_this.inputDevices.keyboard != null)
-                _this.inputDevices.keyboard.inputEvent.addHandler(function (args) {
-                    _this.handleKeyboardEvent(args);
-                });
-            if (_this.inputDevices.mouse != null)
-                _this.inputDevices.mouse.inputEvent.addHandler(function (args) {
-                    _this.handleMouseEvent(args);
-                });
+        this.onStart(function () {
+            _this.createScene(function (scene) {
+                _this.scene = scene;
+                requestAnimationFrame(function () { return _this.loopAnimation(); });
+                if (_this.inputDevices.keyboard != null)
+                    _this.inputDevices.keyboard.inputEvent.addHandler(function (args) {
+                        _this.handleKeyboardEvent(args);
+                    });
+                if (_this.inputDevices.mouse != null)
+                    _this.inputDevices.mouse.inputEvent.addHandler(function (args) {
+                        _this.handleMouseEvent(args);
+                    });
+            });
         });
     };
-    App.prototype.onStart = function () {
+    App.prototype.onStart = function (continuation) {
+        continuation();
     };
     App.prototype.createRendererOutput = function () {
         return new RendererOutput(this.graphicOutput.get_buffer());

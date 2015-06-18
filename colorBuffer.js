@@ -19,5 +19,19 @@ var ColorBuffer = (function (_super) {
     ColorBuffer.create = function (width, height) {
         return new ColorBuffer(new Array(width * height * 4), width);
     };
+    ColorBuffer.fromHtmlImage = function (urlOrData64, continuation) {
+        var image = new Image();
+        image.onload = function () {
+            var canvas = document.createElement("canvas");
+            canvas.width = image.width;
+            canvas.height = image.height;
+            var internalContext = canvas.getContext("2d");
+            internalContext.drawImage(image, 0, 0);
+            var data = internalContext.getImageData(0, 0, image.width, image.height).data;
+            var cb = new ColorBuffer(data, image.width);
+            continuation(cb);
+        };
+        image.src = urlOrData64;
+    };
     return ColorBuffer;
 })(Array1dAs2d);

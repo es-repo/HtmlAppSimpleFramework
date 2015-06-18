@@ -504,6 +504,20 @@ var ColorBuffer = (function (_super) {
     ColorBuffer.create = function (width, height) {
         return new ColorBuffer(new Array(width * height * 4), width);
     };
+    ColorBuffer.fromHtmlImage = function (urlOrData64, continuation) {
+        var image = new Image();
+        image.onload = function () {
+            var canvas = document.createElement("canvas");
+            canvas.width = image.width;
+            canvas.height = image.height;
+            var internalContext = canvas.getContext("2d");
+            internalContext.drawImage(image, 0, 0);
+            var data = internalContext.getImageData(0, 0, image.width, image.height).data;
+            var cb = new ColorBuffer(data, image.width);
+            continuation(cb);
+        };
+        image.src = urlOrData64;
+    };
     return ColorBuffer;
 })(Array1dAs2d);
 var GraphicOutput = (function () {
@@ -789,12 +803,15 @@ var RendererOutput = (function () {
         this.width = colorBuffer.width;
         this.height = colorBuffer.height;
         this.depthBuffer = new Array1dAs2d(new Array(colorBuffer.width * colorBuffer.height), colorBuffer.width);
-        this.clear();
+        this.resetDepthBuffer();
     }
     RendererOutput.prototype.clear = function () {
         for (var i = 0; i < this.colorBuffer.array.length; i++) {
             this.colorBuffer.array[i] = 0;
         }
+        this.resetDepthBuffer();
+    };
+    RendererOutput.prototype.resetDepthBuffer = function () {
         for (var i = 0; i < this.depthBuffer.array.length; i++) {
             this.depthBuffer.array[i] = 10000000; // Max possible value 
         }
@@ -887,12 +904,22 @@ var Renderer2d = (function (_super) {
     Renderer2d.prototype.drawImage = function (x, y, z, image, scale) {
         if (scale === void 0) { scale = null; }
         if (scale == null)
-            scale = new BABYLON.Vector2(0, 0);
-        for (var i = 0, py = y, fullpy = 0; i < image.height; i++) {
+            scale = new BABYLON.Vector2(1, 1);
+        var sx = 0;
+        if (x < 0) {
+            sx = -x / scale.x >> 0;
+            x = 0;
+        }
+        var sy = 0;
+        if (y < 0) {
+            sy = -y / scale.y >> 0;
+            y = 0;
+        }
+        for (var i = sy, py = y, fullpy = 0; i < image.height && py < this.output.height; i++) {
             fullpy += scale.y;
             if (fullpy >= 1) {
                 while (fullpy >= 1) {
-                    for (var j = 0, px = x, fullpx = 0; j < image.width; j++) {
+                    for (var j = sx, px = x, fullpx = 0; j < image.width && px < this.output.width; j++) {
                         fullpx += scale.x;
                         if (fullpx >= 1) {
                             while (fullpx >= 1) {
@@ -1344,24 +1371,27 @@ var App = (function () {
         this.phisics = new Phisics();
         this.inputDevices = inputDevices;
         this.renderer3d = new Renderer3d(this.createRendererOutput());
+        this.renderer2d = this.renderer3d.renderer2d;
     }
     App.prototype.start = function () {
         var _this = this;
-        this.onStart();
-        this.createScene(function (scene) {
-            _this.scene = scene;
-            requestAnimationFrame(function () { return _this.loopAnimation(); });
-            if (_this.inputDevices.keyboard != null)
-                _this.inputDevices.keyboard.inputEvent.addHandler(function (args) {
-                    _this.handleKeyboardEvent(args);
-                });
-            if (_this.inputDevices.mouse != null)
-                _this.inputDevices.mouse.inputEvent.addHandler(function (args) {
-                    _this.handleMouseEvent(args);
-                });
+        this.onStart(function () {
+            _this.createScene(function (scene) {
+                _this.scene = scene;
+                requestAnimationFrame(function () { return _this.loopAnimation(); });
+                if (_this.inputDevices.keyboard != null)
+                    _this.inputDevices.keyboard.inputEvent.addHandler(function (args) {
+                        _this.handleKeyboardEvent(args);
+                    });
+                if (_this.inputDevices.mouse != null)
+                    _this.inputDevices.mouse.inputEvent.addHandler(function (args) {
+                        _this.handleMouseEvent(args);
+                    });
+            });
         });
     };
-    App.prototype.onStart = function () {
+    App.prototype.onStart = function (continuation) {
+        continuation();
     };
     App.prototype.createRendererOutput = function () {
         return new RendererOutput(this.graphicOutput.get_buffer());

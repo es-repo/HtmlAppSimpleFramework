@@ -84,12 +84,22 @@ var Renderer2d = (function (_super) {
     Renderer2d.prototype.drawImage = function (x, y, z, image, scale) {
         if (scale === void 0) { scale = null; }
         if (scale == null)
-            scale = new BABYLON.Vector2(0, 0);
-        for (var i = 0, py = y, fullpy = 0; i < image.height; i++) {
+            scale = new BABYLON.Vector2(1, 1);
+        var sx = 0;
+        if (x < 0) {
+            sx = -x / scale.x >> 0;
+            x = 0;
+        }
+        var sy = 0;
+        if (y < 0) {
+            sy = -y / scale.y >> 0;
+            y = 0;
+        }
+        for (var i = sy, py = y, fullpy = 0; i < image.height && py < this.output.height; i++) {
             fullpy += scale.y;
             if (fullpy >= 1) {
                 while (fullpy >= 1) {
-                    for (var j = 0, px = x, fullpx = 0; j < image.width; j++) {
+                    for (var j = sx, px = x, fullpx = 0; j < image.width && px < this.output.width; j++) {
                         fullpx += scale.x;
                         if (fullpx >= 1) {
                             while (fullpx >= 1) {

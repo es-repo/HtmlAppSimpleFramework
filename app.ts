@@ -2,6 +2,7 @@
 
     protected graphicOutput: GraphicOutput;
     protected renderer3d: Renderer3d;
+    protected renderer2d: Renderer2d;
     protected scene: Scene;
     protected phisics: Phisics;
     protected inputDevices: InputDevices;
@@ -12,28 +13,32 @@
         this.phisics = new Phisics();
         this.inputDevices = inputDevices;
         this.renderer3d = new Renderer3d(this.createRendererOutput());
+        this.renderer2d = this.renderer3d.renderer2d;
     }
 
     private start() {
-        this.onStart();
-        this.createScene((scene) => {
-            this.scene = scene;
+        this.onStart(() => {
+            this.createScene((scene) => {
+                this.scene = scene;
 
-            requestAnimationFrame(() => this.loopAnimation());
+                requestAnimationFrame(() => this.loopAnimation());
 
-            if (this.inputDevices.keyboard != null)
-                this.inputDevices.keyboard.inputEvent.addHandler(args => {
-                    this.handleKeyboardEvent(args);
-                });
+                if (this.inputDevices.keyboard != null)
+                    this.inputDevices.keyboard.inputEvent.addHandler(args => {
+                        this.handleKeyboardEvent(args);
+                    });
 
-            if (this.inputDevices.mouse != null)
-                this.inputDevices.mouse.inputEvent.addHandler(args => {
-                    this.handleMouseEvent(args);
-                });
+                if (this.inputDevices.mouse != null)
+                    this.inputDevices.mouse.inputEvent.addHandler(args => {
+                        this.handleMouseEvent(args);
+                    });
+            });
         });
     }
 
-    protected onStart() {}
+    protected onStart(continuation: () => any) {
+        continuation();
+    }
 
     protected createRendererOutput(): RendererOutput {
         return new RendererOutput(this.graphicOutput.get_buffer());
@@ -90,7 +95,6 @@
                 this.scene.camera.position.z -= cameraDelta;
             }
         }
-
     }
 
     public handleMouseEvent(eventArgs: MouseEventArgs) {

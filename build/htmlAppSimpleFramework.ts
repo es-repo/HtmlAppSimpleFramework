@@ -520,6 +520,22 @@ class ColorBuffer extends Array1dAs2d<number> {
     public static create(width: number, height: number): ColorBuffer {
         return new ColorBuffer(new Array(width * height * 4), width);
     }
+
+    public static fromHtmlImage(urlOrData64: string, continuation: (cb: ColorBuffer) => void) {
+        var image = new Image();
+        image.onload = () => {
+            var canvas: HTMLCanvasElement = document.createElement("canvas");
+            canvas.width = image.width;
+            canvas.height = image.height;
+            var internalContext: CanvasRenderingContext2D = canvas.getContext("2d");
+            internalContext.drawImage(image, 0, 0);
+            var data = internalContext.getImageData(0, 0, image.width, image.height).data;
+            var cb = new ColorBuffer(data, image.width);
+            continuation(cb);
+        };
+        image.src = urlOrData64;
+    }
+
 }
 class GraphicOutput {
     
@@ -820,14 +836,17 @@ class RendererOutput {
         this.width = colorBuffer.width;
         this.height = colorBuffer.height;
         this.depthBuffer = new Array1dAs2d(new Array(colorBuffer.width * colorBuffer.height), colorBuffer.width);
-        this.clear();
+        this.resetDepthBuffer();
     }
 
     public clear() {
         for (var i = 0; i < this.colorBuffer.array.length; i++) {
             this.colorBuffer.array[i] = 0;  
         }
+        this.resetDepthBuffer();
+    }
 
+    private resetDepthBuffer() {
         for (var i = 0; i < this.depthBuffer.array.length; i++) {
             this.depthBuffer.array[i] = 10000000; // Max possible value 
         }
@@ -930,14 +949,24 @@ class Renderer2d extends Renderer {
 
     public drawImage(x: number, y: number, z: number, image: ColorBuffer, scale: BABYLON.Vector2 = null) {
         if (scale == null)
-            scale = new BABYLON.Vector2(0, 0);
-        
-        
-        for (var i = 0, py = y, fullpy = 0; i < image.height; i++) {
+            scale = new BABYLON.Vector2(1, 1);
+
+        var sx = 0;
+        if (x < 0) {
+            sx = - x / scale.x >> 0;
+            x = 0;
+        }
+        var sy = 0;
+        if (y < 0) {
+            sy = -y / scale.y >> 0;
+            y = 0;
+        }
+
+        for (var i = sy, py = y, fullpy = 0; i < image.height && py < this.output.height; i++) {
             fullpy += scale.y;
             if (fullpy >= 1) {
                 while (fullpy >= 1) {
-                    for (var j = 0, px = x, fullpx = 0; j < image.width; j++) {
+                    for (var j = sx, px = x, fullpx = 0; j < image.width && px < this.output.width; j++) {
                         fullpx += scale.x;
                         if (fullpx >= 1) {
                             while (fullpx >= 1) {
@@ -1469,6 +1498,7 @@ class App {
 
     protected graphicOutput: GraphicOutput;
     protected renderer3d: Renderer3d;
+    protected renderer2d: Renderer2d;
     protected scene: Scene;
     protected phisics: Phisics;
     protected inputDevices: InputDevices;
@@ -1479,28 +1509,32 @@ class App {
         this.phisics = new Phisics();
         this.inputDevices = inputDevices;
         this.renderer3d = new Renderer3d(this.createRendererOutput());
+        this.renderer2d = this.renderer3d.renderer2d;
     }
 
     private start() {
-        this.onStart();
-        this.createScene((scene) => {
-            this.scene = scene;
+        this.onStart(() => {
+            this.createScene((scene) => {
+                this.scene = scene;
 
-            requestAnimationFrame(() => this.loopAnimation());
+                requestAnimationFrame(() => this.loopAnimation());
 
-            if (this.inputDevices.keyboard != null)
-                this.inputDevices.keyboard.inputEvent.addHandler(args => {
-                    this.handleKeyboardEvent(args);
-                });
+                if (this.inputDevices.keyboard != null)
+                    this.inputDevices.keyboard.inputEvent.addHandler(args => {
+                        this.handleKeyboardEvent(args);
+                    });
 
-            if (this.inputDevices.mouse != null)
-                this.inputDevices.mouse.inputEvent.addHandler(args => {
-                    this.handleMouseEvent(args);
-                });
+                if (this.inputDevices.mouse != null)
+                    this.inputDevices.mouse.inputEvent.addHandler(args => {
+                        this.handleMouseEvent(args);
+                    });
+            });
         });
     }
 
-    protected onStart() {}
+    protected onStart(continuation: () => any) {
+        continuation();
+    }
 
     protected createRendererOutput(): RendererOutput {
         return new RendererOutput(this.graphicOutput.get_buffer());
@@ -1557,7 +1591,6 @@ class App {
                 this.scene.camera.position.z -= cameraDelta;
             }
         }
-
     }
 
     public handleMouseEvent(eventArgs: MouseEventArgs) {
