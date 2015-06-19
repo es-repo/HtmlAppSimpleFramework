@@ -26,6 +26,8 @@
     <Content Include="samples\3dObject\monkey.jpg" />
     <Content Include="samples\stencil\index.html" />
     <Content Include="samples\paintBrush\index.html" />
+    <Content Include="samples\stencil\maze128.png" />
+    <Content Include="samples\stencil\maze256.png" />
     <Content Include="samples\stencil\maze512.png" />
     <Content Include="tests\jasmine\jasmine-html.js" />
     <Content Include="tests\jasmine\jasmine.js" />

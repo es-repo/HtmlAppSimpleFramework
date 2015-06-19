@@ -504,7 +504,7 @@ var ColorBuffer = (function (_super) {
     ColorBuffer.create = function (width, height) {
         return new ColorBuffer(new Array(width * height * 4), width);
     };
-    ColorBuffer.fromHtmlImage = function (urlOrData64, continuation) {
+    ColorBuffer.fromHtmlImage = function (urlOrBase64Data, continuation) {
         var image = new Image();
         image.onload = function () {
             var canvas = document.createElement("canvas");
@@ -516,7 +516,7 @@ var ColorBuffer = (function (_super) {
             var cb = new ColorBuffer(data, image.width);
             continuation(cb);
         };
-        image.src = urlOrData64;
+        image.src = urlOrBase64Data;
     };
     return ColorBuffer;
 })(Array1dAs2d);

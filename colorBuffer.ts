@@ -16,7 +16,7 @@ class ColorBuffer extends Array1dAs2d<number> {
         return new ColorBuffer(new Array(width * height * 4), width);
     }
 
-    public static fromHtmlImage(urlOrData64: string, continuation: (cb: ColorBuffer) => void) {
+    public static fromHtmlImage(urlOrBase64Data: string, continuation: (cb: ColorBuffer) => void) {
         var image = new Image();
         image.onload = () => {
             var canvas: HTMLCanvasElement = document.createElement("canvas");
@@ -28,7 +28,7 @@ class ColorBuffer extends Array1dAs2d<number> {
             var cb = new ColorBuffer(data, image.width);
             continuation(cb);
         };
-        image.src = urlOrData64;
+        image.src = urlOrBase64Data;
     }
 
 }

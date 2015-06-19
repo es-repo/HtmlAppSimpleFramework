@@ -12,6 +12,12 @@
 <body>
 <canvas id="canvas" width="640" height="480"></canvas>
 <div>
+    Image:<select id="imageSelect">
+        <option value="maze128.png">maze 128</option>
+        <option value="maze256.png" selected="selected">maze 256</option>
+        <option value="maze512.png">maze 512</option>
+    </select>
+    <label><input type="checkbox" id="showImageCheckbox" checked="true">Show image</label>
 </div>
 </body>
 <script>
@@ -21,6 +27,25 @@
         inputDevices.mouse = new HtmlMouse("canvas");
         var app = new StencilApp(new HtmlCanvasOutput("canvas"), inputDevices);
         app.start();
+
+        var imageSelect = document.getElementById("imageSelect");
+
+        function onImageSelectChanged(e) {
+            app.set_image(imageSelect.value);
+        }
+        
+        imageSelect.addEventListener("change", onImageSelectChanged);
+        onImageSelectChanged();
+
+        var showImageCheckbox = document.getElementById("showImageCheckbox");
+
+        function onShowImageCheckboxClicked(e) {
+            app.set_showImage(showImageCheckbox.checked);
+        }
+        
+        showImageCheckbox.addEventListener("click", onShowImageCheckboxClicked);
+        onShowImageCheckboxClicked();
     };
-</script>
+
+    </script>
 </html>
