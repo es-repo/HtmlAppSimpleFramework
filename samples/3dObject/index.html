@@ -10,10 +10,13 @@
     <script src="object3dApp.js"></script>
 </head>
 <body>
-<canvas id="canvas" width="640" height="480"></canvas>
-<div>
-    <label><input id="showTexturesCheckBox" type="checkbox" value="value" checked="checked">Show textures</label>
-</div>
+    <canvas id="canvas" width="640" height="480"></canvas>
+    <div>
+        <label><input type="radio" id="monkeyRadio" name="meshSelect" value="monkey" checked="checked">Monkey</label>
+        <label><input type="radio" id="cube1Radio" name="meshSelect" value="cube1"> Cube 1</label>
+        <label><input type="radio" id="cube2Radio" name="meshSelect" value="cube2"> Cube 2</label>
+        <label><input id="showTexturesCheckBox" type="checkbox" value="value" checked="checked">Show textures</label>
+    </div>
 </body>
 <script>
     window.onload = function () {
@@ -22,6 +25,29 @@
         inputDevices.mouse = new HtmlMouse("canvas");
         var app = new Object3dApp(new HtmlCanvasOutput("canvas"), inputDevices);
         app.start();
+
+        var monkeyRadio = document.getElementById("monkeyRadio");
+        var cube1Radio = document.getElementById("cube1Radio");
+        var cube2Radio = document.getElementById("cube2Radio");
+
+        function onMonkeyRadioClick() {
+            app.scene.figures = MeshFactory.createFromBabylonAndTextureBase64Data(Objects3dLib.monkey);
+            Object3dApp.rotateScene(app.scene, new BABYLON.Vector3(0, Math.PI, 0));
+        }
+
+        function onCube1RadioClick() {
+            app.scene.figures = [Object3dApp.createCube()];
+        }
+
+        function onCube2RadioClick() {
+            app.scene.figures = [Object3dApp.createCube2()];
+        }
+
+        monkeyRadio.addEventListener("click", onMonkeyRadioClick);
+        cube1Radio.addEventListener("click", onCube1RadioClick);
+        cube2Radio.addEventListener("click", onCube2RadioClick);
+
+        onMonkeyRadioClick();
     };
 </script>
 </html>

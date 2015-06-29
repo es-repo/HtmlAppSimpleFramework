@@ -14,12 +14,8 @@ var Object3dApp = (function (_super) {
         showTexturesCheckBox.addEventListener("click", function (ev) { return _this.renderer3d.renderSettings.showTextures = showTexturesCheckBox.checked; });
     }
     Object3dApp.prototype.createScene = function (continuation) {
-        var meshes = MeshFactory.createFromBabylonAndTextureBase64Data(Objects3dLib.monkey);
-        meshes = [Object3dApp.createCube2()];
         var scene = new Scene();
-        scene.figures = meshes;
         scene.camera.position.z = 10;
-        this.rotateScene(scene, new BABYLON.Vector3(0, Math.PI, 0));
         continuation((scene));
         //MeshFactory.loadFromBabylonJsonFileAsync("monkey.babylon", meshes => {
         //    var scene = new Scene();
@@ -110,9 +106,9 @@ var Object3dApp = (function (_super) {
     };
     Object3dApp.prototype.doLogicStep = function () {
         _super.prototype.doLogicStep.call(this);
-        this.rotateScene(this.scene, this.rotateVector);
+        Object3dApp.rotateScene(this.scene, this.rotateVector);
     };
-    Object3dApp.prototype.rotateScene = function (scene, rotationDelta) {
+    Object3dApp.rotateScene = function (scene, rotationDelta) {
         for (var i = 0; i < scene.figures.length; i++) {
             var m = scene.figures[i];
             m.rotation.x += rotationDelta.x;

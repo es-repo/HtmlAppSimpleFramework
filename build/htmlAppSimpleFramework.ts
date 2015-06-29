@@ -1525,7 +1525,7 @@ class App {
     protected graphicOutput: GraphicOutput;
     protected renderer3d: Renderer3d;
     protected renderer2d: Renderer2d;
-    protected scene: Scene;
+    public scene: Scene;
     protected phisics: Phisics;
     protected inputDevices: InputDevices;
     private previousFrameTime: number;

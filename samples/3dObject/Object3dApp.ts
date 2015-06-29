@@ -13,12 +13,8 @@
 
     protected createScene(continuation: (Scene: Scene) => void) {
 
-        var meshes = MeshFactory.createFromBabylonAndTextureBase64Data(Objects3dLib.monkey);
-        meshes = [Object3dApp.createCube2()]; 
         var scene = new Scene();
-        scene.figures = meshes;
         scene.camera.position.z = 10;
-        this.rotateScene(scene, new BABYLON.Vector3(0, Math.PI, 0));
         continuation((scene));
             
         //MeshFactory.loadFromBabylonJsonFileAsync("monkey.babylon", meshes => {
@@ -30,7 +26,7 @@
         //});
     }
 
-    private static createCube2(): Mesh {
+    public static createCube2(): Mesh {
         var vc = 36;
         var mesh = new Mesh(vc, vc / 3);
         mesh.vertices[0] = { coordinates: new BABYLON.Vector3(-1, 1, -1), normal: new BABYLON.Vector3(0, 0, 0), textureCoordinates: new BABYLON.Vector2(0, 0) };
@@ -100,7 +96,7 @@
         return mesh;
     }
 
-    private static createCube(): Mesh {
+    public static createCube(): Mesh {
         var mesh = new Mesh(8, 12);
         mesh.vertices[0] = { coordinates: new BABYLON.Vector3(1.0000, -1.0000, -1.0000), normal: new BABYLON.Vector3(0.5773, -0.5773, -0.5773), textureCoordinates: new BABYLON.Vector2(0, 0) };
         mesh.vertices[1] = { coordinates: new BABYLON.Vector3(-1.0000, -1.0000, -1.0000), normal: new BABYLON.Vector3(-0.5773, -0.5773, -0.5773), textureCoordinates: new BABYLON.Vector2(0, 0) };
@@ -129,10 +125,10 @@
 
     protected doLogicStep() {
         super.doLogicStep();
-        this.rotateScene(this.scene, this.rotateVector);
+        Object3dApp.rotateScene(this.scene, this.rotateVector);
     }
 
-    private rotateScene(scene: Scene, rotationDelta: BABYLON.Vector3) {
+    public static rotateScene(scene: Scene, rotationDelta: BABYLON.Vector3) {
         for (var i = 0; i < scene.figures.length; i++) {
             var m = <Mesh>scene.figures[i];
             m.rotation.x += rotationDelta.x;
