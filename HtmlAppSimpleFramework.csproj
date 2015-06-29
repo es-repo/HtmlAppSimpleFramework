@@ -28,7 +28,9 @@
     <Content Include="samples\paintBrush\index.html" />
     <Content Include="samples\stencil\maze128.png" />
     <Content Include="samples\stencil\maze256.png" />
+    <Content Include="samples\stencil\test1.png" />
     <Content Include="samples\stencil\maze512.png" />
+    <Content Include="samples\stencil\tests\triangulatorTests.js" />
     <Content Include="tests\jasmine\jasmine-html.js" />
     <Content Include="tests\jasmine\jasmine.js" />
     <Content Include="samples\stencil\tests\outlinerTests.js" />
@@ -61,9 +63,11 @@
     <TypeScriptCompile Include="renderer3d.ts" />
     <TypeScriptCompile Include="array1dAs2d.ts" />
     <TypeScriptCompile Include="colorBuffer.ts" />
+    <TypeScriptCompile Include="samples\stencil\Coord.ts" />
     <TypeScriptCompile Include="samples\stencil\stencilApp.ts" />
     <TypeScriptCompile Include="samples\paintBrush\paintBrushdApp.ts" />
     <TypeScriptCompile Include="samples\stencil\outliner.ts" />
+    <TypeScriptCompile Include="samples\stencil\triangulator.ts" />
     <TypeScriptCompile Include="samples\stencil\vectorizer.ts" />
     <TypeScriptCompile Include="scanLineData.ts" />
     <TypeScriptCompile Include="scene.ts" />

@@ -1,11 +1,11 @@
 ﻿class Outliner {
 
-    public static findOutlines(colorBuffer: ColorBuffer): { x: number; y: number }[][] {
+    public static findOutlines(colorBuffer: ColorBuffer): Coord[][] {
         var bw = Outliner.toBlackWhite(colorBuffer);
         return Outliner.findOutlinesBW(bw);
     }
 
-    public static findOutlinesBW(arr: number[][]): { x: number; y: number }[][] {
+    public static findOutlinesBW(arr: number[][]): Coord[][] {
 
         var outlines = [];
         var outlineStart = { x: 0, y: 0 };
@@ -32,7 +32,7 @@
         return arr;
     }
 
-    private static findOutline(arr: number[][], lookupStart: { x: number; y: number }): { x: number; y: number }[] {
+    private static findOutline(arr: number[][], lookupStart: Coord): Coord[] {
 
         var pos = lookupStart;
         var outline = [pos];
@@ -46,7 +46,7 @@
         return outline;
     }
 
-    private static findNextOutlineStart(arr: number[][], start: { x: number; y: number }): { x: number; y: number } {
+    private static findNextOutlineStart(arr: number[][], start: Coord): Coord {
         
         var startx = start.x;
         for (var i = start.y; i < arr.length; i++) {
@@ -70,7 +70,7 @@
         return null;
     }
 
-    private static getNextDirection(arr: number[][], pos: { x: number; y: number }) {
+    private static getNextDirection(arr: number[][], pos: Coord) {
 
         var rightd = { x: 1, y: 0 };
         var upd = { x: 0, y: 1 };
@@ -90,7 +90,7 @@
         return null;
     }
 
-    private static canGo(arr: number[][], pos: { x: number; y: number }, d: { x: number; y: number }): boolean {
+    private static canGo(arr: number[][], pos: Coord, d: Coord): boolean {
         var nextPos = { x: pos.x + d.x, y: pos.y + d.y };
         var freeInNextPos = Outliner.inArrayBoundares(arr, nextPos.x, nextPos.y) && arr[nextPos.y][nextPos.x] == 1;
         var emptyDown = !Outliner.inArrayBoundares(arr, nextPos.x, nextPos.y + 1) || arr[nextPos.y + 1][nextPos.x] == 0;

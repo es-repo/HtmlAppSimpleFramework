@@ -936,6 +936,28 @@ var Renderer2d = (function (_super) {
             }
         }
     };
+    Renderer2d.prototype.drawRectangle = function (x, y, z, width, height, color) {
+        this.drawLine(x, y, x + width, y, z, color);
+        this.drawLine(x + width, y, x + width, y + height, z, color);
+        this.drawLine(x + width, y + height, x, y + height, z, color);
+        this.drawLine(x, y + height, x, y, z, color);
+    };
+    Renderer2d.prototype.drawFilledRectangle = function (x, y, z, width, height, color) {
+        for (var i = y; i < y + width; i++)
+            this.drawLine(x, i, x + width - 1, i, z, color);
+    };
+    Renderer2d.prototype.drawPolygon = function (path, z, color) {
+        for (var i = 0; i < path.length - 1; i++) {
+            var p1 = path[i];
+            var p2 = path[i + 1];
+            this.drawLine(p1.x, p1.y, p2.x, p2.y, z, color);
+        }
+    };
+    Renderer2d.prototype.drawTriangle = function (xa, ya, xb, yb, xc, yc, z, color) {
+        this.drawLine(xa, ya, xb, yb, z, color);
+        this.drawLine(xb, yb, xc, yc, z, color);
+        this.drawLine(xc, yc, xa, ya, z, color);
+    };
     return Renderer2d;
 })(Renderer);
 // THE CODE IS BASED ON http://blogs.msdn.com/b/davrous/archive/2013/06/13/tutorial-series-learning-how-to-write-a-3d-soft-engine-from-scratch-in-c-typescript-or-javascript.aspx

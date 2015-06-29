@@ -7,18 +7,28 @@
     <link rel="stylesheet" href="../../app.css" type="text/css" />
     <script src="../../build/htmlAppSimpleFramework.js"></script>
     <script src="outliner.js"></script>
+    <script src="triangulator.js"></script>
     <script src="stencilApp.js"></script>
 </head>
 <body>
-<canvas id="canvas" width="640" height="480"></canvas>
-<div>
-    Image:<select id="imageSelect">
-        <option value="maze128.png">maze 128</option>
-        <option value="maze256.png" selected="selected">maze 256</option>
-        <option value="maze512.png">maze 512</option>
-    </select>
-    <label><input type="checkbox" id="showImageCheckbox" checked="true">Show image</label>
-</div>
+    <canvas id="canvas" width="640" height="480"></canvas>
+    <div>
+        Image: <select id="imageSelect">
+            <option value="test1.png" selected="selected">test 1</option>
+            <option value="maze128.png">maze 128</option>
+            <option value="maze256.png">maze 256</option>
+            <option value="maze512.png">maze 512</option>
+        </select>
+        <label><input type="checkbox" id="showImageCheckbox" checked="checked">Show image</label>
+    <div>
+        Quality: <input type="range" id="polygonQualityRange" min="1" max="30" value="20" style="width: 300px"><label id="polygonQualityValueLabel"></label>
+        <br/>
+        Shift: <input type="range" id="polygonShiftRange" min="0" max="29" value="0" style="width: 300px"><label id="polygonShiftValueLabel"></label>
+        <br/>
+        <label><input type="checkbox" id="showPolygonsCheckbox" checked="checked">Show polygons</label>
+        <br />
+        <label><input type="checkbox" id="showMeshesCheckbox" checked="checked">Show meshes</label>
+    </div>
 </body>
 <script>
     window.onload = function () {
@@ -33,19 +43,54 @@
         function onImageSelectChanged(e) {
             app.set_image(imageSelect.value);
         }
-        
+
         imageSelect.addEventListener("change", onImageSelectChanged);
         onImageSelectChanged();
 
         var showImageCheckbox = document.getElementById("showImageCheckbox");
 
-        function onShowImageCheckboxClicked(e) {
+        function onShowImageCheckboxClicked() {
             app.set_showImage(showImageCheckbox.checked);
         }
-        
+
         showImageCheckbox.addEventListener("click", onShowImageCheckboxClicked);
         onShowImageCheckboxClicked();
+
+        var polygonQualityRange = document.getElementById("polygonQualityRange");
+        var polygonQualityValueLabel = document.getElementById("polygonQualityValueLabel");
+        var polygonShiftRange = document.getElementById("polygonShiftRange");
+        var polygonShiftValueLabel = document.getElementById("polygonShiftValueLabel");
+
+        function onPolygonQualityRangeChanged() {
+            polygonQualityValueLabel.innerText = polygonQualityRange.value;
+            app.set_polygonQuality(parseInt(polygonQualityRange.value));
+        }
+
+        polygonQualityRange.addEventListener("change", onPolygonQualityRangeChanged);
+        onPolygonQualityRangeChanged();
+
+        function onPolygonShiftRangeChanged() {
+            polygonShiftValueLabel.innerText = polygonShiftRange.value;
+            app.set_polygonShift(parseInt(polygonShiftRange.value));
+        }
+
+        polygonShiftRange.addEventListener("change", onPolygonShiftRangeChanged);
+        onPolygonShiftRangeChanged();
+
+        var showPolygonsCheckbox = document.getElementById("showPolygonsCheckbox");
+
+        function onShowPolygonsCheckboxClicked() {
+            app.set_showPolygons(showPolygonsCheckbox.checked);
+        }
+        showPolygonsCheckbox.addEventListener("click", onShowPolygonsCheckboxClicked);
+
+        var showMeshesCheckbox = document.getElementById("showMeshesCheckbox");
+
+        function onShowMeshesCheckboxClicked() {
+            app.set_showMeshes(showMeshesCheckbox.checked);
+        }
+        showMeshesCheckbox.addEventListener("click", onShowMeshesCheckboxClicked);
     };
 
-    </script>
+</script>
 </html>

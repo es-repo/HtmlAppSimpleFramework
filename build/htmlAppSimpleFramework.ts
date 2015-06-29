@@ -983,6 +983,32 @@ class Renderer2d extends Renderer {
             }
         }
     }
+
+    public drawRectangle(x: number, y: number, z: number, width: number, height:number, color: BABYLON.Color4) {
+        this.drawLine(x, y, x + width, y, z, color);
+        this.drawLine(x + width, y, x + width, y + height, z, color);
+        this.drawLine(x + width, y + height, x, y + height, z, color);
+        this.drawLine(x, y + height, x, y, z, color);
+    }
+
+    public drawFilledRectangle(x: number, y: number, z: number, width: number, height: number, color: BABYLON.Color4) {
+        for (var i = y ; i < y + width; i++)
+            this.drawLine(x, i, x + width - 1, i, z, color);
+    }
+
+    public drawPolygon(path: { x: number; y: number }[], z: number, color: BABYLON.Color4) {
+        for (var i = 0; i < path.length - 1; i++) {
+            var p1 = path[i];
+            var p2 = path[i + 1];
+            this.drawLine(p1.x, p1.y, p2.x, p2.y, z, color);
+        }
+    }
+
+    public drawTriangle(xa: number, ya: number, xb: number, yb: number, xc: number, yc: number, z: number, color: BABYLON.Color4) {
+        this.drawLine(xa, ya, xb, yb, z, color);
+        this.drawLine(xb, yb, xc, yc, z, color);
+        this.drawLine(xc, yc, xa, ya, z, color);
+    }
 }
 // THE CODE IS BASED ON http://blogs.msdn.com/b/davrous/archive/2013/06/13/tutorial-series-learning-how-to-write-a-3d-soft-engine-from-scratch-in-c-typescript-or-javascript.aspx
 

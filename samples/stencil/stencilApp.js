@@ -9,6 +9,10 @@ var StencilApp = (function (_super) {
     function StencilApp(graphicOutput, inputControllerHandlers) {
         _super.call(this, graphicOutput, inputControllerHandlers);
         this.outlineDashShift = 0;
+        this.polygonQuality = 10;
+        this.polygonShift = 0;
+        this.showMeshes = true;
+        this.showPolygons = true;
         this.imageScale = new BABYLON.Vector2(1, 1);
         this.showImage = true;
     }
@@ -23,13 +27,51 @@ var StencilApp = (function (_super) {
             var rendererOutput = new RendererOutput(ColorBuffer.create(_this.image.width, _this.image.height));
             _this.imageRenderer2d = new Renderer2d(rendererOutput);
             _this.outlines = Outliner.findOutlines(_this.image);
+            _this.calculateMeshes();
         });
     };
     StencilApp.prototype.set_showImage = function (v) {
         this.showImage = v;
     };
+    StencilApp.prototype.set_showPolygons = function (v) {
+        this.showPolygons = v;
+    };
+    StencilApp.prototype.set_showMeshes = function (v) {
+        this.showMeshes = v;
+    };
+    StencilApp.prototype.set_polygonQuality = function (v) {
+        this.polygonQuality = v;
+        if (this.image != null)
+            this.calculateMeshes();
+    };
+    StencilApp.prototype.set_polygonShift = function (v) {
+        this.polygonShift = v;
+        if (this.image != null)
+            this.calculateMeshes();
+    };
+    StencilApp.prototype.logPolygon = function (polygon) {
+        var arr = [];
+        for (var i = 0; i < polygon.length; i++) {
+            var p = polygon[i];
+            arr.push("{x: " + p.x + ", y: " + p.y + "}");
+        }
+        console.log(arr.join(", "));
+    };
+    StencilApp.prototype.calculateMeshes = function () {
+        var _this = this;
+        this.polygons = this.outlines.map(function (o) { return StencilApp.getPolygon(o, _this.polygonQuality, _this.polygonShift); });
+        this.meshes = this.polygons.map(function (p) {
+            try {
+                return Triangulator.triangulate(p);
+            }
+            catch (e) {
+                console.log(e);
+                _this.logPolygon(p);
+                return [];
+            }
+        });
+    };
     StencilApp.prototype.doLogicStep = function () {
-        _super.prototype.doLogicStep.call(this);
     };
     StencilApp.prototype.drawFrame = function () {
         this.renderer2d.output.clear();
@@ -39,6 +81,10 @@ var StencilApp = (function (_super) {
                 this.imageRenderer2d.drawImage(0, 0, 0, this.image);
             }
             this.drawOutlines();
+            if (this.showPolygons)
+                this.drawPolygons();
+            if (this.showMeshes)
+                this.drawMeshes();
             this.renderer2d.drawImage(this.imagePos.x, this.imagePos.y, this.imagePos.z, this.imageRenderer2d.output.colorBuffer, this.imageScale);
         }
         this.graphicOutput.drawBuffer();
@@ -57,6 +103,29 @@ var StencilApp = (function (_super) {
         ;
         this.outlineDashShift++;
     };
+    StencilApp.prototype.drawPolygons = function () {
+        var colorStart = new BABYLON.Color4(1, 0, 0, 1);
+        var color = new BABYLON.Color4(0, 1, 1, 1);
+        var color1 = new BABYLON.Color4(1, 0.5, 0, 1);
+        for (var i = 0; i < this.polygons.length; i++) {
+            var p = this.polygons[i];
+            for (var j = 0; j < p.length; j++) {
+                var c = p[j];
+                this.imageRenderer2d.drawFilledRectangle(c.x - 1, c.y - 1, 0, 3, 3, j == 0 ? colorStart : color);
+            }
+            this.imageRenderer2d.drawPolygon(p, 0, color1);
+        }
+    };
+    StencilApp.prototype.drawMeshes = function () {
+        var color = new BABYLON.Color4(0, 1, 0, 1);
+        for (var i = 0; i < this.meshes.length; i++) {
+            var m = this.meshes[i];
+            for (var j = 0; j < m.length; j++) {
+                var t = m[j];
+                this.imageRenderer2d.drawTriangle(t.a.x, t.a.y, t.b.x, t.b.y, t.c.x, t.c.y, 0, color);
+            }
+        }
+    };
     StencilApp.prototype.handleKeyboardEvent = function (eventArgs) {
         _super.prototype.handleKeyboardEvent.call(this, eventArgs);
     };
@@ -68,6 +137,14 @@ var StencilApp = (function (_super) {
             this.imagePos.x += eventArgs.deltaX;
             this.imagePos.y += eventArgs.deltaY;
         }
+    };
+    StencilApp.getPolygon = function (outline, quality, shift) {
+        var p = [];
+        for (var i = 0; i < outline.length; i += quality) {
+            p.push(outline[(i + shift) % outline.length]);
+        }
+        p.reverse();
+        return p;
     };
     return StencilApp;
 })(App);
