@@ -7,11 +7,8 @@ var __extends = this.__extends || function (d, b) {
 var Object3dApp = (function (_super) {
     __extends(Object3dApp, _super);
     function Object3dApp(graphicOutput, inputControllerHandlers) {
-        var _this = this;
         _super.call(this, graphicOutput, inputControllerHandlers);
         this.rotateVector = new BABYLON.Vector3(0, Object3dApp.rotateDelta, 0);
-        var showTexturesCheckBox = document.getElementById("showTexturesCheckBox");
-        showTexturesCheckBox.addEventListener("click", function (ev) { return _this.renderer3d.renderSettings.showTextures = showTexturesCheckBox.checked; });
     }
     Object3dApp.prototype.createScene = function (continuation) {
         var scene = new Scene();

@@ -1523,8 +1523,8 @@ class InputDevices {
 class App {
 
     protected graphicOutput: GraphicOutput;
-    protected renderer3d: Renderer3d;
-    protected renderer2d: Renderer2d;
+    public renderer3d: Renderer3d;
+    public renderer2d: Renderer2d;
     public scene: Scene;
     protected phisics: Phisics;
     protected inputDevices: InputDevices;

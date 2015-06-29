@@ -48,6 +48,16 @@
         cube2Radio.addEventListener("click", onCube2RadioClick);
 
         onMonkeyRadioClick();
+
+        var showTexturesCheckBox = document.getElementById("showTexturesCheckBox");
+
+        function onShowTexturesCheckBox() {
+            app.renderer3d.renderSettings.showTextures = showTexturesCheckBox.checked;
+        }
+
+        showTexturesCheckBox.addEventListener("click", onShowTexturesCheckBox);
+        onShowTexturesCheckBox();
+
     };
 </script>
 </html>

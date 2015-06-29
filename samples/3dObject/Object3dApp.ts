@@ -6,9 +6,6 @@
     constructor(graphicOutput: GraphicOutput, inputControllerHandlers: InputDevices) {
         super(graphicOutput, inputControllerHandlers);
         this.rotateVector = new BABYLON.Vector3(0, Object3dApp.rotateDelta, 0);
-
-        var showTexturesCheckBox = <HTMLInputElement>document.getElementById("showTexturesCheckBox");
-        showTexturesCheckBox.addEventListener("click", ev => this.renderer3d.renderSettings.showTextures = showTexturesCheckBox.checked);
     }
 
     protected createScene(continuation: (Scene: Scene) => void) {

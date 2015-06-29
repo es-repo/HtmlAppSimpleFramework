@@ -13,22 +13,19 @@
 <body>
     <canvas id="canvas" width="640" height="480"></canvas>
     <div>
-        Image: <select id="imageSelect">
-            <option value="test1.png" selected="selected">test 1</option>
-            <option value="maze128.png">maze 128</option>
-            <option value="maze256.png">maze 256</option>
-            <option value="maze512.png">maze 512</option>
-        </select>
+        Image:<label><input type="radio" id="maze128Radio" name="imageSelect" value="maze128.png" checked="checked">maze 128</label>
+        <label><input type="radio" id="maze256Radio" name="imageSelect" value="maze256.png">maze 256</label>
+        <label><input type="radio" id="maze512Radio" name="imageSelect" value="maze512.png">maze 512</label>
         <label><input type="checkbox" id="showImageCheckbox" checked="checked">Show image</label>
-    <div>
-        Quality: <input type="range" id="polygonQualityRange" min="1" max="30" value="20" style="width: 300px"><label id="polygonQualityValueLabel"></label>
-        <br/>
-        Shift: <input type="range" id="polygonShiftRange" min="0" max="29" value="0" style="width: 300px"><label id="polygonShiftValueLabel"></label>
-        <br/>
-        <label><input type="checkbox" id="showPolygonsCheckbox" checked="checked">Show polygons</label>
-        <br />
-        <label><input type="checkbox" id="showMeshesCheckbox" checked="checked">Show meshes</label>
-    </div>
+        <div>
+            Quality: <input type="range" id="polygonQualityRange" min="1" max="30" value="20" style="width: 300px"><label id="polygonQualityValueLabel"></label>
+            <br />
+            Shift: <input type="range" id="polygonShiftRange" min="0" max="29" value="0" style="width: 300px"><label id="polygonShiftValueLabel"></label>
+            <br />
+            <label><input type="checkbox" id="showPolygonsCheckbox" checked="checked">Show polygons</label>
+            <br />
+            <label><input type="checkbox" id="showMeshesCheckbox" checked="checked">Show meshes</label>
+        </div>
 </body>
 <script>
     window.onload = function () {
@@ -38,14 +35,18 @@
         var app = new StencilApp(new HtmlCanvasOutput("canvas"), inputDevices);
         app.start();
 
-        var imageSelect = document.getElementById("imageSelect");
+        var maze128Radio = document.getElementById("maze128Radio");
+        var maze256Radio = document.getElementById("maze256Radio");
+        var maze5128Radio = document.getElementById("maze512Radio");
 
-        function onImageSelectChanged(e) {
-            app.set_image(imageSelect.value);
+        function onImageRadioClicked(e) {
+            app.set_image(e.target.value);
         }
 
-        imageSelect.addEventListener("change", onImageSelectChanged);
-        onImageSelectChanged();
+        maze128Radio.addEventListener("change", onImageRadioClicked);
+        maze256Radio.addEventListener("change", onImageRadioClicked);
+        maze5128Radio.addEventListener("change", onImageRadioClicked);
+        onImageRadioClicked({ target: maze128Radio });
 
         var showImageCheckbox = document.getElementById("showImageCheckbox");
 
