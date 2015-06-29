@@ -1083,7 +1083,7 @@ var Renderer3d = (function (_super) {
         var p2 = v2.coordinates;
         var p3 = v3.coordinates;
         // Light position
-        var lightPos = new BABYLON.Vector3(0, 10, 10);
+        var lightPos = new BABYLON.Vector3(0, 0, 10);
         // computing the cos of the angle between the light vector and the normal vector
         // it will return a value between 0 and 1 that will be used as the intensity of the color
         //var ndotl = this.computeNDotL(centerPoint, vnFace, lightPos);
