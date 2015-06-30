@@ -76,7 +76,7 @@ var StencilApp = (function (_super) {
     };
     StencilApp.prototype.createMesh = function (meshStencil) {
         var mesh = new Mesh(meshStencil.length * 3 * 8, meshStencil.length * 8);
-        var hheight = 5;
+        var hheight = 10;
         var xs = this.image.width / 2;
         var ys = this.image.height / 2;
         for (var a, b, c, normal, l, m, i = 0, j = 0, k = 0; i < meshStencil.length; i++, k += 8, j += 24) {
@@ -91,9 +91,9 @@ var StencilApp = (function (_super) {
             mesh.vertices[l + 1] = { coordinates: b, normal: normal, textureCoordinates: new BABYLON.Vector2(0, 0) };
             mesh.vertices[l + 2] = { coordinates: c, normal: normal, textureCoordinates: new BABYLON.Vector2(0, 0) };
             mesh.faces[m] = { a: l, b: l + 1, c: l + 2 };
-            a = new BABYLON.Vector3(-t.c.x + xs, -t.c.y + ys, -hheight);
-            b = new BABYLON.Vector3(-t.b.x + xs, -t.b.y + ys, -hheight);
-            c = new BABYLON.Vector3(-t.a.x + xs, -t.a.y + ys, -hheight);
+            a = new BABYLON.Vector3(-t.c.x + xs, -t.c.y + ys, 0);
+            b = new BABYLON.Vector3(-t.b.x + xs, -t.b.y + ys, 0);
+            c = new BABYLON.Vector3(-t.a.x + xs, -t.a.y + ys, 0);
             normal = new BABYLON.Vector3(0, 0, -1);
             l = j + 3;
             m = k + 1;
@@ -102,7 +102,7 @@ var StencilApp = (function (_super) {
             mesh.vertices[l + 2] = { coordinates: c, normal: normal, textureCoordinates: new BABYLON.Vector2(0, 0) };
             mesh.faces[m] = { a: l, b: l + 1, c: l + 2 };
             a = new BABYLON.Vector3(-t.a.x + xs, -t.a.y + ys, hheight);
-            b = new BABYLON.Vector3(-t.a.x + xs, -t.a.y + ys, -hheight);
+            b = new BABYLON.Vector3(-t.a.x + xs, -t.a.y + ys, 0);
             c = new BABYLON.Vector3(-t.b.x + xs, -t.b.y + ys, hheight);
             normal = BABYLON.Vector3.Cross(a.subtract(b), c.subtract(b));
             normal.normalize();
@@ -116,8 +116,8 @@ var StencilApp = (function (_super) {
             mesh.vertices[l + 2].normal = normal;
             mesh.faces[m] = { a: l, b: l + 1, c: l + 2 };
             a = new BABYLON.Vector3(-t.b.x + xs, -t.b.y + ys, hheight);
-            b = new BABYLON.Vector3(-t.a.x + xs, -t.a.y + ys, -hheight);
-            c = new BABYLON.Vector3(-t.b.x + xs, -t.b.y + ys, -hheight);
+            b = new BABYLON.Vector3(-t.a.x + xs, -t.a.y + ys, 0);
+            c = new BABYLON.Vector3(-t.b.x + xs, -t.b.y + ys, 0);
             normal = BABYLON.Vector3.Cross(a.subtract(b), c.subtract(b));
             normal.normalize();
             l = j + 9;
@@ -127,7 +127,7 @@ var StencilApp = (function (_super) {
             mesh.vertices[l + 2] = { coordinates: c, normal: normal, textureCoordinates: new BABYLON.Vector2(0, 0) };
             mesh.faces[m] = { a: l, b: l + 1, c: l + 2 };
             a = new BABYLON.Vector3(-t.b.x + xs, -t.b.y + ys, hheight);
-            b = new BABYLON.Vector3(-t.b.x + xs, -t.b.y + ys, -hheight);
+            b = new BABYLON.Vector3(-t.b.x + xs, -t.b.y + ys, 0);
             c = new BABYLON.Vector3(-t.c.x + xs, -t.c.y + ys, hheight);
             normal = BABYLON.Vector3.Cross(a.subtract(b), c.subtract(b));
             normal.normalize();
@@ -138,8 +138,8 @@ var StencilApp = (function (_super) {
             mesh.vertices[l + 2] = { coordinates: c, normal: normal, textureCoordinates: new BABYLON.Vector2(0, 0) };
             mesh.faces[m] = { a: l, b: l + 1, c: l + 2 };
             a = new BABYLON.Vector3(-t.c.x + xs, -t.c.y + ys, hheight);
-            b = new BABYLON.Vector3(-t.b.x + xs, -t.b.y + ys, -hheight);
-            c = new BABYLON.Vector3(-t.c.x + xs, -t.c.y + ys, -hheight);
+            b = new BABYLON.Vector3(-t.b.x + xs, -t.b.y + ys, 0);
+            c = new BABYLON.Vector3(-t.c.x + xs, -t.c.y + ys, 0);
             normal = BABYLON.Vector3.Cross(a.subtract(b), c.subtract(b));
             normal.normalize();
             l = j + 15;
@@ -149,7 +149,7 @@ var StencilApp = (function (_super) {
             mesh.vertices[l + 2] = { coordinates: c, normal: normal, textureCoordinates: new BABYLON.Vector2(0, 0) };
             mesh.faces[m] = { a: l, b: l + 1, c: l + 2 };
             a = new BABYLON.Vector3(-t.c.x + xs, -t.c.y + ys, hheight);
-            b = new BABYLON.Vector3(-t.c.x + xs, -t.c.y + ys, -hheight);
+            b = new BABYLON.Vector3(-t.c.x + xs, -t.c.y + ys, 0);
             c = new BABYLON.Vector3(-t.a.x + xs, -t.a.y + ys, hheight);
             normal = BABYLON.Vector3.Cross(a.subtract(b), c.subtract(b));
             normal.normalize();
@@ -160,8 +160,8 @@ var StencilApp = (function (_super) {
             mesh.vertices[l + 2] = { coordinates: c, normal: normal, textureCoordinates: new BABYLON.Vector2(0, 0) };
             mesh.faces[m] = { a: l, b: l + 1, c: l + 2 };
             a = new BABYLON.Vector3(-t.a.x + xs, -t.a.y + ys, hheight);
-            b = new BABYLON.Vector3(-t.c.x + xs, -t.c.y + ys, -hheight);
-            c = new BABYLON.Vector3(-t.a.x + xs, -t.a.y + ys, -hheight);
+            b = new BABYLON.Vector3(-t.c.x + xs, -t.c.y + ys, 0);
+            c = new BABYLON.Vector3(-t.a.x + xs, -t.a.y + ys, 0);
             normal = BABYLON.Vector3.Cross(a.subtract(b), c.subtract(b));
             normal.normalize();
             l = j + 21;
