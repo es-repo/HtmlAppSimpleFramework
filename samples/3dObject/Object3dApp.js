@@ -68,12 +68,11 @@ var Object3dApp = (function (_super) {
             var a = mesh.vertices[j].coordinates;
             var b = mesh.vertices[j + 1].coordinates;
             var c = mesh.vertices[j + 2].coordinates;
-            mesh.vertices[j].normal = BABYLON.Vector3.Cross(b.subtract(a), c.subtract(a));
-            mesh.vertices[j].normal.normalize();
-            mesh.vertices[j + 1].normal = BABYLON.Vector3.Cross(c.subtract(b), a.subtract(b));
-            mesh.vertices[j + 1].normal.normalize();
-            mesh.vertices[j + 2].normal = BABYLON.Vector3.Cross(a.subtract(c), b.subtract(c));
-            mesh.vertices[j + 2].normal.normalize();
+            var normal = BABYLON.Vector3.Cross(b.subtract(a), c.subtract(a));
+            normal.normalize();
+            mesh.vertices[j].normal = normal;
+            mesh.vertices[j + 1].normal = normal;
+            mesh.vertices[j + 2].normal = normal;
         }
         return mesh;
     };
