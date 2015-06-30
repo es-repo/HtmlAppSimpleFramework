@@ -50,9 +50,13 @@
         var maze256Radio = document.getElementById("maze256Radio");
         var maze5128Radio = document.getElementById("maze512Radio");
 
+        function onMeshesUpdated() {
+            object3dApp.scene.figures = app.meshes;
+        }
+
         function onImageRadioClicked(e) {
             app.set_image(e.target.value, function () {
-                object3dApp.scene.figures = app.meshes;
+                onMeshesUpdated();
                 if (e.target == maze128Radio) {
                     object3dApp.scene.camera.position.z = 800;
                 }
@@ -87,7 +91,7 @@
         function onPolygonQualityRangeChanged() {
             polygonQualityValueLabel.innerText = polygonQualityRange.value;
             app.set_polygonQuality(parseInt(polygonQualityRange.value));
-            object3dApp.scene.figures = app.meshes;
+            onMeshesUpdated();
         }
 
         polygonQualityRange.addEventListener("change", onPolygonQualityRangeChanged);
@@ -96,7 +100,7 @@
         function onPolygonShiftRangeChanged() {
             polygonShiftValueLabel.innerText = polygonShiftRange.value;
             app.set_polygonShift(parseInt(polygonShiftRange.value));
-            object3dApp.scene.figures = app.meshes;
+            onMeshesUpdated();
         }
 
         polygonShiftRange.addEventListener("change", onPolygonShiftRangeChanged);
