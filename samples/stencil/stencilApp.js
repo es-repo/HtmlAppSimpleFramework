@@ -91,9 +91,9 @@ var StencilApp = (function (_super) {
             mesh.vertices[l + 1] = { coordinates: b, normal: normal, textureCoordinates: new BABYLON.Vector2(0, 0) };
             mesh.vertices[l + 2] = { coordinates: c, normal: normal, textureCoordinates: new BABYLON.Vector2(0, 0) };
             mesh.faces[m] = { a: l, b: l + 1, c: l + 2 };
-            a = new BABYLON.Vector3(-t.a.x + xs, -t.a.y + ys, -hheight);
+            a = new BABYLON.Vector3(-t.c.x + xs, -t.c.y + ys, -hheight);
             b = new BABYLON.Vector3(-t.b.x + xs, -t.b.y + ys, -hheight);
-            c = new BABYLON.Vector3(-t.c.x + xs, -t.c.y + ys, -hheight);
+            c = new BABYLON.Vector3(-t.a.x + xs, -t.a.y + ys, -hheight);
             normal = new BABYLON.Vector3(0, 0, -1);
             l = j + 3;
             m = k + 1;
@@ -102,9 +102,9 @@ var StencilApp = (function (_super) {
             mesh.vertices[l + 2] = { coordinates: c, normal: normal, textureCoordinates: new BABYLON.Vector2(0, 0) };
             mesh.faces[m] = { a: l, b: l + 1, c: l + 2 };
             a = new BABYLON.Vector3(-t.a.x + xs, -t.a.y + ys, hheight);
-            b = new BABYLON.Vector3(-t.b.x + xs, -t.b.y + ys, hheight);
-            c = new BABYLON.Vector3(-t.a.x + xs, -t.a.y + ys, -hheight);
-            normal = BABYLON.Vector3.Cross(b.subtract(a), c.subtract(a));
+            b = new BABYLON.Vector3(-t.a.x + xs, -t.a.y + ys, -hheight);
+            c = new BABYLON.Vector3(-t.b.x + xs, -t.b.y + ys, hheight);
+            normal = BABYLON.Vector3.Cross(a.subtract(b), c.subtract(b));
             normal.normalize();
             l = j + 6;
             m = k + 2;
@@ -116,9 +116,9 @@ var StencilApp = (function (_super) {
             mesh.vertices[l + 2].normal = normal;
             mesh.faces[m] = { a: l, b: l + 1, c: l + 2 };
             a = new BABYLON.Vector3(-t.b.x + xs, -t.b.y + ys, hheight);
-            b = new BABYLON.Vector3(-t.b.x + xs, -t.b.y + ys, -hheight);
-            c = new BABYLON.Vector3(-t.a.x + xs, -t.a.y + ys, -hheight);
-            normal = BABYLON.Vector3.Cross(b.subtract(a), c.subtract(a));
+            b = new BABYLON.Vector3(-t.a.x + xs, -t.a.y + ys, -hheight);
+            c = new BABYLON.Vector3(-t.b.x + xs, -t.b.y + ys, -hheight);
+            normal = BABYLON.Vector3.Cross(a.subtract(b), c.subtract(b));
             normal.normalize();
             l = j + 9;
             m = k + 3;
@@ -127,9 +127,9 @@ var StencilApp = (function (_super) {
             mesh.vertices[l + 2] = { coordinates: c, normal: normal, textureCoordinates: new BABYLON.Vector2(0, 0) };
             mesh.faces[m] = { a: l, b: l + 1, c: l + 2 };
             a = new BABYLON.Vector3(-t.b.x + xs, -t.b.y + ys, hheight);
-            b = new BABYLON.Vector3(-t.c.x + xs, -t.c.y + ys, hheight);
-            c = new BABYLON.Vector3(-t.b.x + xs, -t.b.y + ys, -hheight);
-            normal = BABYLON.Vector3.Cross(b.subtract(a), c.subtract(a));
+            b = new BABYLON.Vector3(-t.b.x + xs, -t.b.y + ys, -hheight);
+            c = new BABYLON.Vector3(-t.c.x + xs, -t.c.y + ys, hheight);
+            normal = BABYLON.Vector3.Cross(a.subtract(b), c.subtract(b));
             normal.normalize();
             l = j + 12;
             m = k + 4;
@@ -138,9 +138,9 @@ var StencilApp = (function (_super) {
             mesh.vertices[l + 2] = { coordinates: c, normal: normal, textureCoordinates: new BABYLON.Vector2(0, 0) };
             mesh.faces[m] = { a: l, b: l + 1, c: l + 2 };
             a = new BABYLON.Vector3(-t.c.x + xs, -t.c.y + ys, hheight);
-            b = new BABYLON.Vector3(-t.c.x + xs, -t.c.y + ys, -hheight);
-            c = new BABYLON.Vector3(-t.b.x + xs, -t.b.y + ys, -hheight);
-            normal = BABYLON.Vector3.Cross(b.subtract(a), c.subtract(a));
+            b = new BABYLON.Vector3(-t.b.x + xs, -t.b.y + ys, -hheight);
+            c = new BABYLON.Vector3(-t.c.x + xs, -t.c.y + ys, -hheight);
+            normal = BABYLON.Vector3.Cross(a.subtract(b), c.subtract(b));
             normal.normalize();
             l = j + 15;
             m = k + 5;
@@ -149,9 +149,9 @@ var StencilApp = (function (_super) {
             mesh.vertices[l + 2] = { coordinates: c, normal: normal, textureCoordinates: new BABYLON.Vector2(0, 0) };
             mesh.faces[m] = { a: l, b: l + 1, c: l + 2 };
             a = new BABYLON.Vector3(-t.c.x + xs, -t.c.y + ys, hheight);
-            b = new BABYLON.Vector3(-t.a.x + xs, -t.a.y + ys, hheight);
-            c = new BABYLON.Vector3(-t.c.x + xs, -t.c.y + ys, -hheight);
-            normal = BABYLON.Vector3.Cross(b.subtract(a), c.subtract(a));
+            b = new BABYLON.Vector3(-t.c.x + xs, -t.c.y + ys, -hheight);
+            c = new BABYLON.Vector3(-t.a.x + xs, -t.a.y + ys, hheight);
+            normal = BABYLON.Vector3.Cross(a.subtract(b), c.subtract(b));
             normal.normalize();
             l = j + 18;
             m = k + 6;
@@ -160,9 +160,9 @@ var StencilApp = (function (_super) {
             mesh.vertices[l + 2] = { coordinates: c, normal: normal, textureCoordinates: new BABYLON.Vector2(0, 0) };
             mesh.faces[m] = { a: l, b: l + 1, c: l + 2 };
             a = new BABYLON.Vector3(-t.a.x + xs, -t.a.y + ys, hheight);
-            b = new BABYLON.Vector3(-t.a.x + xs, -t.a.y + ys, -hheight);
-            c = new BABYLON.Vector3(-t.c.x + xs, -t.c.y + ys, -hheight);
-            normal = BABYLON.Vector3.Cross(b.subtract(a), c.subtract(a));
+            b = new BABYLON.Vector3(-t.c.x + xs, -t.c.y + ys, -hheight);
+            c = new BABYLON.Vector3(-t.a.x + xs, -t.a.y + ys, -hheight);
+            normal = BABYLON.Vector3.Cross(a.subtract(b), c.subtract(b));
             normal.normalize();
             l = j + 21;
             m = k + 7;
@@ -172,22 +172,6 @@ var StencilApp = (function (_super) {
             mesh.faces[m] = { a: l, b: l + 1, c: l + 2 };
         }
         ;
-        //for (var i = 0, j = verticesFromStencilCount, e = facesFromStencilCount; i < polygon.length; i++, j++, e++) {
-        //    var p1 = polygon[i];
-        //    var p2 = polygon[(i + 1) % polygon.length];
-        //    var a = new BABYLON.Vector3(-p1.x + xs, -p1.y + ys, hheight);
-        //    var b = new BABYLON.Vector3(-p2.x + xs, -p2.y + ys, hheight);
-        //    var c = new BABYLON.Vector3(-p1.x + xs, -p1.y + ys, -hheight);
-        //    mesh.vertices[j] = { coordinates: a, normal: new BABYLON.Vector3(0, 0, 1), textureCoordinates: new BABYLON.Vector2(0, 0) };
-        //    mesh.vertices[j + 1] = { coordinates: b, normal: new BABYLON.Vector3(0, 0, 1), textureCoordinates: new BABYLON.Vector2(0, 0) };
-        //    mesh.vertices[j + 2] = { coordinates: c, normal: new BABYLON.Vector3(0, 0, 1), textureCoordinates: new BABYLON.Vector2(0, 0) };
-        //    var normal = BABYLON.Vector3.Cross(b.subtract(a), c.subtract(a));
-        //    normal.normalize();
-        //    mesh.vertices[j].normal = normal;
-        //    mesh.vertices[j + 1].normal = normal;
-        //    mesh.vertices[j + 2].normal = normal; 
-        //    mesh.faces[e] = { a: j, b: j + 1, c: j + 2 };
-        //}
         return mesh;
     };
     StencilApp.prototype.doLogicStep = function () {
@@ -264,6 +248,24 @@ var StencilApp = (function (_super) {
         }
         p.reverse();
         return p;
+    };
+    StencilApp.createQuakeMap = function (meshes) {
+        var s = "// entity 0\n{";
+        for (var i = 0, j = 0; i < meshes.length; i++) {
+            var m = meshes[i];
+            s += StencilApp.meshToBrushes(m, j);
+            j += m.faces.length;
+        }
+        return s + "\n}";
+    };
+    StencilApp.meshToBrushes = function (m, startIndex) {
+        var vToS = function (v) { return "( " + v.coordinates.x + " " + v.coordinates.y + " " + v.coordinates.z + " ) "; };
+        var fToS = function (f, m) { return vToS(m.vertices[f.a]) + vToS(m.vertices[f.b]) + vToS(m.vertices[f.c]) + "NULL 0 0 0 0.5 0.5 0 0 0\n"; };
+        var s = "";
+        for (var i = 0, j = startIndex; i < m.faces.length; i += 8, j++) {
+            s += "\n// brush " + j + "\n{\n" + fToS(m.faces[i], m) + fToS(m.faces[i + 1], m) + fToS(m.faces[i + 2], m) + fToS(m.faces[i + 4], m) + fToS(m.faces[i + 6], m) + "}";
+        }
+        return s;
     };
     return StencilApp;
 })(App);
