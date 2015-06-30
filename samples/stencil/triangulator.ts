@@ -1,7 +1,7 @@
 ﻿interface Triangle {
-    a: { x: number; y: number };
-    b: { x: number; y: number };
-    c: { x: number; y: number };
+    a: Coord;
+    b: Coord;
+    c: Coord;
 }
 
 class Triangulator {

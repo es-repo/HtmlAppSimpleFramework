@@ -5,7 +5,8 @@
     private outlineDashShift = 0;
     private polygonQuality = 10;
     private polygonShift = 0;
-    private meshes: Triangle[][];
+    private meshStencils: Triangle[][];
+    public meshes: Mesh[];
     private showMeshes = true;
     private polygons: Coord[][];
     private showPolygons = true;
@@ -18,7 +19,7 @@
         super(graphicOutput, inputControllerHandlers);
     }
 
-    public set_image(urlOrBase64Data: string) {
+    public set_image(urlOrBase64Data: string, onImageLoaded?: Function) {
         this.image = null;
         this.imageScale.x = 1;
         this.imageScale.y = 1;
@@ -34,6 +35,8 @@
             this.imageRenderer2d = new Renderer2d(rendererOutput);
             this.outlines = Outliner.findOutlines(this.image);
             this.calculateMeshes();
+            if (onImageLoaded)
+                onImageLoaded();
         });
     }
 
@@ -72,7 +75,7 @@
 
     private calculateMeshes() {
         this.polygons = this.outlines.map(o => StencilApp.getPolygon(o, this.polygonQuality, this.polygonShift));
-        this.meshes = this.polygons.map(p => {
+        this.meshStencils = this.polygons.map(p => {
             try {
                 return Triangulator.triangulate(p);
             } catch (e) {
@@ -80,8 +83,31 @@
                 this.logPolygon(p);
                 return [];
             }
-            
         });
+        this.meshes = this.meshStencils.map(s => this.createMesh(s));
+    }
+
+    private createMesh(meshStencil: Triangle[]): Mesh {
+         
+        var mesh = new Mesh(meshStencil.length * 3 * 2, meshStencil.length * 2);
+        var hheight = 10; 
+        var xs = this.image.width / 2;
+        var ys = this.image.height / 2;
+
+        for (var i = 0, j = 0, e = meshStencil.length, k = meshStencil.length * 3; i < meshStencil.length; i++, j+=3, e++, k+=3) {
+            var s = meshStencil[i];
+            mesh.vertices[j] = { coordinates: new BABYLON.Vector3(-s.a.x + xs, -s.a.y + ys, hheight), normal: new BABYLON.Vector3(0, 0, 1), textureCoordinates: new BABYLON.Vector2(0, 0) };
+            mesh.vertices[j + 1] = { coordinates: new BABYLON.Vector3(-s.b.x + xs, -s.b.y + ys, hheight), normal: new BABYLON.Vector3(0, 0, 1), textureCoordinates: new BABYLON.Vector2(0, 0) };
+            mesh.vertices[j + 2] = { coordinates: new BABYLON.Vector3(-s.c.x + xs, -s.c.y + ys, hheight), normal: new BABYLON.Vector3(0, 0, 1), textureCoordinates: new BABYLON.Vector2(0, 0) };
+            mesh.faces[i] = { a: j, b: j + 1, c: j + 2 };
+
+            mesh.vertices[k] = { coordinates: new BABYLON.Vector3(-s.a.x + xs, -s.a.y + ys, -hheight), normal: new BABYLON.Vector3(0, 0, -1), textureCoordinates: new BABYLON.Vector2(0, 0) };
+            mesh.vertices[k + 1] = { coordinates: new BABYLON.Vector3(-s.b.x + xs, -s.b.y + ys, -hheight), normal: new BABYLON.Vector3(0, 0, -1), textureCoordinates: new BABYLON.Vector2(0, 0) };
+            mesh.vertices[k + 2] = { coordinates: new BABYLON.Vector3(-s.c.x + xs, -s.c.y + ys, -hheight), normal: new BABYLON.Vector3(0, 0, -1), textureCoordinates: new BABYLON.Vector2(0, 0) };
+            mesh.faces[e] = { a: k, b: k + 1, c: k + 2 };
+        };
+        
+        return mesh;
     }
 
     protected doLogicStep() {
@@ -136,8 +162,8 @@
 
     private drawMeshes() {
         var color = new BABYLON.Color4(0, 1, 0, 1);
-        for (var i = 0; i < this.meshes.length; i++) {
-            var m = this.meshes[i];
+        for (var i = 0; i < this.meshStencils.length; i++) {
+            var m = this.meshStencils[i];
             for (var j = 0; j < m.length; j++) {
                 var t = m[j];
                 this.imageRenderer2d.drawTriangle(t.a.x, t.a.y, t.b.x, t.b.y, t.c.x, t.c.y, 0, color);

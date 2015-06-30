@@ -18,6 +18,7 @@
     <IISExpressUseClassicPipelineMode />
   </PropertyGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="light.ts" />
     <TypeScriptCompile Include="samples\3dObject\monkey.ts" />
     <Content Include="css\jasmine.css" />
     <Content Include="samples\3dObject\index.html" />

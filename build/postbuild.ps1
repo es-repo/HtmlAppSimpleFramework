@@ -13,6 +13,7 @@ Get-Content babylon.math.ts, `
  mesh.ts, `
  meshFactory.ts, `
  camera.ts, `
+ light.ts, `
  scene.ts, `
  rendererOutput.ts, `
  renderer.ts, `

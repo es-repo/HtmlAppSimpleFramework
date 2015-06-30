@@ -29,7 +29,7 @@
         mesh.vertices[0] = { coordinates: new BABYLON.Vector3(-1, 1, -1), normal: new BABYLON.Vector3(0, 0, 0), textureCoordinates: new BABYLON.Vector2(0, 0) };
         mesh.vertices[1] = { coordinates: new BABYLON.Vector3(1, 1, -1), normal: new BABYLON.Vector3(0, 0, 0), textureCoordinates: new BABYLON.Vector2(0, 0) };
         mesh.vertices[2] = { coordinates: new BABYLON.Vector3(-1, -1, -1), normal: new BABYLON.Vector3(0, 0, 0), textureCoordinates: new BABYLON.Vector2(0, 0) };
-
+        
         mesh.vertices[3] = { coordinates: new BABYLON.Vector3(1, 1, -1), normal: new BABYLON.Vector3(0, 0, 0), textureCoordinates: new BABYLON.Vector2(0, 0) };
         mesh.vertices[4] = { coordinates: new BABYLON.Vector3(1, -1, -1), normal: new BABYLON.Vector3(0, 0, 0), textureCoordinates: new BABYLON.Vector2(0, 0) };
         mesh.vertices[5] = { coordinates: new BABYLON.Vector3(-1, -1, -1), normal: new BABYLON.Vector3(0, 0, 0), textureCoordinates: new BABYLON.Vector2(0, 0) };

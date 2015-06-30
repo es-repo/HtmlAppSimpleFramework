@@ -790,10 +790,17 @@ var Camera = (function () {
     }
     return Camera;
 })();
+var Light = (function () {
+    function Light() {
+        this.position = new BABYLON.Vector3(0, 0, 200);
+    }
+    return Light;
+})();
 var Scene = (function () {
     function Scene() {
         this.figures = [];
         this.camera = new Camera();
+        this.light = new Light();
     }
     return Scene;
 })();
@@ -1025,10 +1032,10 @@ var Renderer3d = (function (_super) {
     Renderer3d.prototype.drawScene = function (scene) {
         this.projectScene(scene);
         for (var i = 0; i < scene.figures.length; i++) {
-            this.drawFigure(scene.figures[i]);
+            this.drawFigure(scene.figures[i], scene.light);
         }
     };
-    Renderer3d.prototype.drawFigure = function (f) {
+    Renderer3d.prototype.drawFigure = function (f, light) {
         if (f instanceof Circle) {
             this.drawCircle(f);
         }
@@ -1036,7 +1043,7 @@ var Renderer3d = (function (_super) {
             this.drawSprite(f);
         }
         else if (f instanceof Mesh) {
-            this.drawMesh(f);
+            this.drawMesh(f, light);
         }
     };
     Renderer3d.prototype.drawCircle = function (circle) {
@@ -1050,17 +1057,17 @@ var Renderer3d = (function (_super) {
         var y = sprite.projectedPosition.y - sprite.projectedSize.y / 2;
         this.renderer2d.drawImage(x, y, sprite.projectedPosition.z, sprite.image, scale);
     };
-    Renderer3d.prototype.drawMesh = function (m) {
+    Renderer3d.prototype.drawMesh = function (m, light) {
         for (var indexFaces = 0; indexFaces < m.faces.length; indexFaces++) {
             var currentFace = m.faces[indexFaces];
             var va = m.projectedVertices[currentFace.a];
             var vb = m.projectedVertices[currentFace.b];
             var vc = m.projectedVertices[currentFace.c];
             var color = 1.0;
-            this.drawTriangle(va, vb, vc, new BABYLON.Color4(color, color, color, 1), this.renderSettings.showTextures ? m.texture : null);
+            this.drawTriangle(va, vb, vc, new BABYLON.Color4(color, color, color, 1), light, this.renderSettings.showTextures ? m.texture : null);
         }
     };
-    Renderer3d.prototype.drawTriangle = function (v1, v2, v3, color, texture) {
+    Renderer3d.prototype.drawTriangle = function (v1, v2, v3, color, light, texture) {
         // Sorting the points in order to always have this order on screen p1, p2 & p3
         // with p1 always up (thus having the Y the lowest possible to be near the top screen)
         // then p2 between p1 & p3
@@ -1082,14 +1089,12 @@ var Renderer3d = (function (_super) {
         var p1 = v1.coordinates;
         var p2 = v2.coordinates;
         var p3 = v3.coordinates;
-        // Light position
-        var lightPos = new BABYLON.Vector3(0, 0, 10);
         // computing the cos of the angle between the light vector and the normal vector
         // it will return a value between 0 and 1 that will be used as the intensity of the color
         //var ndotl = this.computeNDotL(centerPoint, vnFace, lightPos);
-        var nl1 = this.computeNDotL(v1.worldCoordinates, v1.normal, lightPos);
-        var nl2 = this.computeNDotL(v2.worldCoordinates, v2.normal, lightPos);
-        var nl3 = this.computeNDotL(v3.worldCoordinates, v3.normal, lightPos);
+        var nl1 = this.computeNDotL(v1.worldCoordinates, v1.normal, light.position);
+        var nl2 = this.computeNDotL(v2.worldCoordinates, v2.normal, light.position);
+        var nl3 = this.computeNDotL(v3.worldCoordinates, v3.normal, light.position);
         var data = {};
         // computing lines' directions
         var dP1P2;
