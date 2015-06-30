@@ -85,13 +85,12 @@
             }
         });
         this.meshes = this.meshStencils.map((s, i) => this.createMesh(s));
-        //this.meshes = [this.createMesh(this.meshStencils[0])];
     }
 
     private createMesh(meshStencil: Triangle[]): Mesh {
 
         var mesh = new Mesh(meshStencil.length * 3 * 8, meshStencil.length * 8);
-        var hheight = 10; 
+        var hheight = 5; 
         var xs = this.image.width / 2;
         var ys = this.image.height / 2;
         

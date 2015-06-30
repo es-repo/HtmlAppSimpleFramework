@@ -73,11 +73,10 @@ var StencilApp = (function (_super) {
             }
         });
         this.meshes = this.meshStencils.map(function (s, i) { return _this.createMesh(s); });
-        //this.meshes = [this.createMesh(this.meshStencils[0])];
     };
     StencilApp.prototype.createMesh = function (meshStencil) {
         var mesh = new Mesh(meshStencil.length * 3 * 8, meshStencil.length * 8);
-        var hheight = 10;
+        var hheight = 5;
         var xs = this.image.width / 2;
         var ys = this.image.height / 2;
         for (var a, b, c, normal, l, m, i = 0, j = 0, k = 0; i < meshStencil.length; i++, k += 8, j += 24) {
