@@ -55,7 +55,7 @@
 
         function onMeshesUpdated() {
             object3dApp.scene.figures = app.meshes;
-            quakeMapTextarea.value = StencilApp.createQuakeMap(app.meshes);
+            quakeMapTextarea.value = app.createQuakeMap();
         }
 
         function onImageRadioClicked(e) {

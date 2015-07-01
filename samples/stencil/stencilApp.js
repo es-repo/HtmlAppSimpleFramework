@@ -249,21 +249,111 @@ var StencilApp = (function (_super) {
         p.reverse();
         return p;
     };
-    StencilApp.createQuakeMap = function (meshes) {
-        var s = "// entity 0\n{";
-        for (var i = 0, j = 0; i < meshes.length; i++) {
-            var m = meshes[i];
-            s += StencilApp.meshToBrushes(m, j);
+    StencilApp.prototype.createQuakeMap = function () {
+        if (this.meshes == null)
+            return "";
+        var s = "// maze \n{ \n\"classname\" \"worldspawn\"\n";
+        var scale = 50;
+        var padding = 10;
+        var wallsHeight = 50;
+        var wallThikness = 5;
+        var ww = (this.image.width + padding) * scale;
+        var wl = (this.image.height + padding) * scale;
+        var wh = wallsHeight * scale;
+        s += StencilApp.createQaukeWalls(ww, wl, wh, wallThikness * scale);
+        for (var i = 0, j = 0; i < this.meshes.length; i++) {
+            var m = this.meshes[i];
+            s += StencilApp.meshToQuakeBrushes(m, j, scale);
             j += m.faces.length;
         }
-        return s + "\n}";
+        s += "\n}\n";
+        s += StencilApp.createQuakePlayerStart(ww, wl);
+        s += StencilApp.createQuakeLights(ww, wl, wh, this.image.width / 32 >> 0);
+        return s;
     };
-    StencilApp.meshToBrushes = function (m, startIndex) {
-        var vToS = function (v) { return "( " + v.coordinates.x + " " + v.coordinates.y + " " + v.coordinates.z + " ) "; };
-        var fToS = function (f, m) { return vToS(m.vertices[f.a]) + vToS(m.vertices[f.b]) + vToS(m.vertices[f.c]) + "NULL 0 0 0 0.5 0.5 0 0 0\n"; };
+    StencilApp.createQaukeWalls = function (w, l, h, thikness) {
+        var wallToS = function (wall) {
+            var s = "//" + wall.bname + "\n{\n";
+            for (var i = 0; i < wall.length; i++) {
+                for (var j = 0; j < wall[i].length; j++) {
+                    s += "( " + wall[i][j].join(" ") + " ) ";
+                }
+                s += "NULL 0 0 0 1 1 0 0 0\n";
+            }
+            return s + "}";
+        };
+        var duplWall = function (wall, ci, inc, name) {
+            var dw = [];
+            dw.bname = name;
+            for (var i = 0; i < wall.length; i++) {
+                dw[i] = [];
+                for (var j = 0; j < wall[i].length; j++) {
+                    dw[i].push(wall[i][j].slice());
+                    dw[i][j][ci] += inc;
+                }
+            }
+            return dw;
+        };
+        var hw = w / 2;
+        var hl = l / 2;
+        var bottom = [];
+        bottom[0] = [[0, 0, 0], [0, hl, 0], [hw, 0, 0]];
+        bottom[1] = [[0, 0, -thikness], [hw, 0, -thikness], [0, hl, -thikness]];
+        bottom[2] = [[-hw, 0, 0], [-hw, hl, 0], [-hw, 0, thikness]];
+        bottom[3] = [[hw, 0, 0], [hw, 0, thikness], [hw, hl, 0]];
+        bottom[4] = [[0, -hl, 0], [0, -hl, thikness], [hw, -hl, 0]];
+        bottom[5] = [[0, hl, 0], [hw, hl, thikness], [0, hl, thikness]];
+        bottom.bname = "wall bottom";
+        var top = duplWall(bottom, 2, h + thikness, "wall top");
+        var right = [];
+        right[0] = [[0, 0, h], [0, hl, h], [hw, 0, h]];
+        right[1] = [[0, 0, 0], [hw, 0, 0], [0, hl, 0]];
+        right[2] = [[-hw, 0, 0], [-hw, hl, 0], [-hw, 0, thikness]];
+        right[3] = [[hw, 0, 0], [hw, 0, thikness], [hw, hl, 0]];
+        right[4] = [[0, -hl - thikness, 0], [0, -hl - thikness, thikness], [hw, -hl - thikness, 0]];
+        right[5] = [[0, -hl, 0], [hw, -hl, thikness], [0, -hl, thikness]];
+        right.bname = "wall right";
+        var left = duplWall(right, 1, l + thikness, "wall left");
+        var front = [];
+        front[0] = [[0, 0, h], [0, hl, h], [hw, 0, h]];
+        front[1] = [[0, 0, 0], [hw, 0, 0], [0, hl, 0]];
+        front[2] = [[-hw - thikness, 0, 0], [-hw - thikness, hl, 0], [-hw - thikness, 0, thikness]];
+        front[3] = [[-hw, 0, 0], [-hw, 0, thikness], [-hw, hl, 0]];
+        front[4] = [[0, -hl, 0], [0, -hl, thikness], [hw, -hl, 0]];
+        front[5] = [[0, hl, 0], [hw, hl, thikness], [0, hl, thikness]];
+        front.bname = "wall front";
+        var back = duplWall(front, 0, w + thikness, "wall back");
+        return [bottom, top, right, left, front, back].map(wallToS).join("\n");
+    };
+    StencilApp.createQuakePlayerStart = function (w, l) {
+        var shift = 30;
+        var c = [-w / 2 + shift, -l / 2 + shift, shift];
+        return "// player start \n{\n\"classname\" \"info_player_start\"\n\"origin\" \"" + c.join(" ") + "\"\n}\n";
+    };
+    StencilApp.createQuakeLights = function (w, l, h, n) {
+        var s = "";
+        var dx = w / (n + 1);
+        var dy = l / (n + 1);
+        var z = h * 0.75;
+        for (var i = 0; i < n; i++) {
+            var y = -l / 2 + dy + dy * i;
+            for (var j = 0; j < n; j++) {
+                var x = -w / 2 + dx + dx * j;
+                s += StencilApp.createQuakeLight(x, y, z, i * n + j);
+            }
+        }
+        return s;
+    };
+    StencilApp.createQuakeLight = function (x, y, z, i) {
+        var s = "// " + "light " + i + "\n{\n\"classname\" \"light\"\n\"origin\" \"" + x + " " + y + " " + z + "\"\n\"light\" \"4000\"\n}\n";
+        return s;
+    };
+    StencilApp.meshToQuakeBrushes = function (m, startIndex, scale) {
+        var vToS = function (v) { return "( " + v.coordinates.x * scale + " " + v.coordinates.y * scale + " " + v.coordinates.z * scale + " ) "; };
+        var fToS = function (f, m) { return vToS(m.vertices[f.a]) + vToS(m.vertices[f.b]) + vToS(m.vertices[f.c]) + "NULL 0 0 0 1 1 0 0 0\n"; };
         var s = "";
         for (var i = 0, j = startIndex; i < m.faces.length; i += 8, j++) {
-            s += "\n// brush " + j + "\n{\n" + fToS(m.faces[i], m) + fToS(m.faces[i + 1], m) + fToS(m.faces[i + 2], m) + fToS(m.faces[i + 4], m) + fToS(m.faces[i + 6], m) + "}";
+            s += "\n// maze piece " + j + "\n{\n" + fToS(m.faces[i], m) + fToS(m.faces[i + 1], m) + fToS(m.faces[i + 2], m) + fToS(m.faces[i + 4], m) + fToS(m.faces[i + 6], m) + "}";
         }
         return s;
     };
