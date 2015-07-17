@@ -25,10 +25,11 @@
     <Content Include="app.css" />
     <Content Include="index.html" />
     <Content Include="samples\3dObject\monkey.jpg" />
+    <Content Include="samples\blur\index.html" />
     <Content Include="samples\stencil\index.html" />
     <Content Include="samples\paintBrush\index.html" />
     <Content Include="samples\stencil\maze128.png" />
-    <Content Include="samples\stencil\maze256.png" />
+    <Content Include="samples\stencil\maze260.png" />
     <Content Include="samples\stencil\test1.png" />
     <Content Include="samples\stencil\maze512.png" />
     <Content Include="samples\stencil\tests\triangulatorTests.js" />
@@ -64,6 +65,7 @@
     <TypeScriptCompile Include="renderer3d.ts" />
     <TypeScriptCompile Include="array1dAs2d.ts" />
     <TypeScriptCompile Include="colorBuffer.ts" />
+    <TypeScriptCompile Include="samples\blur\blurApp.ts" />
     <TypeScriptCompile Include="samples\stencil\Coord.ts" />
     <TypeScriptCompile Include="samples\stencil\stencilApp.ts" />
     <TypeScriptCompile Include="samples\paintBrush\paintBrushdApp.ts" />
