@@ -837,13 +837,14 @@ var Renderer2d = (function (_super) {
         _super.call(this, output);
     }
     Renderer2d.prototype.drawPoint = function (x, y, z, c) {
-        this.drawPointInternal(x, y, z, c.r * 255, c.g * 255, c.b * 255, c.a * 255);
+        this.drawPointC(x, y, z, c.r * 255, c.g * 255, c.b * 255, c.a * 255);
     };
-    Renderer2d.prototype.drawPointInternal = function (x, y, z, r, g, b, a) {
+    Renderer2d.prototype.drawPointC = function (x, y, z, r, g, b, a) {
         x = x >> 0;
         y = y >> 0;
-        if (x >= 0 && y >= 0 && x < this.output.width && y < this.output.height) {
-            var i = this.output.depthBuffer.get_index(x, y);
+        var i = this.output.depthBuffer.get_index(x, y);
+        if (i >= 0 && i < this.output.depthBuffer.array.length) {
+            //if (x >= 0 && y >= 0 && x < this.output.width && y < this.output.height) {
             if (this.output.depthBuffer.array[i] >= z) {
                 this.output.depthBuffer.array[i] = z;
                 var i4 = i * 4;
@@ -931,7 +932,7 @@ var Renderer2d = (function (_super) {
                         if (fullpx >= 1) {
                             while (fullpx >= 1) {
                                 var bi = image.get_index(j, i);
-                                this.drawPointInternal(px, py, z, image.array[bi], image.array[bi + 1], image.array[bi + 2], image.array[bi + 3]);
+                                this.drawPointC(px, py, z, image.array[bi], image.array[bi + 1], image.array[bi + 2], image.array[bi + 3]);
                                 fullpx--;
                                 px++;
                             }
@@ -1229,7 +1230,7 @@ var Renderer3d = (function (_super) {
             // changing the native color value using the cosine of the angle
             // between the light vector and the normal vector
             // and the texture color
-            this.renderer2d.drawPoint(x, data.currentY, z, new BABYLON.Color4(color.r * ndotl * textureColor.r, color.g * ndotl * textureColor.g, color.b * ndotl * textureColor.b, 1));
+            this.renderer2d.drawPointC(x, data.currentY, z, color.r * ndotl * textureColor.r * 255, color.g * ndotl * textureColor.g * 255, color.b * ndotl * textureColor.b * 255, 255);
         }
     };
     // Compute the cosine of the angle between the light vector and the normal vector

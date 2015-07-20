@@ -5,10 +5,10 @@
     }
 
     public drawPoint(x: number, y: number, z: number, c: BABYLON.Color4): void {
-        this.drawPointInternal(x, y, z, c.r * 255, c.g * 255, c.b * 255, c.a * 255);
+        this.drawPointC(x, y, z, c.r * 255, c.g * 255, c.b * 255, c.a * 255);
     }
 
-    private drawPointInternal(x: number, y: number, z: number, r: number, g: number, b: number, a: number) {
+    public drawPointC(x: number, y: number, z: number, r: number, g: number, b: number, a: number) {
         x = x >> 0;
         y = y >> 0;
         if (x >= 0 && y >= 0 && x < this.output.width && y < this.output.height) {
@@ -110,7 +110,7 @@
                         if (fullpx >= 1) {
                             while (fullpx >= 1) {
                                 var bi = image.get_index(j, i);
-                                this.drawPointInternal(px, py, z, image.array[bi], image.array[bi + 1], image.array[bi + 2], image.array[bi + 3]);
+                                this.drawPointC(px, py, z, image.array[bi], image.array[bi + 1], image.array[bi + 2], image.array[bi + 3]);
                                 fullpx--;
                                 px++;
                             }
@@ -123,7 +123,7 @@
         }
     }
 
-    public drawRectangle(x: number, y: number, z: number, width: number, height:number, color: BABYLON.Color4) {
+    public drawRectangle(x: number, y: number, z: number, width: number, height: number, color: BABYLON.Color4) {
         this.drawLine(x, y, x + width, y, z, color);
         this.drawLine(x + width, y, x + width, y + height, z, color);
         this.drawLine(x + width, y + height, x, y + height, z, color);
@@ -131,7 +131,7 @@
     }
 
     public drawFilledRectangle(x: number, y: number, z: number, width: number, height: number, color: BABYLON.Color4) {
-        for (var i = y ; i < y + width; i++)
+        for (var i = y; i < y + width; i++)
             this.drawLine(x, i, x + width - 1, i, z, color);
     }
 

@@ -266,7 +266,7 @@ var Renderer3d = (function (_super) {
             // changing the native color value using the cosine of the angle
             // between the light vector and the normal vector
             // and the texture color
-            this.renderer2d.drawPoint(x, data.currentY, z, new BABYLON.Color4(color.r * ndotl * textureColor.r, color.g * ndotl * textureColor.g, color.b * ndotl * textureColor.b, 1));
+            this.renderer2d.drawPointC(x, data.currentY, z, color.r * ndotl * textureColor.r * 255, color.g * ndotl * textureColor.g * 255, color.b * ndotl * textureColor.b * 255, 255);
         }
     };
     // Compute the cosine of the angle between the light vector and the normal vector

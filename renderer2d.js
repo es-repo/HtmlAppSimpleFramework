@@ -10,9 +10,9 @@ var Renderer2d = (function (_super) {
         _super.call(this, output);
     }
     Renderer2d.prototype.drawPoint = function (x, y, z, c) {
-        this.drawPointInternal(x, y, z, c.r * 255, c.g * 255, c.b * 255, c.a * 255);
+        this.drawPointC(x, y, z, c.r * 255, c.g * 255, c.b * 255, c.a * 255);
     };
-    Renderer2d.prototype.drawPointInternal = function (x, y, z, r, g, b, a) {
+    Renderer2d.prototype.drawPointC = function (x, y, z, r, g, b, a) {
         x = x >> 0;
         y = y >> 0;
         if (x >= 0 && y >= 0 && x < this.output.width && y < this.output.height) {
@@ -104,7 +104,7 @@ var Renderer2d = (function (_super) {
                         if (fullpx >= 1) {
                             while (fullpx >= 1) {
                                 var bi = image.get_index(j, i);
-                                this.drawPointInternal(px, py, z, image.array[bi], image.array[bi + 1], image.array[bi + 2], image.array[bi + 3]);
+                                this.drawPointC(px, py, z, image.array[bi], image.array[bi + 1], image.array[bi + 2], image.array[bi + 3]);
                                 fullpx--;
                                 px++;
                             }
