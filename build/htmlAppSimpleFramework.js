@@ -842,9 +842,8 @@ var Renderer2d = (function (_super) {
     Renderer2d.prototype.drawPointC = function (x, y, z, r, g, b, a) {
         x = x >> 0;
         y = y >> 0;
-        var i = this.output.depthBuffer.get_index(x, y);
-        if (i >= 0 && i < this.output.depthBuffer.array.length) {
-            //if (x >= 0 && y >= 0 && x < this.output.width && y < this.output.height) {
+        if (x >= 0 && y >= 0 && x < this.output.width && y < this.output.height) {
+            var i = this.output.depthBuffer.get_index(x, y);
             if (this.output.depthBuffer.array[i] >= z) {
                 this.output.depthBuffer.array[i] = z;
                 var i4 = i * 4;

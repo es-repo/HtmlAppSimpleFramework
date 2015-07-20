@@ -876,10 +876,8 @@ class Renderer2d extends Renderer {
     public drawPointC(x: number, y: number, z: number, r: number, g: number, b: number, a: number) {
         x = x >> 0;
         y = y >> 0;
-        var i = this.output.depthBuffer.get_index(x, y);
-        if (i >=0 && i  < this.output.depthBuffer.array.length){
-        //if (x >= 0 && y >= 0 && x < this.output.width && y < this.output.height) {
-            
+        if (x >= 0 && y >= 0 && x < this.output.width && y < this.output.height) {
+            var i = this.output.depthBuffer.get_index(x, y);
             if (this.output.depthBuffer.array[i] >= z) {
                 this.output.depthBuffer.array[i] = z;
                 var i4 = i * 4;
@@ -990,7 +988,7 @@ class Renderer2d extends Renderer {
         }
     }
 
-    public drawRectangle(x: number, y: number, z: number, width: number, height:number, color: BABYLON.Color4) {
+    public drawRectangle(x: number, y: number, z: number, width: number, height: number, color: BABYLON.Color4) {
         this.drawLine(x, y, x + width, y, z, color);
         this.drawLine(x + width, y, x + width, y + height, z, color);
         this.drawLine(x + width, y + height, x, y + height, z, color);
@@ -998,7 +996,7 @@ class Renderer2d extends Renderer {
     }
 
     public drawFilledRectangle(x: number, y: number, z: number, width: number, height: number, color: BABYLON.Color4) {
-        for (var i = y ; i < y + width; i++)
+        for (var i = y; i < y + width; i++)
             this.drawLine(x, i, x + width - 1, i, z, color);
     }
 
