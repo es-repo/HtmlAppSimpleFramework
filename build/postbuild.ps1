@@ -19,6 +19,7 @@ Get-Content babylon.math.ts, `
  renderer.ts, `
  renderer2d.ts, `
  renderer3d.ts, `
+ imageTransformer.ts, `
  phisics.ts, `
  abstractEvent.ts,
  scanLineData.ts, `

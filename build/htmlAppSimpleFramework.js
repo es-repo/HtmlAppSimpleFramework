@@ -494,12 +494,15 @@ var ColorBuffer = (function (_super) {
     function ColorBuffer(array, width) {
         _super.call(this, array, width, 4);
     }
-    ColorBuffer.prototype.setColor = function (x, y, c) {
+    ColorBuffer.prototype.setColor = function (x, y, r, g, b, a) {
         var i = this.get_index(x, y);
-        this.array[i] = c.r * 255;
-        this.array[i + 1] = c.g * 255;
-        this.array[i + 2] = c.b * 255;
-        this.array[i + 3] = c.a * 255;
+        this.array[i] = r;
+        this.array[i + 1] = g;
+        this.array[i + 2] = b;
+        this.array[i + 3] = a;
+    };
+    ColorBuffer.prototype.clear = function () {
+        this.setAll(0);
     };
     ColorBuffer.create = function (width, height) {
         return new ColorBuffer(new Array(width * height * 4), width);
@@ -846,11 +849,7 @@ var Renderer2d = (function (_super) {
             var i = this.output.depthBuffer.get_index(x, y);
             if (this.output.depthBuffer.array[i] >= z) {
                 this.output.depthBuffer.array[i] = z;
-                var i4 = i * 4;
-                this.output.colorBuffer.array[i4] = r;
-                this.output.colorBuffer.array[i4 + 1] = g;
-                this.output.colorBuffer.array[i4 + 2] = b;
-                this.output.colorBuffer.array[i4 + 3] = a;
+                this.output.colorBuffer.setColor(x, y, r, g, b, a);
             }
         }
     };
@@ -1242,6 +1241,38 @@ var Renderer3d = (function (_super) {
     };
     return Renderer3d;
 })(Renderer);
+var ImageTransformer = (function () {
+    function ImageTransformer() {
+    }
+    ImageTransformer.rotate = function (input, output, angle) {
+        var cos = Math.cos(angle);
+        var sin = Math.sin(angle);
+        var imovx = -input.width / 2;
+        var imovy = -input.height / 2;
+        var omovx = -output.width / 2;
+        var omovy = -output.height / 2;
+        for (var i = 0, iy = imovy, idx = 0; i < input.height; i++, iy++) {
+            for (var j = 0, ix = imovx; j < input.width; j++, ix++, idx += 4) {
+                var ox = Math.round(ix * cos - iy * sin - omovx) >> 0;
+                var oy = Math.round(ix * sin + iy * cos - omovy) >> 0;
+                var oidx = output.get_index(ox, oy);
+                output.array[oidx] = input.array[idx];
+                output.array[oidx + 1] = input.array[idx + 1];
+                output.array[oidx + 2] = input.array[idx + 2];
+                output.array[oidx + 3] = input.array[idx + 3];
+                if (j < input.width - 1) {
+                    output.array[oidx + 4] = input.array[idx];
+                    output.array[oidx + 5] = input.array[idx + 1];
+                    output.array[oidx + 6] = input.array[idx + 2];
+                    output.array[oidx + 7] = input.array[idx + 3];
+                }
+            }
+        }
+    };
+    ImageTransformer.prototype.transform = function (input, output, x, y, scale, angle) {
+    };
+    return ImageTransformer;
+})();
 var Phisics = (function () {
     function Phisics() {
     }

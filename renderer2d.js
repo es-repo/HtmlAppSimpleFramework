@@ -19,11 +19,7 @@ var Renderer2d = (function (_super) {
             var i = this.output.depthBuffer.get_index(x, y);
             if (this.output.depthBuffer.array[i] >= z) {
                 this.output.depthBuffer.array[i] = z;
-                var i4 = i * 4;
-                this.output.colorBuffer.array[i4] = r;
-                this.output.colorBuffer.array[i4 + 1] = g;
-                this.output.colorBuffer.array[i4 + 2] = b;
-                this.output.colorBuffer.array[i4 + 3] = a;
+                this.output.colorBuffer.setColor(x, y, r, g, b, a);
             }
         }
     };

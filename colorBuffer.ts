@@ -4,12 +4,16 @@ class ColorBuffer extends Array1dAs2d<number> {
         super(array, width, 4);
     }
 
-    public setColor(x: number, y: number, c: BABYLON.Color4) {
+    public setColor(x: number, y: number, r: number, g: number, b: number, a: number) {
         var i = this.get_index(x, y);
-        this.array[i] = c.r * 255;
-        this.array[i + 1] = c.g * 255;
-        this.array[i + 2] = c.b * 255;
-        this.array[i + 3] = c.a * 255;
+        this.array[i] = r;
+        this.array[i + 1] = g;
+        this.array[i + 2] = b;
+        this.array[i + 3] = a;
+    }
+
+    public clear() {
+        this.setAll(0);
     }
 
     public static create(width: number, height: number): ColorBuffer {

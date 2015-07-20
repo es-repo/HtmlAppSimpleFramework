@@ -509,12 +509,16 @@ class ColorBuffer extends Array1dAs2d<number> {
         super(array, width, 4);
     }
 
-    public setColor(x: number, y: number, c: BABYLON.Color4) {
+    public setColor(x: number, y: number, r: number, g: number, b: number, a: number) {
         var i = this.get_index(x, y);
-        this.array[i] = c.r * 255;
-        this.array[i + 1] = c.g * 255;
-        this.array[i + 2] = c.b * 255;
-        this.array[i + 3] = c.a * 255;
+        this.array[i] = r;
+        this.array[i + 1] = g;
+        this.array[i + 2] = b;
+        this.array[i + 3] = a;
+    }
+
+    public clear() {
+        this.setAll(0);
     }
 
     public static create(width: number, height: number): ColorBuffer {
@@ -880,11 +884,7 @@ class Renderer2d extends Renderer {
             var i = this.output.depthBuffer.get_index(x, y);
             if (this.output.depthBuffer.array[i] >= z) {
                 this.output.depthBuffer.array[i] = z;
-                var i4 = i * 4;
-                this.output.colorBuffer.array[i4] = r;
-                this.output.colorBuffer.array[i4 + 1] = g;
-                this.output.colorBuffer.array[i4 + 2] = b;
-                this.output.colorBuffer.array[i4 + 3] = a;
+                this.output.colorBuffer.setColor(x, y, r, g, b, a);
             }
         }
     }
@@ -1362,6 +1362,43 @@ class Renderer3d extends Renderer {
         return Math.max(0, BABYLON.Vector3.Dot(normal, lightDirection));
     }
 }
+class ImageTransformer {
+
+    public static rotate(input: ColorBuffer, output: ColorBuffer, angle: number) {
+
+        var cos = Math.cos(angle);
+        var sin = Math.sin(angle);
+
+        var imovx = -input.width / 2;
+        var imovy = -input.height / 2;
+
+        var omovx = -output.width / 2;
+        var omovy = -output.height / 2;
+         
+        for (var i = 0, iy = imovy, idx = 0; i < input.height; i++, iy++) {
+            for (var j = 0, ix = imovx; j < input.width; j++, ix++, idx+=4) {
+                var ox = Math.round(ix * cos - iy * sin - omovx) >> 0;
+                var oy = Math.round(ix * sin + iy * cos - omovy) >> 0;
+                var oidx = output.get_index(ox, oy);
+                output.array[oidx] = input.array[idx];
+                output.array[oidx + 1] = input.array[idx + 1];
+                output.array[oidx + 2] = input.array[idx + 2];
+                output.array[oidx + 3] = input.array[idx + 3];
+
+                if (j < input.width - 1) {
+                    output.array[oidx + 4] = input.array[idx];
+                    output.array[oidx + 5] = input.array[idx + 1];
+                    output.array[oidx + 6] = input.array[idx + 2];
+                    output.array[oidx + 7] = input.array[idx + 3];
+                }
+            }
+        }
+    }
+
+    public transform(input: ColorBuffer, output: ColorBuffer, x: number, y: number, scale: number, angle: number) {
+        
+    }
+} 
 class Phisics {
 
     public applyTime(scene: Scene, ticks:number = 1) {

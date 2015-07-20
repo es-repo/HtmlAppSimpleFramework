@@ -9,12 +9,15 @@ var ColorBuffer = (function (_super) {
     function ColorBuffer(array, width) {
         _super.call(this, array, width, 4);
     }
-    ColorBuffer.prototype.setColor = function (x, y, c) {
+    ColorBuffer.prototype.setColor = function (x, y, r, g, b, a) {
         var i = this.get_index(x, y);
-        this.array[i] = c.r * 255;
-        this.array[i + 1] = c.g * 255;
-        this.array[i + 2] = c.b * 255;
-        this.array[i + 3] = c.a * 255;
+        this.array[i] = r;
+        this.array[i + 1] = g;
+        this.array[i + 2] = b;
+        this.array[i + 3] = a;
+    };
+    ColorBuffer.prototype.clear = function () {
+        this.setAll(0);
     };
     ColorBuffer.create = function (width, height) {
         return new ColorBuffer(new Array(width * height * 4), width);
