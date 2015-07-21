@@ -16,6 +16,10 @@ var ColorBuffer = (function (_super) {
         this.array[i + 2] = b;
         this.array[i + 3] = a;
     };
+    ColorBuffer.prototype.copyColor = function (x, y, from, xFrom, yFrom) {
+        var i = from.get_index(xFrom, yFrom);
+        this.setColor(x, y, from.array[i], from.array[i + 1], from.array[i + 2], from.array[i + 3]);
+    };
     ColorBuffer.prototype.clear = function () {
         this.setAll(0);
     };

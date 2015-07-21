@@ -12,6 +12,11 @@ class ColorBuffer extends Array1dAs2d<number> {
         this.array[i + 3] = a;
     }
 
+    public copyColor(x: number, y: number, from: ColorBuffer, xFrom: number, yFrom: number) {
+        var i = from.get_index(xFrom, yFrom);
+        this.setColor(x, y, from.array[i], from.array[i + 1], from.array[i + 2], from.array[i + 3]);
+    }
+
     public clear() {
         this.setAll(0);
     }

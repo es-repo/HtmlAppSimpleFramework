@@ -19,7 +19,8 @@ var Renderer2d = (function (_super) {
             var i = this.output.depthBuffer.get_index(x, y);
             if (this.output.depthBuffer.array[i] >= z) {
                 this.output.depthBuffer.array[i] = z;
-                this.output.colorBuffer.setColor(x, y, r, g, b, a);
+                if (a != 0)
+                    this.output.colorBuffer.setColor(x, y, r, g, b, a);
             }
         }
     };
@@ -78,39 +79,11 @@ var Renderer2d = (function (_super) {
                     this.drawPoint(cx + x, cy + y, z, color);
     };
     Renderer2d.prototype.drawImage = function (x, y, z, image, scale) {
+        var _this = this;
         if (scale === void 0) { scale = null; }
         if (scale == null)
             scale = new BABYLON.Vector2(1, 1);
-        var sx = 0;
-        if (x < 0) {
-            sx = -x / scale.x >> 0;
-            x = 0;
-        }
-        var sy = 0;
-        if (y < 0) {
-            sy = -y / scale.y >> 0;
-            y = 0;
-        }
-        for (var i = sy, py = y, fullpy = 0; i < image.height && py < this.output.height; i++) {
-            fullpy += scale.y;
-            if (fullpy >= 1) {
-                while (fullpy >= 1) {
-                    for (var j = sx, px = x, fullpx = 0; j < image.width && px < this.output.width; j++) {
-                        fullpx += scale.x;
-                        if (fullpx >= 1) {
-                            while (fullpx >= 1) {
-                                var bi = image.get_index(j, i);
-                                this.drawPointC(px, py, z, image.array[bi], image.array[bi + 1], image.array[bi + 2], image.array[bi + 3]);
-                                fullpx--;
-                                px++;
-                            }
-                        }
-                    }
-                    fullpy--;
-                    py++;
-                }
-            }
-        }
+        ImageTransformer.scale(image, this.output.colorBuffer, scale.x, scale.y, x, y, function (ox, oy, r, g, b, a) { return _this.drawPointC(ox, oy, z, r, g, b, a); });
     };
     Renderer2d.prototype.drawRectangle = function (x, y, z, width, height, color) {
         this.drawLine(x, y, x + width, y, z, color);

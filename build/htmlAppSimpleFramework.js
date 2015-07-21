@@ -505,6 +505,10 @@ var ColorBuffer = (function (_super) {
         this.array[i + 2] = b;
         this.array[i + 3] = a;
     };
+    ColorBuffer.prototype.copyColor = function (x, y, from, xFrom, yFrom) {
+        var i = from.get_index(xFrom, yFrom);
+        this.setColor(x, y, from.array[i], from.array[i + 1], from.array[i + 2], from.array[i + 3]);
+    };
     ColorBuffer.prototype.clear = function () {
         this.setAll(0);
     };
@@ -853,7 +857,8 @@ var Renderer2d = (function (_super) {
             var i = this.output.depthBuffer.get_index(x, y);
             if (this.output.depthBuffer.array[i] >= z) {
                 this.output.depthBuffer.array[i] = z;
-                this.output.colorBuffer.setColor(x, y, r, g, b, a);
+                if (a != 0)
+                    this.output.colorBuffer.setColor(x, y, r, g, b, a);
             }
         }
     };
@@ -912,39 +917,11 @@ var Renderer2d = (function (_super) {
                     this.drawPoint(cx + x, cy + y, z, color);
     };
     Renderer2d.prototype.drawImage = function (x, y, z, image, scale) {
+        var _this = this;
         if (scale === void 0) { scale = null; }
         if (scale == null)
             scale = new BABYLON.Vector2(1, 1);
-        var sx = 0;
-        if (x < 0) {
-            sx = -x / scale.x >> 0;
-            x = 0;
-        }
-        var sy = 0;
-        if (y < 0) {
-            sy = -y / scale.y >> 0;
-            y = 0;
-        }
-        for (var i = sy, py = y, fullpy = 0; i < image.height && py < this.output.height; i++) {
-            fullpy += scale.y;
-            if (fullpy >= 1) {
-                while (fullpy >= 1) {
-                    for (var j = sx, px = x, fullpx = 0; j < image.width && px < this.output.width; j++) {
-                        fullpx += scale.x;
-                        if (fullpx >= 1) {
-                            while (fullpx >= 1) {
-                                var bi = image.get_index(j, i);
-                                this.drawPointC(px, py, z, image.array[bi], image.array[bi + 1], image.array[bi + 2], image.array[bi + 3]);
-                                fullpx--;
-                                px++;
-                            }
-                        }
-                    }
-                    fullpy--;
-                    py++;
-                }
-            }
-        }
+        ImageTransformer.scale(image, this.output.colorBuffer, scale.x, scale.y, x, y, function (ox, oy, r, g, b, a) { return _this.drawPointC(ox, oy, z, r, g, b, a); });
     };
     Renderer2d.prototype.drawRectangle = function (x, y, z, width, height, color) {
         this.drawLine(x, y, x + width, y, z, color);
@@ -1255,26 +1232,67 @@ var ImageTransformer = (function () {
         var imovy = -input.height / 2;
         var omovx = -output.width / 2;
         var omovy = -output.height / 2;
-        for (var i = 0, iy = imovy, idx = 0; i < input.height; i++, iy++) {
-            for (var j = 0, ix = imovx; j < input.width; j++, ix++, idx += 4) {
-                var ox = Math.round(ix * cos - iy * sin - omovx) >> 0;
-                var oy = Math.round(ix * sin + iy * cos - omovy) >> 0;
-                var oidx = output.get_index(ox, oy);
-                output.array[oidx] = input.array[idx];
-                output.array[oidx + 1] = input.array[idx + 1];
-                output.array[oidx + 2] = input.array[idx + 2];
-                output.array[oidx + 3] = input.array[idx + 3];
-                // Dirty fill potentially unfilled pixels. 
-                if (j < input.width - 1) {
-                    output.array[oidx + 4] = input.array[idx];
-                    output.array[oidx + 5] = input.array[idx + 1];
-                    output.array[oidx + 6] = input.array[idx + 2];
-                    output.array[oidx + 7] = input.array[idx + 3];
+        for (var i = 0, iy = imovy; i < input.height; i++, iy++) {
+            for (var j = 0, ix = imovx; j < input.width; j++, ix++) {
+                var ox = ix * cos - iy * sin - omovx >> 0;
+                var oy = ix * sin + iy * cos - omovy >> 0;
+                if (ox >= 0 && ox < output.width && oy >= 0 && oy < output.height) {
+                    var idx = input.get_index(j, i);
+                    var oidx = output.get_index(ox, oy);
+                    output.array[oidx] = input.array[idx];
+                    output.array[oidx + 1] = input.array[idx + 1];
+                    output.array[oidx + 2] = input.array[idx + 2];
+                    output.array[oidx + 3] = input.array[idx + 3];
+                    // Dirty fill potentially unfilled pixels. 
+                    if (ox < output.width - 1) {
+                        output.array[oidx + 4] = input.array[idx];
+                        output.array[oidx + 5] = input.array[idx + 1];
+                        output.array[oidx + 6] = input.array[idx + 2];
+                        output.array[oidx + 7] = input.array[idx + 3];
+                    }
                 }
             }
         }
     };
-    ImageTransformer.prototype.transform = function (input, output, x, y, scale, angle) {
+    ImageTransformer.scale = function (input, output, scaleX, scaleY, x, y, outputFunc) {
+        if (x === void 0) { x = 0; }
+        if (y === void 0) { y = 0; }
+        if (outputFunc === void 0) { outputFunc = null; }
+        var sx = 0;
+        if (x < 0) {
+            sx = -x / scaleX >> 0;
+            x = 0;
+        }
+        var sy = 0;
+        if (y < 0) {
+            sy = -y / scaleY >> 0;
+            y = 0;
+        }
+        for (var iy = sy, oy = y >> 0, fullpy = 0; iy < input.height && oy < output.height; iy++) {
+            fullpy += scaleY;
+            if (fullpy >= 1) {
+                while (fullpy >= 1) {
+                    for (var ix = sx, ox = x >> 0, fullpx = 0; ix < input.width && ox < output.width; ix++) {
+                        fullpx += scaleX;
+                        if (fullpx >= 1) {
+                            while (fullpx >= 1) {
+                                if (outputFunc != null) {
+                                    var idx = input.get_index(ix, iy);
+                                    outputFunc(ox, oy, input.array[idx], input.array[idx + 1], input.array[idx + 2], input.array[idx + 3]);
+                                }
+                                else {
+                                    output.copyColor(ox, oy, input, ix, iy);
+                                }
+                                fullpx--;
+                                ox++;
+                            }
+                        }
+                    }
+                    fullpy--;
+                    oy++;
+                }
+            }
+        }
     };
     return ImageTransformer;
 })();

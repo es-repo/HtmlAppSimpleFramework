@@ -20,7 +20,7 @@
   <ItemGroup>
     <TypeScriptCompile Include="imageTransformer.ts" />
     <TypeScriptCompile Include="light.ts" />
-    <TypeScriptCompile Include="samples\2dTransformations\Transformations2dApp.ts" />
+    <TypeScriptCompile Include="samples\2dTransformations\transformations2dApp.ts" />
     <TypeScriptCompile Include="samples\3dObject\monkey.ts" />
     <Content Include="samples\2dTransformations\index.html" />
     <Content Include="samples\3dObject\index.html" />
