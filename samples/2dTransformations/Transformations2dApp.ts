@@ -42,6 +42,7 @@
         if (this.image != null) {
             this.transformedImage.clear();
             ImageTransformer.rotate(this.image, this.transformedImage, this.rotateAngle);
+            ImageEffects.blur(this.transformedImage, this.transformedImage, 5);
             this.renderer2d.drawImage(this.imagePos.x, this.imagePos.y, this.imagePos.z, this.transformedImage, this.imageScale);
         }
         this.graphicOutput.drawBuffer();

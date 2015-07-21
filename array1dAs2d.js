@@ -19,5 +19,9 @@ var Array1dAs2d = (function () {
         for (var i = 0; i < this.array.length; i++)
             this.array[i] = v;
     };
+    Array1dAs2d.prototype.copy = function (from) {
+        for (var i = 0; i < this.array.length; i++)
+            this.array[i] = from.array[i];
+    };
     return Array1dAs2d;
 })();

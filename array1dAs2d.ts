@@ -27,4 +27,9 @@ class Array1dAs2d<T> {
         for (var i = 0; i < this.array.length; i++)
             this.array[i] = v;
     }
+
+    public copy(from: Array1dAs2d<T>) {
+        for (var i = 0; i < this.array.length; i++)
+            this.array[i] = from.array[i];
+    }
 }

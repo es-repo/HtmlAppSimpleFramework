@@ -68,6 +68,7 @@
     <TypeScriptCompile Include="array1dAs2d.ts" />
     <TypeScriptCompile Include="colorBuffer.ts" />
     <TypeScriptCompile Include="samples\blur\blurApp.ts" />
+    <TypeScriptCompile Include="imageEffects.ts" />
     <TypeScriptCompile Include="samples\stencil\Coord.ts" />
     <TypeScriptCompile Include="samples\stencil\stencilApp.ts" />
     <TypeScriptCompile Include="samples\paintBrush\paintBrushdApp.ts" />
