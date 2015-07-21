@@ -10,7 +10,7 @@ var Transformations2dApp = (function (_super) {
         _super.call(this, graphicOutput, inputControllerHandlers);
         this.imageScale = new BABYLON.Vector2(1, 1);
         this.rotateAngle = 0.8;
-        this.rotateDelta = 0.005;
+        this.rotateDelta = 0.01;
     }
     Transformations2dApp.prototype.set_image = function (urlOrBase64Data, onImageLoaded) {
         var _this = this;

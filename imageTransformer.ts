@@ -35,8 +35,7 @@
         }
     }
 
-    public static scale(input: ColorBuffer, output: ColorBuffer, scaleX: number, scaleY: number, x: number = 0, y: number = 0,
-        outputFunc: (x: number, y: number, r: number, g: number, b: number, a: number) => void = null) {
+    public static scale(input: ColorBuffer, output: ColorBuffer, scaleX: number, scaleY: number, x: number = 0, y: number = 0, filter: (x:number,number) => boolean = null) {
 
         var sx = 0;
         
@@ -59,10 +58,7 @@
                         fullpx += scaleX;
                         if (fullpx >= 1) {
                             while (fullpx >= 1) {
-                                if (outputFunc != null) {
-                                    var idx = input.get_index(ix, iy);
-                                    outputFunc(ox, oy, input.array[idx], input.array[idx + 1], input.array[idx + 2], input.array[idx + 3]);
-                                } else {
+                                if (filter == null || filter(ox, oy)) {
                                     output.copyColor(ox, oy, input, ix, iy);
                                 }
                                 fullpx--;

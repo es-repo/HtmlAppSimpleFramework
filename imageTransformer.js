@@ -30,10 +30,10 @@ var ImageTransformer = (function () {
             }
         }
     };
-    ImageTransformer.scale = function (input, output, scaleX, scaleY, x, y, outputFunc) {
+    ImageTransformer.scale = function (input, output, scaleX, scaleY, x, y, filter) {
         if (x === void 0) { x = 0; }
         if (y === void 0) { y = 0; }
-        if (outputFunc === void 0) { outputFunc = null; }
+        if (filter === void 0) { filter = null; }
         var sx = 0;
         if (x < 0) {
             sx = -x / scaleX >> 0;
@@ -52,11 +52,7 @@ var ImageTransformer = (function () {
                         fullpx += scaleX;
                         if (fullpx >= 1) {
                             while (fullpx >= 1) {
-                                if (outputFunc != null) {
-                                    var idx = input.get_index(ix, iy);
-                                    outputFunc(ox, oy, input.array[idx], input.array[idx + 1], input.array[idx + 2], input.array[idx + 3]);
-                                }
-                                else {
+                                if (filter == null || filter(ox, oy)) {
                                     output.copyColor(ox, oy, input, ix, iy);
                                 }
                                 fullpx--;

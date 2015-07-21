@@ -5,6 +5,8 @@ class ColorBuffer extends Array1dAs2d<number> {
     }
 
     public setColor(x: number, y: number, r: number, g: number, b: number, a: number) {
+        if (a == 0)
+            return;
         var i = this.get_index(x, y);
         this.array[i] = r;
         this.array[i + 1] = g;

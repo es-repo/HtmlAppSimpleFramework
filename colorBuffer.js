@@ -10,6 +10,8 @@ var ColorBuffer = (function (_super) {
         _super.call(this, array, width, 4);
     }
     ColorBuffer.prototype.setColor = function (x, y, r, g, b, a) {
+        if (a == 0)
+            return;
         var i = this.get_index(x, y);
         this.array[i] = r;
         this.array[i + 1] = g;

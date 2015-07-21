@@ -499,6 +499,8 @@ var ColorBuffer = (function (_super) {
         _super.call(this, array, width, 4);
     }
     ColorBuffer.prototype.setColor = function (x, y, r, g, b, a) {
+        if (a == 0)
+            return;
         var i = this.get_index(x, y);
         this.array[i] = r;
         this.array[i + 1] = g;
@@ -854,13 +856,18 @@ var Renderer2d = (function (_super) {
         x = x >> 0;
         y = y >> 0;
         if (x >= 0 && y >= 0 && x < this.output.width && y < this.output.height) {
-            var i = this.output.depthBuffer.get_index(x, y);
-            if (this.output.depthBuffer.array[i] >= z) {
-                this.output.depthBuffer.array[i] = z;
-                if (a != 0)
-                    this.output.colorBuffer.setColor(x, y, r, g, b, a);
+            if (this.checkDepth(x, y, z)) {
+                this.output.colorBuffer.setColor(x, y, r, g, b, a);
             }
         }
+    };
+    Renderer2d.prototype.checkDepth = function (x, y, z) {
+        var i = this.output.depthBuffer.get_index(x, y);
+        if (this.output.depthBuffer.array[i] >= z) {
+            this.output.depthBuffer.array[i] = z;
+            return true;
+        }
+        return false;
     };
     Renderer2d.prototype.drawLine = function (x0, y0, x1, y1, z, c) {
         x0 = x0 >> 0;
@@ -921,7 +928,7 @@ var Renderer2d = (function (_super) {
         if (scale === void 0) { scale = null; }
         if (scale == null)
             scale = new BABYLON.Vector2(1, 1);
-        ImageTransformer.scale(image, this.output.colorBuffer, scale.x, scale.y, x, y, function (ox, oy, r, g, b, a) { return _this.drawPointC(ox, oy, z, r, g, b, a); });
+        ImageTransformer.scale(image, this.output.colorBuffer, scale.x, scale.y, x, y, function (ox, oy) { return _this.checkDepth(ox, oy, z); });
     };
     Renderer2d.prototype.drawRectangle = function (x, y, z, width, height, color) {
         this.drawLine(x, y, x + width, y, z, color);
@@ -1254,10 +1261,10 @@ var ImageTransformer = (function () {
             }
         }
     };
-    ImageTransformer.scale = function (input, output, scaleX, scaleY, x, y, outputFunc) {
+    ImageTransformer.scale = function (input, output, scaleX, scaleY, x, y, filter) {
         if (x === void 0) { x = 0; }
         if (y === void 0) { y = 0; }
-        if (outputFunc === void 0) { outputFunc = null; }
+        if (filter === void 0) { filter = null; }
         var sx = 0;
         if (x < 0) {
             sx = -x / scaleX >> 0;
@@ -1276,11 +1283,7 @@ var ImageTransformer = (function () {
                         fullpx += scaleX;
                         if (fullpx >= 1) {
                             while (fullpx >= 1) {
-                                if (outputFunc != null) {
-                                    var idx = input.get_index(ix, iy);
-                                    outputFunc(ox, oy, input.array[idx], input.array[idx + 1], input.array[idx + 2], input.array[idx + 3]);
-                                }
-                                else {
+                                if (filter == null || filter(ox, oy)) {
                                     output.copyColor(ox, oy, input, ix, iy);
                                 }
                                 fullpx--;

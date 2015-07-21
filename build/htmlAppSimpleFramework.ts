@@ -515,6 +515,8 @@ class ColorBuffer extends Array1dAs2d<number> {
     }
 
     public setColor(x: number, y: number, r: number, g: number, b: number, a: number) {
+        if (a == 0)
+            return;
         var i = this.get_index(x, y);
         this.array[i] = r;
         this.array[i + 1] = g;
@@ -888,17 +890,23 @@ class Renderer2d extends Renderer {
     }
 
     public drawPointC(x: number, y: number, z: number, r: number, g: number, b: number, a: number) {
-         
+
         x = x >> 0;
         y = y >> 0;
         if (x >= 0 && y >= 0 && x < this.output.width && y < this.output.height) {
-            var i = this.output.depthBuffer.get_index(x, y);
-            if (this.output.depthBuffer.array[i] >= z) {
-                this.output.depthBuffer.array[i] = z;
-                if (a != 0)
-                    this.output.colorBuffer.setColor(x, y, r, g, b, a);
+            if (this.checkDepth(x, y, z)) {
+                this.output.colorBuffer.setColor(x, y, r, g, b, a);
             }
         }
+    }
+
+    private checkDepth(x: number, y: number, z: number) {
+        var i = this.output.depthBuffer.get_index(x, y);
+        if (this.output.depthBuffer.array[i] >= z) {
+            this.output.depthBuffer.array[i] = z;
+            return true;
+        }
+        return false;
     }
 
     public drawLine(x0: number, y0: number, x1: number, y1: number, z: number, c: BABYLON.Color4): void {
@@ -966,7 +974,7 @@ class Renderer2d extends Renderer {
     public drawImage(x: number, y: number, z: number, image: ColorBuffer, scale: BABYLON.Vector2 = null) {
         if (scale == null)
             scale = new BABYLON.Vector2(1, 1);
-        ImageTransformer.scale(image, this.output.colorBuffer, scale.x, scale.y, x, y, (ox, oy, r, g ,b, a) => this.drawPointC(ox, oy, z, r, g, b, a));
+        ImageTransformer.scale(image, this.output.colorBuffer, scale.x, scale.y, x, y,(ox, oy) => this.checkDepth(ox, oy, z));
     }
 
     public drawRectangle(x: number, y: number, z: number, width: number, height: number, color: BABYLON.Color4) {
@@ -1380,8 +1388,7 @@ class ImageTransformer {
         }
     }
 
-    public static scale(input: ColorBuffer, output: ColorBuffer, scaleX: number, scaleY: number, x: number = 0, y: number = 0,
-        outputFunc: (x: number, y: number, r: number, g: number, b: number, a: number) => void = null) {
+    public static scale(input: ColorBuffer, output: ColorBuffer, scaleX: number, scaleY: number, x: number = 0, y: number = 0, filter: (x:number,number) => boolean = null) {
 
         var sx = 0;
         
@@ -1404,10 +1411,7 @@ class ImageTransformer {
                         fullpx += scaleX;
                         if (fullpx >= 1) {
                             while (fullpx >= 1) {
-                                if (outputFunc != null) {
-                                    var idx = input.get_index(ix, iy);
-                                    outputFunc(ox, oy, input.array[idx], input.array[idx + 1], input.array[idx + 2], input.array[idx + 3]);
-                                } else {
+                                if (filter == null || filter(ox, oy)) {
                                     output.copyColor(ox, oy, input, ix, iy);
                                 }
                                 fullpx--;

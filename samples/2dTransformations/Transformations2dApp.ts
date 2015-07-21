@@ -6,7 +6,7 @@
     private imagePos: BABYLON.Vector3;
     private imageScale = new BABYLON.Vector2(1, 1);
     private rotateAngle = 0.8;
-    private rotateDelta = 0.005;
+    private rotateDelta = 0.01;
 
     constructor(graphicOutput: GraphicOutput, inputControllerHandlers: InputDevices) {
         super(graphicOutput, inputControllerHandlers);

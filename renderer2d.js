@@ -16,13 +16,18 @@ var Renderer2d = (function (_super) {
         x = x >> 0;
         y = y >> 0;
         if (x >= 0 && y >= 0 && x < this.output.width && y < this.output.height) {
-            var i = this.output.depthBuffer.get_index(x, y);
-            if (this.output.depthBuffer.array[i] >= z) {
-                this.output.depthBuffer.array[i] = z;
-                if (a != 0)
-                    this.output.colorBuffer.setColor(x, y, r, g, b, a);
+            if (this.checkDepth(x, y, z)) {
+                this.output.colorBuffer.setColor(x, y, r, g, b, a);
             }
         }
+    };
+    Renderer2d.prototype.checkDepth = function (x, y, z) {
+        var i = this.output.depthBuffer.get_index(x, y);
+        if (this.output.depthBuffer.array[i] >= z) {
+            this.output.depthBuffer.array[i] = z;
+            return true;
+        }
+        return false;
     };
     Renderer2d.prototype.drawLine = function (x0, y0, x1, y1, z, c) {
         x0 = x0 >> 0;
@@ -83,7 +88,7 @@ var Renderer2d = (function (_super) {
         if (scale === void 0) { scale = null; }
         if (scale == null)
             scale = new BABYLON.Vector2(1, 1);
-        ImageTransformer.scale(image, this.output.colorBuffer, scale.x, scale.y, x, y, function (ox, oy, r, g, b, a) { return _this.drawPointC(ox, oy, z, r, g, b, a); });
+        ImageTransformer.scale(image, this.output.colorBuffer, scale.x, scale.y, x, y, function (ox, oy) { return _this.checkDepth(ox, oy, z); });
     };
     Renderer2d.prototype.drawRectangle = function (x, y, z, width, height, color) {
         this.drawLine(x, y, x + width, y, z, color);
