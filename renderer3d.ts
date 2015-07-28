@@ -185,7 +185,7 @@ class Renderer3d extends Renderer {
             dP1P3 = 0;
 
         if (dP1P2 > dP1P3) {
-            for (var y = p1.y >> 0; y <= p3.y >> 0; y++) {
+            for (var y = Math.max(p1.y >> 0, 0), ye = Math.min(p3.y >> 0, this.output.height); y <= ye; y++) {
                 data.currentY = y;
 
                 if (y < p2.y) {
@@ -227,7 +227,7 @@ class Renderer3d extends Renderer {
             }
         }
         else {
-            for (var y = p1.y >> 0; y <= p3.y >> 0; y++) {
+            for (var y = Math.max(0, p1.y >> 0), ye = Math.min(this.output.height, p3.y >> 0); y <= ye; y++) {
                 data.currentY = y;
 
                 if (y < p2.y) {
@@ -282,6 +282,7 @@ class Renderer3d extends Renderer {
     // papb -> pcpd
     // pa, pb, pc, pd must then be sorted before
     private processScanLine(data: ScanLineData, va: Vertex, vb: Vertex, vc: Vertex, vd: Vertex, color: BABYLON.Color4, texture?: Texture): void {
+        
         var pa = va.coordinates;
         var pb = vb.coordinates;
         var pc = vc.coordinates;
@@ -310,8 +311,9 @@ class Renderer3d extends Renderer {
         var sv = this.interpolate(data.va, data.vb, gradient1);
         var ev = this.interpolate(data.vc, data.vd, gradient2);
 
+        var white = new BABYLON.Color4(1, 1, 1, 1);
         // drawing a line from left (sx) to right (ex) 
-        for (var x = sx; x < ex; x++) {
+        for (var x = Math.max(0, sx), exx = Math.min(ex, this.output.width); x < exx; x++) {
             var gradient: number = (x - sx) / (ex - sx);
 
             // Interpolating Z, normal and texture coordinates on X
@@ -320,12 +322,7 @@ class Renderer3d extends Renderer {
             var u = this.interpolate(su, eu, gradient);
             var v = this.interpolate(sv, ev, gradient);
 
-            var textureColor;
-
-            if (texture)
-                textureColor = texture.map(u, v);
-            else
-                textureColor = new BABYLON.Color4(1, 1, 1, 1);
+            var textureColor = texture ? texture.map(u, v) : BABYLON.Color4.white;
 
             // changing the native color value using the cosine of the angle
             // between the light vector and the normal vector

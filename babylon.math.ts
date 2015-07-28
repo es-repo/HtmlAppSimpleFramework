@@ -1,5 +1,9 @@
 module BABYLON {
     export class Color4 {
+
+        public static white = new Color4(1, 1, 1, 1);
+        public static black = new Color4(0, 0, 0, 1);
+
         r: number;
         g: number;
         b: number;
