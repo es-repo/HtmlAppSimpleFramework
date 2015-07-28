@@ -8,8 +8,35 @@
     private rotateAngle = 0.8;
     private rotateDelta = 0.01;
 
+    private starZMax;
+    private starZMin;
+    private stars: Circle[];
+    
     constructor(graphicOutput: GraphicOutput, inputControllerHandlers: InputDevices) {
         super(graphicOutput, inputControllerHandlers);
+    }
+
+    protected createScene(continuation: (scene: Scene) => void) {
+        var scene = new Scene();
+        this.starZMax = scene.camera.position.z - 10;
+        this.starZMin = -100;
+        var r = 0.05;
+        var d = 5;
+        this.stars = [];
+        for (var i = 0; i < 300; i++) {
+            var fi = 2 * Math.PI * Math.random();
+            var a = d / 2 + Math.random() * d * 4;
+            var x = a * Math.sin(fi);
+            var y = a * Math.cos(fi);
+            var z = this.starZMin + Math.random() * (Math.abs(this.starZMin) + this.starZMax);
+            var s = new Circle();
+            s.color = new BABYLON.Color4(1, 1, 1, 1);
+            s.position = new BABYLON.Vector3(x, y, z);
+            s.set_radius(r);
+            scene.figures.push(s);
+            this.stars.push(s);
+        }
+        continuation(scene);
     }
     
     public set_image(urlOrBase64Data: string, onImageLoaded?: Function) {
@@ -34,10 +61,17 @@
     protected doLogicStep() {
         super.doLogicStep();
         this.rotateAngle += this.rotateDelta;
+        for (var i = 0, p; i < this.stars.length; i++) {
+            p = this.stars[i].position;
+            p.z = p.z + 1;
+            if (p.z > this.starZMax)
+               p.z = this.starZMin;
+        }
     }
 
     protected drawFrame() {
         this.renderer2d.output.clear();
+        this.renderer3d.drawScene(this.scene);
         if (this.image != null) {
             this.transImage1.clear();
             
@@ -69,7 +103,7 @@
         }
         this.graphicOutput.drawBuffer();
     }
-
+    
     public handleKeyboardEvent(eventArgs: KeyboardEventArgs) {
 
         super.handleKeyboardEvent(eventArgs);
@@ -97,6 +131,8 @@
         if (eventArgs.leftButtonClicked) {
             this.imagePos.x += eventArgs.deltaX;
             this.imagePos.y += eventArgs.deltaY;
+            this.scene.camera.position.x += eventArgs.deltaX / 10;
+            this.scene.camera.position.y += eventArgs.deltaY / 10;
         }
     }    
 }

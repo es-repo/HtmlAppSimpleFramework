@@ -965,8 +965,10 @@ class Renderer2d extends Renderer {
     }
 
     public drawFilledCircle(cx: number, cy: number, z: number, radius: number, color: BABYLON.Color4) {
-        for (var y = -radius; y <= radius; y++)
-            for (var x = -radius; x <= radius; x++)
+        var yb = Math.min(radius, this.output.height / 2);
+        var xb = Math.min(radius, this.output.width / 2);
+        for (var y = -yb; y <= yb; y++)
+            for (var x = -xb; x <= xb; x++)
                 if (x * x + y * y <= radius * radius)
                     this.drawPoint(cx + x, cy + y, z, color);
     }
@@ -1020,12 +1022,15 @@ class Renderer3d extends Renderer {
         this.renderer2d = new Renderer2d(output);
     }
 
+    public get_viewProjectionMatrix(camera: Camera) {
+        var viewMatrix = BABYLON.Matrix.LookAtLH(camera.position, camera.direction, camera.up);
+        var projectionMatrix = BABYLON.Matrix.PerspectiveFovLH(camera.fov, this.output.width / this.output.height, camera.zNear, camera.zFar);
+        return viewMatrix.multiply(projectionMatrix);
+    }
+
     public projectScene(scene: Scene) {
 
-        var viewMatrix = BABYLON.Matrix.LookAtLH(scene.camera.position, scene.camera.direction, scene.camera.up);
-        var projectionMatrix = BABYLON.Matrix.PerspectiveFovLH(scene.camera.fov, this.output.width / this.output.height,
-            scene.camera.zNear, scene.camera.zFar);
-
+        var viewProjectionMatrix = this.get_viewProjectionMatrix(scene.camera);
         for (var i = 0; i < scene.figures.length; i++) {
              
             var f = scene.figures[i];
@@ -1035,12 +1040,12 @@ class Renderer3d extends Renderer {
                 .multiply(BABYLON.Matrix.Translation(
                 f.position.x, f.position.y, f.position.z));
 
-            var transformMatrix = worldMatrix.multiply(viewMatrix).multiply(projectionMatrix);
+            var transformMatrix = worldMatrix.multiply(viewProjectionMatrix);
             this.projectFigure(f, worldMatrix, transformMatrix);
         }
     }
 
-    private projectVector(v: BABYLON.Vector3, transMat: BABYLON.Matrix): BABYLON.Vector3 {
+    public projectVector(v: BABYLON.Vector3, transMat: BABYLON.Matrix): BABYLON.Vector3 {
 
         var point = BABYLON.Vector3.TransformCoordinates(v, transMat);
         var x = point.x * this.output.width + this.output.width / 2.0;
@@ -1050,19 +1055,19 @@ class Renderer3d extends Renderer {
 
     private projectVertex(vertex: Vertex, transMat: BABYLON.Matrix, worldMat: BABYLON.Matrix): Vertex {
         
-        var point3DWorld = BABYLON.Vector3.TransformCoordinates(vertex.coordinates, worldMat);
-        var normal3DWorld = BABYLON.Vector3.TransformCoordinates(vertex.normal, worldMat);
+        var worldCoords = BABYLON.Vector3.TransformCoordinates(vertex.coordinates, worldMat);
+        var normal = BABYLON.Vector3.TransformCoordinates(vertex.normal, worldMat);
         var coord = this.projectVector(vertex.coordinates, transMat);
 
         return ({
             coordinates: coord,
-            normal: normal3DWorld,
-            worldCoordinates: point3DWorld,
+            normal: normal,
+            worldCoordinates: worldCoords,
             textureCoordinates: vertex.textureCoordinates
         });
     }
 
-    private projectFigure(f: Figure, worldMatrix: BABYLON.Matrix, transformMatrix: BABYLON.Matrix) {
+    public projectFigure(f: Figure, worldMatrix: BABYLON.Matrix, transformMatrix: BABYLON.Matrix) {
            
         f.projectedPosition = this.projectVector(f.position, transformMatrix);
         var posPlusSize = f.position.add(f.size);

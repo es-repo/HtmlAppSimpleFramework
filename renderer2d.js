@@ -78,8 +78,10 @@ var Renderer2d = (function (_super) {
         }
     };
     Renderer2d.prototype.drawFilledCircle = function (cx, cy, z, radius, color) {
-        for (var y = -radius; y <= radius; y++)
-            for (var x = -radius; x <= radius; x++)
+        var yb = Math.min(radius, this.output.height / 2);
+        var xb = Math.min(radius, this.output.width / 2);
+        for (var y = -yb; y <= yb; y++)
+            for (var x = -xb; x <= xb; x++)
                 if (x * x + y * y <= radius * radius)
                     this.drawPoint(cx + x, cy + y, z, color);
     };

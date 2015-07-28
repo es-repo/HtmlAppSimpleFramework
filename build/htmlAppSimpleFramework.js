@@ -918,8 +918,10 @@ var Renderer2d = (function (_super) {
         }
     };
     Renderer2d.prototype.drawFilledCircle = function (cx, cy, z, radius, color) {
-        for (var y = -radius; y <= radius; y++)
-            for (var x = -radius; x <= radius; x++)
+        var yb = Math.min(radius, this.output.height / 2);
+        var xb = Math.min(radius, this.output.width / 2);
+        for (var y = -yb; y <= yb; y++)
+            for (var x = -xb; x <= xb; x++)
                 if (x * x + y * y <= radius * radius)
                     this.drawPoint(cx + x, cy + y, z, color);
     };
@@ -968,13 +970,17 @@ var Renderer3d = (function (_super) {
         this.renderSettings = new Renderer3dSettings();
         this.renderer2d = new Renderer2d(output);
     }
+    Renderer3d.prototype.get_viewProjectionMatrix = function (camera) {
+        var viewMatrix = BABYLON.Matrix.LookAtLH(camera.position, camera.direction, camera.up);
+        var projectionMatrix = BABYLON.Matrix.PerspectiveFovLH(camera.fov, this.output.width / this.output.height, camera.zNear, camera.zFar);
+        return viewMatrix.multiply(projectionMatrix);
+    };
     Renderer3d.prototype.projectScene = function (scene) {
-        var viewMatrix = BABYLON.Matrix.LookAtLH(scene.camera.position, scene.camera.direction, scene.camera.up);
-        var projectionMatrix = BABYLON.Matrix.PerspectiveFovLH(scene.camera.fov, this.output.width / this.output.height, scene.camera.zNear, scene.camera.zFar);
+        var viewProjectionMatrix = this.get_viewProjectionMatrix(scene.camera);
         for (var i = 0; i < scene.figures.length; i++) {
             var f = scene.figures[i];
             var worldMatrix = BABYLON.Matrix.RotationYawPitchRoll(f.rotation.y, f.rotation.x, f.rotation.z).multiply(BABYLON.Matrix.Translation(f.position.x, f.position.y, f.position.z));
-            var transformMatrix = worldMatrix.multiply(viewMatrix).multiply(projectionMatrix);
+            var transformMatrix = worldMatrix.multiply(viewProjectionMatrix);
             this.projectFigure(f, worldMatrix, transformMatrix);
         }
     };
@@ -985,13 +991,13 @@ var Renderer3d = (function (_super) {
         return (new BABYLON.Vector3(x, y, point.z));
     };
     Renderer3d.prototype.projectVertex = function (vertex, transMat, worldMat) {
-        var point3DWorld = BABYLON.Vector3.TransformCoordinates(vertex.coordinates, worldMat);
-        var normal3DWorld = BABYLON.Vector3.TransformCoordinates(vertex.normal, worldMat);
+        var worldCoords = BABYLON.Vector3.TransformCoordinates(vertex.coordinates, worldMat);
+        var normal = BABYLON.Vector3.TransformCoordinates(vertex.normal, worldMat);
         var coord = this.projectVector(vertex.coordinates, transMat);
         return ({
             coordinates: coord,
-            normal: normal3DWorld,
-            worldCoordinates: point3DWorld,
+            normal: normal,
+            worldCoordinates: worldCoords,
             textureCoordinates: vertex.textureCoordinates
         });
     };
