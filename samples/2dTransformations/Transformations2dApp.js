@@ -8,7 +8,8 @@ var Transformations2dApp = (function (_super) {
     __extends(Transformations2dApp, _super);
     function Transformations2dApp(graphicOutput, inputControllerHandlers) {
         _super.call(this, graphicOutput, inputControllerHandlers);
-        this.imageScale = new BABYLON.Vector2(1, 1);
+        this.imageScalex = 1;
+        this.imageScaley = 1;
         this.rotateAngle = 0.8;
         this.rotateDelta = 0.01;
     }
@@ -83,7 +84,7 @@ var Transformations2dApp = (function (_super) {
                 this.transImage2.clear();
                 scl(this.image, this.transImage1, i);
                 rot(this.transImage1, this.transImage2, i);
-                this.renderer2d.drawImage(this.imagePos.x + c.x, this.imagePos.y + c.y, this.imagePos.z, this.transImage2, this.imageScale);
+                this.renderer2d.drawImage(this.transImage2, this.imagePos.x + c.x, this.imagePos.y + c.y, this.imagePos.z, this.imageScaley, this.imageScaley);
             }
         }
         this.graphicOutput.drawBuffer();
@@ -102,8 +103,8 @@ var Transformations2dApp = (function (_super) {
     };
     Transformations2dApp.prototype.handleMouseEvent = function (eventArgs) {
         var scaleDelta = -eventArgs.wheelDelta * 0.001;
-        this.imageScale.x += scaleDelta;
-        this.imageScale.y += scaleDelta;
+        this.imageScalex += scaleDelta;
+        this.imageScaley += scaleDelta;
         if (eventArgs.leftButtonClicked) {
             this.imagePos.x += eventArgs.deltaX;
             this.imagePos.y += eventArgs.deltaY;

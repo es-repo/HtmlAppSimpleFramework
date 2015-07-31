@@ -4,7 +4,8 @@
     private transImage1: ColorBuffer;
     private transImage2: ColorBuffer;
     private imagePos: BABYLON.Vector3;
-    private imageScale = new BABYLON.Vector2(1, 1);
+    private imageScalex = 1;
+    private imageScaley = 1;
     private rotateAngle = 0.8;
     private rotateDelta = 0.01;
 
@@ -98,7 +99,7 @@
                 this.transImage2.clear();
                 scl(this.image, this.transImage1, i);
                 rot(this.transImage1, this.transImage2, i);
-                this.renderer2d.drawImage(this.imagePos.x + c.x, this.imagePos.y + c.y, this.imagePos.z, this.transImage2, this.imageScale);
+                this.renderer2d.drawImage(this.transImage2, this.imagePos.x + c.x, this.imagePos.y + c.y, this.imagePos.z, this.imageScaley, this.imageScaley);
             }
         }
         this.graphicOutput.drawBuffer();
@@ -125,8 +126,8 @@
     public handleMouseEvent(eventArgs: MouseEventArgs) {
 
         var scaleDelta = -eventArgs.wheelDelta * 0.001;
-        this.imageScale.x += scaleDelta;
-        this.imageScale.y += scaleDelta;
+        this.imageScalex += scaleDelta;
+        this.imageScaley += scaleDelta;
 
         if (eventArgs.leftButtonClicked) {
             this.imagePos.x += eventArgs.deltaX;

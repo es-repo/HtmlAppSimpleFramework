@@ -210,7 +210,7 @@
         if (this.image != null) {
             this.imageRenderer2d.output.clear();
             if (this.showImage) {
-                this.imageRenderer2d.drawImage(0, 0, 0, this.image);
+                this.imageRenderer2d.drawImage(this.image, 0, 0, 0);
             }
             this.drawOutlines();
             
@@ -219,7 +219,7 @@
 
             if (this.showMeshes)
                 this.drawMeshes();
-            this.renderer2d.drawImage(this.imagePos.x, this.imagePos.y, this.imagePos.z, this.imageRenderer2d.output.colorBuffer, this.imageScale);
+            this.renderer2d.drawImage(this.imageRenderer2d.output.colorBuffer, this.imagePos.x, this.imagePos.y, this.imagePos.z, this.imageScale.x, this.imageScale.y);
         }
         this.graphicOutput.drawBuffer();
     }

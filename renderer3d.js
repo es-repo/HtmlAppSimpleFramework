@@ -5,17 +5,20 @@ var __extends = this.__extends || function (d, b) {
     __.prototype = b.prototype;
     d.prototype = new __();
 };
-var Renderer3dSettings = (function () {
-    function Renderer3dSettings() {
+var Render3dSettings = (function () {
+    function Render3dSettings() {
         this.showTextures = true;
+        this.showMeshes = false;
+        this.showFaces = true;
+        this.showCoordinates = false;
     }
-    return Renderer3dSettings;
+    return Render3dSettings;
 })();
 var Renderer3d = (function (_super) {
     __extends(Renderer3d, _super);
     function Renderer3d(output) {
         _super.call(this, output);
-        this.renderSettings = new Renderer3dSettings();
+        this.renderSettings = new Render3dSettings();
         this.renderer2d = new Renderer2d(output);
     }
     Renderer3d.prototype.get_viewProjectionMatrix = function (camera) {
@@ -83,6 +86,9 @@ var Renderer3d = (function (_super) {
         else if (f instanceof Sprite) {
             this.drawSprite(f);
         }
+        else if (f instanceof Tile) {
+            this.drawTile(f);
+        }
         else if (f instanceof Mesh) {
             this.drawMesh(f, light);
         }
@@ -91,21 +97,30 @@ var Renderer3d = (function (_super) {
         this.renderer2d.drawFilledCircle(circle.projectedPosition.x, circle.projectedPosition.y, circle.projectedPosition.z, circle.get_projectedRadius(), circle.color);
     };
     Renderer3d.prototype.drawSprite = function (sprite) {
-        var scale = new BABYLON.Vector2(1, 1);
-        scale.x = sprite.projectedSize.x / sprite.image.width;
-        scale.y = sprite.projectedSize.y / sprite.image.height;
+        var scalex = sprite.projectedSize.x / sprite.image.width;
+        var scaley = sprite.projectedSize.y / sprite.image.height;
         var x = sprite.projectedPosition.x - sprite.projectedSize.x / 2;
         var y = sprite.projectedPosition.y - sprite.projectedSize.y / 2;
-        this.renderer2d.drawImage(x, y, sprite.projectedPosition.z, sprite.image, scale);
+        this.renderer2d.drawImage(sprite.image, x, y, sprite.projectedPosition.z, scalex, scaley);
+    };
+    Renderer3d.prototype.drawTile = function (tile) {
     };
     Renderer3d.prototype.drawMesh = function (m, light) {
+        var linesColor = new BABYLON.Color4(1, 1, 1, 1);
         for (var indexFaces = 0; indexFaces < m.faces.length; indexFaces++) {
             var currentFace = m.faces[indexFaces];
             var va = m.projectedVertices[currentFace.a];
             var vb = m.projectedVertices[currentFace.b];
             var vc = m.projectedVertices[currentFace.c];
-            var color = 1.0;
-            this.drawTriangle(va, vb, vc, new BABYLON.Color4(color, color, color, 1), light, this.renderSettings.showTextures ? m.texture : null);
+            if (this.renderSettings.showFaces) {
+                var color = new BABYLON.Color4(1, 1, 1, 1);
+                this.drawTriangle(va, vb, vc, color, light, this.renderSettings.showTextures ? m.texture : null);
+            }
+            if (this.renderSettings.showMeshes) {
+                this.renderer2d.drawLine(va.coordinates.x, va.coordinates.y, vb.coordinates.x, vb.coordinates.y, 0, linesColor);
+                this.renderer2d.drawLine(vb.coordinates.x, vb.coordinates.y, vc.coordinates.x, vc.coordinates.y, 0, linesColor);
+                this.renderer2d.drawLine(vc.coordinates.x, vc.coordinates.y, va.coordinates.x, va.coordinates.y, 0, linesColor);
+            }
         }
     };
     Renderer3d.prototype.drawTriangle = function (v1, v2, v3, color, light, texture) {
@@ -255,7 +270,6 @@ var Renderer3d = (function (_super) {
         var eu = this.interpolate(data.uc, data.ud, gradient2);
         var sv = this.interpolate(data.va, data.vb, gradient1);
         var ev = this.interpolate(data.vc, data.vd, gradient2);
-        var white = new BABYLON.Color4(1, 1, 1, 1);
         for (var x = Math.max(0, sx), exx = Math.min(ex, this.output.width); x < exx; x++) {
             var gradient = (x - sx) / (ex - sx);
             // Interpolating Z, normal and texture coordinates on X

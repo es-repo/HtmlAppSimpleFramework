@@ -28,3 +28,12 @@ class Sprite extends Figure {
         this.image = image;
     }
 }
+
+class Tile extends Sprite {
+    public width = 1;
+    public height = 1;
+
+    constructor(image) {
+        super(image);
+    }
+}

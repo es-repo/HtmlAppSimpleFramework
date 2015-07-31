@@ -2,7 +2,8 @@
 
     private image: ColorBuffer;
     private bluredImage: ColorBuffer;
-    private imageScale = new BABYLON.Vector2(1, 1);
+    private imageScalex = 1;
+    private imageScaley = 1;
     private imagePos: BABYLON.Vector3;
     private radius = 0;
 
@@ -12,8 +13,8 @@
 
     public set_image(urlOrBase64Data: string, onImageLoaded?: Function) {
         this.image = null;
-        this.imageScale.x = 1;
-        this.imageScale.y = 1;
+        this.imageScalex = 1;
+        this.imageScaley = 1;
         ColorBuffer.fromHtmlImage(urlOrBase64Data, cb => {
             this.image = cb;
             
@@ -41,7 +42,7 @@
     protected drawFrame() {
         this.renderer2d.output.clear();
         if (this.image != null) {
-            this.renderer2d.drawImage(this.imagePos.x, this.imagePos.y, this.imagePos.z, this.bluredImage, this.imageScale);
+            this.renderer2d.drawImage(this.bluredImage, this.imagePos.x, this.imagePos.y, this.imagePos.z, this.imageScalex, this.imageScaley);
         }
         this.graphicOutput.drawBuffer();
     }
@@ -53,8 +54,8 @@
     public handleMouseEvent(eventArgs: MouseEventArgs) {
 
         var scaleDelta = -eventArgs.wheelDelta * 0.001;
-        this.imageScale.x += scaleDelta;
-        this.imageScale.y += scaleDelta;
+        this.imageScalex += scaleDelta;
+        this.imageScaley += scaleDelta;
 
         if (eventArgs.leftButtonClicked) {
             this.imagePos.x += eventArgs.deltaX;

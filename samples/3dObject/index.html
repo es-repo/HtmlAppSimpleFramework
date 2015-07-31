@@ -16,6 +16,8 @@
         <label><input type="radio" id="cube1Radio" name="meshSelect" value="cube1"> Cube 1</label>
         <label><input type="radio" id="cube2Radio" name="meshSelect" value="cube2"> Cube 2</label>
         <label><input id="showTexturesCheckBox" type="checkbox" value="value" checked="checked">Show textures</label>
+    <label><input id="showFacesCheckBox" type="checkbox" value="value" checked="checked">Show faces</label>
+        <label><input id="showMeshesCheckBox" type="checkbox" value="value">Show meshes</label>
     </div>
 </body>
 <script>
@@ -57,6 +59,24 @@
 
         showTexturesCheckBox.addEventListener("click", onShowTexturesCheckBox);
         onShowTexturesCheckBox();
+
+        var showMeshesCheckBox = document.getElementById("showMeshesCheckBox");
+
+        function onShowMeshesCheckBox() {
+            app.renderer3d.renderSettings.showMeshes = showMeshesCheckBox.checked;
+        }
+
+        showMeshesCheckBox.addEventListener("click", onShowMeshesCheckBox);
+        onShowMeshesCheckBox();
+
+        var showFacesCheckBox = document.getElementById("showFacesCheckBox");
+
+        function onShowFacesCheckBox() {
+            app.renderer3d.renderSettings.showFaces = showFacesCheckBox.checked;
+        }
+
+        showFacesCheckBox.addEventListener("click", onShowFacesCheckBox);
+        onShowFacesCheckBox();
 
     };
 </script>

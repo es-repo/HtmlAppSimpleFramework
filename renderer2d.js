@@ -16,18 +16,10 @@ var Renderer2d = (function (_super) {
         x = x >> 0;
         y = y >> 0;
         if (x >= 0 && y >= 0 && x < this.output.width && y < this.output.height) {
-            if (this.checkDepth(x, y, z)) {
+            if (this.output.checkDepth(x, y, z)) {
                 this.output.colorBuffer.setColor(x, y, r, g, b, a);
             }
         }
-    };
-    Renderer2d.prototype.checkDepth = function (x, y, z) {
-        var i = this.output.depthBuffer.get_index(x, y);
-        if (this.output.depthBuffer.array[i] >= z) {
-            this.output.depthBuffer.array[i] = z;
-            return true;
-        }
-        return false;
     };
     Renderer2d.prototype.drawLine = function (x0, y0, x1, y1, z, c) {
         x0 = x0 >> 0;
@@ -85,12 +77,21 @@ var Renderer2d = (function (_super) {
                 if (x * x + y * y <= radius * radius)
                     this.drawPoint(cx + x, cy + y, z, color);
     };
-    Renderer2d.prototype.drawImage = function (x, y, z, image, scale) {
+    Renderer2d.prototype.drawImage = function (image, x, y, z, scalex, scaley) {
         var _this = this;
-        if (scale === void 0) { scale = null; }
-        if (scale == null)
-            scale = new BABYLON.Vector2(1, 1);
-        ImageTransformer.scale(image, this.output.colorBuffer, scale.x, scale.y, x, y, function (ox, oy) { return _this.checkDepth(ox, oy, z); });
+        if (scalex === void 0) { scalex = 1; }
+        if (scaley === void 0) { scaley = 1; }
+        ImageTransformer.scale(image, this.output.colorBuffer, scalex, scaley, x, y, function (ox, oy) { return _this.output.checkDepth(ox, oy, z); });
+    };
+    Renderer2d.prototype.drawTiles = function (image, x, y, z, tilesx, tilesy, scalex, scaley) {
+        if (tilesy === void 0) { tilesy = 1; }
+        if (scalex === void 0) { scalex = 1; }
+        if (scaley === void 0) { scaley = 1; }
+        for (var ty = 0, theight = image.height * scaley, py = y; ty < tilesy; ty++, py += theight) {
+            for (var tx = 0, twidth = image.width * scalex, px = x; tx < tilesx; tx++, px += twidth) {
+                this.drawImage(image, px, py, z, scalex, scaley);
+            }
+        }
     };
     Renderer2d.prototype.drawRectangle = function (x, y, z, width, height, color) {
         this.drawLine(x, y, x + width, y, z, color);

@@ -1,5 +1,6 @@
 ﻿class RendererOutput {
     
+    private depthBufferMaxValue = 10000000;
     public colorBuffer: ColorBuffer;
     public depthBuffer: Array1dAs2d<number>;
     public width: number;
@@ -20,9 +21,18 @@
         this.resetDepthBuffer();
     }
 
+    public checkDepth(x: number, y: number, z: number) {
+        var i = this.depthBuffer.get_index(x, y);
+        if (this.depthBuffer.array[i] >= z) {
+            this.depthBuffer.array[i] = z;
+            return true;
+        }
+        return false;
+    }
+
     private resetDepthBuffer() {
         for (var i = 0; i < this.depthBuffer.array.length; i++) {
-            this.depthBuffer.array[i] = 10000000; // Max possible value 
+            this.depthBuffer.array[i] = this.depthBufferMaxValue; 
         }
     }
 }

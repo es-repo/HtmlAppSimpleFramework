@@ -8,14 +8,15 @@ var BlurApp = (function (_super) {
     __extends(BlurApp, _super);
     function BlurApp(graphicOutput, inputControllerHandlers) {
         _super.call(this, graphicOutput, inputControllerHandlers);
-        this.imageScale = new BABYLON.Vector2(1, 1);
+        this.imageScalex = 1;
+        this.imageScaley = 1;
         this.radius = 0;
     }
     BlurApp.prototype.set_image = function (urlOrBase64Data, onImageLoaded) {
         var _this = this;
         this.image = null;
-        this.imageScale.x = 1;
-        this.imageScale.y = 1;
+        this.imageScalex = 1;
+        this.imageScaley = 1;
         ColorBuffer.fromHtmlImage(urlOrBase64Data, function (cb) {
             _this.image = cb;
             _this.imagePos = new BABYLON.Vector3((_this.graphicOutput.get_width() - _this.image.width) / 2, (_this.graphicOutput.get_height() - _this.image.height) / 2, 0);
@@ -35,7 +36,7 @@ var BlurApp = (function (_super) {
     BlurApp.prototype.drawFrame = function () {
         this.renderer2d.output.clear();
         if (this.image != null) {
-            this.renderer2d.drawImage(this.imagePos.x, this.imagePos.y, this.imagePos.z, this.bluredImage, this.imageScale);
+            this.renderer2d.drawImage(this.bluredImage, this.imagePos.x, this.imagePos.y, this.imagePos.z, this.imageScalex, this.imageScaley);
         }
         this.graphicOutput.drawBuffer();
     };
@@ -44,8 +45,8 @@ var BlurApp = (function (_super) {
     };
     BlurApp.prototype.handleMouseEvent = function (eventArgs) {
         var scaleDelta = -eventArgs.wheelDelta * 0.001;
-        this.imageScale.x += scaleDelta;
-        this.imageScale.y += scaleDelta;
+        this.imageScalex += scaleDelta;
+        this.imageScaley += scaleDelta;
         if (eventArgs.leftButtonClicked) {
             this.imagePos.x += eventArgs.deltaX;
             this.imagePos.y += eventArgs.deltaY;

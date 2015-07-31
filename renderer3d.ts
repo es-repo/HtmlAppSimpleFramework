@@ -1,12 +1,15 @@
 ﻿// THE CODE IS BASED ON http://blogs.msdn.com/b/davrous/archive/2013/06/13/tutorial-series-learning-how-to-write-a-3d-soft-engine-from-scratch-in-c-typescript-or-javascript.aspx
 
-class Renderer3dSettings {
-    public showTextures: boolean = true;
+class Render3dSettings {
+    public showTextures = true;
+    public showMeshes = false;
+    public showFaces = true;
+    public showCoordinates = false;
 }
 
 class Renderer3d extends Renderer {
 
-    public renderSettings: Renderer3dSettings = new Renderer3dSettings();
+    public renderSettings: Render3dSettings = new Render3dSettings();
 
     public renderer2d: Renderer2d;
 
@@ -24,6 +27,7 @@ class Renderer3d extends Renderer {
     public projectScene(scene: Scene) {
 
         var viewProjectionMatrix = this.get_viewProjectionMatrix(scene.camera);
+
         for (var i = 0; i < scene.figures.length; i++) {
              
             var f = scene.figures[i];
@@ -103,6 +107,9 @@ class Renderer3d extends Renderer {
         else if (f instanceof Sprite) {
             this.drawSprite(<Sprite>f);
         }
+        else if (f instanceof Tile) {
+            this.drawTile(<Tile>f);
+        }
         else if (f instanceof Mesh) {
             this.drawMesh(<Mesh>f, light);
         }
@@ -113,15 +120,21 @@ class Renderer3d extends Renderer {
     }
 
     private drawSprite(sprite: Sprite) {
-        var scale = new BABYLON.Vector2(1, 1);
-        scale.x = sprite.projectedSize.x / sprite.image.width;
-        scale.y = sprite.projectedSize.y / sprite.image.height;
+        var scalex = sprite.projectedSize.x / sprite.image.width;
+        var scaley = sprite.projectedSize.y / sprite.image.height;
         var x = sprite.projectedPosition.x - sprite.projectedSize.x / 2;
         var y = sprite.projectedPosition.y - sprite.projectedSize.y / 2;
-        this.renderer2d.drawImage(x, y, sprite.projectedPosition.z, sprite.image, scale);
+        this.renderer2d.drawImage(sprite.image, x, y, sprite.projectedPosition.z, scalex, scaley);
+    }
+
+    private drawTile(tile: Tile) {
+        
     }
 
     private drawMesh(m: Mesh, light: Light) {
+
+        var linesColor = new BABYLON.Color4(1, 1, 1, 1);
+                
         for (var indexFaces = 0; indexFaces < m.faces.length; indexFaces++) {
             var currentFace = m.faces[indexFaces];
 
@@ -129,8 +142,16 @@ class Renderer3d extends Renderer {
             var vb = m.projectedVertices[currentFace.b];
             var vc = m.projectedVertices[currentFace.c];
 
-            var color = 1.0;
-            this.drawTriangle(va, vb, vc, new BABYLON.Color4(color, color, color, 1), light, this.renderSettings.showTextures ? m.texture : null);
+            if (this.renderSettings.showFaces) {
+                var color = new BABYLON.Color4(1, 1, 1, 1);
+                this.drawTriangle(va, vb, vc, color, light, this.renderSettings.showTextures ? m.texture : null);
+            }
+
+            if (this.renderSettings.showMeshes) {
+                this.renderer2d.drawLine(va.coordinates.x, va.coordinates.y, vb.coordinates.x, vb.coordinates.y, 0, linesColor);
+                this.renderer2d.drawLine(vb.coordinates.x, vb.coordinates.y, vc.coordinates.x, vc.coordinates.y, 0, linesColor);
+                this.renderer2d.drawLine(vc.coordinates.x, vc.coordinates.y, va.coordinates.x, va.coordinates.y, 0, linesColor);
+            }
         }
     }
 
@@ -311,7 +332,6 @@ class Renderer3d extends Renderer {
         var sv = this.interpolate(data.va, data.vb, gradient1);
         var ev = this.interpolate(data.vc, data.vd, gradient2);
 
-        var white = new BABYLON.Color4(1, 1, 1, 1);
         // drawing a line from left (sx) to right (ex) 
         for (var x = Math.max(0, sx), exx = Math.min(ex, this.output.width); x < exx; x++) {
             var gradient: number = (x - sx) / (ex - sx);

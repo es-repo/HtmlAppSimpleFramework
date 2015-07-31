@@ -84,7 +84,7 @@
     public handleKeyboardEvent(eventArgs: KeyboardEventArgs) {
 
         var k = eventArgs.pressedKey;
-        var cameraDelta = 3;
+        var cameraDelta = 1;
 
         if (this.scene) {
             if (k == 189) {
@@ -99,7 +99,8 @@
 
     public handleMouseEvent(eventArgs: MouseEventArgs) {
 
-        if (this.scene)
-            this.scene.camera.position.z += eventArgs.wheelDelta / 50;
+        if (this.scene) {
+            this.scene.camera.position.z += eventArgs.wheelDelta / 150;
+        }
     }
 }

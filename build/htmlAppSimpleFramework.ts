@@ -629,6 +629,15 @@ class Sprite extends Figure {
         this.image = image;
     }
 }
+
+class Tile extends Sprite {
+    public width = 1;
+    public height = 1;
+
+    constructor(image) {
+        super(image);
+    }
+}
 interface Vertex {
     normal: BABYLON.Vector3;
     coordinates: BABYLON.Vector3;
@@ -850,6 +859,7 @@ class Camera {
  }
 class RendererOutput {
     
+    private depthBufferMaxValue = 10000000;
     public colorBuffer: ColorBuffer;
     public depthBuffer: Array1dAs2d<number>;
     public width: number;
@@ -870,9 +880,18 @@ class RendererOutput {
         this.resetDepthBuffer();
     }
 
+    public checkDepth(x: number, y: number, z: number) {
+        var i = this.depthBuffer.get_index(x, y);
+        if (this.depthBuffer.array[i] >= z) {
+            this.depthBuffer.array[i] = z;
+            return true;
+        }
+        return false;
+    }
+
     private resetDepthBuffer() {
         for (var i = 0; i < this.depthBuffer.array.length; i++) {
-            this.depthBuffer.array[i] = 10000000; // Max possible value 
+            this.depthBuffer.array[i] = this.depthBufferMaxValue; 
         }
     }
 }
@@ -898,19 +917,10 @@ class Renderer2d extends Renderer {
         x = x >> 0;
         y = y >> 0;
         if (x >= 0 && y >= 0 && x < this.output.width && y < this.output.height) {
-            if (this.checkDepth(x, y, z)) {
+            if (this.output.checkDepth(x, y, z)) {
                 this.output.colorBuffer.setColor(x, y, r, g, b, a);
             }
         }
-    }
-
-    private checkDepth(x: number, y: number, z: number) {
-        var i = this.output.depthBuffer.get_index(x, y);
-        if (this.output.depthBuffer.array[i] >= z) {
-            this.output.depthBuffer.array[i] = z;
-            return true;
-        }
-        return false;
     }
 
     public drawLine(x0: number, y0: number, x1: number, y1: number, z: number, c: BABYLON.Color4): void {
@@ -977,10 +987,16 @@ class Renderer2d extends Renderer {
                     this.drawPoint(cx + x, cy + y, z, color);
     }
 
-    public drawImage(x: number, y: number, z: number, image: ColorBuffer, scale: BABYLON.Vector2 = null) {
-        if (scale == null)
-            scale = new BABYLON.Vector2(1, 1);
-        ImageTransformer.scale(image, this.output.colorBuffer, scale.x, scale.y, x, y,(ox, oy) => this.checkDepth(ox, oy, z));
+    public drawImage(image: ColorBuffer, x: number, y: number, z: number, scalex = 1, scaley = 1) {
+        ImageTransformer.scale(image, this.output.colorBuffer, scalex, scaley, x, y,(ox, oy) => this.output.checkDepth(ox, oy, z));
+    }
+
+    public drawTiles(image: ColorBuffer, x: number, y: number, z: number, tilesx: number, tilesy = 1, scalex = 1, scaley = 1) {
+        for (var ty = 0, theight = image.height * scaley, py = y; ty < tilesy; ty++ , py += theight) {
+            for (var tx = 0, twidth = image.width * scalex, px = x; tx < tilesx; tx++ , px += twidth) {
+                this.drawImage(image, px, py, z, scalex, scaley);
+            }
+        }
     }
 
     public drawRectangle(x: number, y: number, z: number, width: number, height: number, color: BABYLON.Color4) {
@@ -1011,13 +1027,16 @@ class Renderer2d extends Renderer {
 }
 // THE CODE IS BASED ON http://blogs.msdn.com/b/davrous/archive/2013/06/13/tutorial-series-learning-how-to-write-a-3d-soft-engine-from-scratch-in-c-typescript-or-javascript.aspx
 
-class Renderer3dSettings {
-    public showTextures: boolean = true;
+class Render3dSettings {
+    public showTextures = true;
+    public showMeshes = false;
+    public showFaces = true;
+    public showCoordinates = false;
 }
 
 class Renderer3d extends Renderer {
 
-    public renderSettings: Renderer3dSettings = new Renderer3dSettings();
+    public renderSettings: Render3dSettings = new Render3dSettings();
 
     public renderer2d: Renderer2d;
 
@@ -1035,6 +1054,7 @@ class Renderer3d extends Renderer {
     public projectScene(scene: Scene) {
 
         var viewProjectionMatrix = this.get_viewProjectionMatrix(scene.camera);
+
         for (var i = 0; i < scene.figures.length; i++) {
              
             var f = scene.figures[i];
@@ -1114,6 +1134,9 @@ class Renderer3d extends Renderer {
         else if (f instanceof Sprite) {
             this.drawSprite(<Sprite>f);
         }
+        else if (f instanceof Tile) {
+            this.drawTile(<Tile>f);
+        }
         else if (f instanceof Mesh) {
             this.drawMesh(<Mesh>f, light);
         }
@@ -1124,15 +1147,21 @@ class Renderer3d extends Renderer {
     }
 
     private drawSprite(sprite: Sprite) {
-        var scale = new BABYLON.Vector2(1, 1);
-        scale.x = sprite.projectedSize.x / sprite.image.width;
-        scale.y = sprite.projectedSize.y / sprite.image.height;
+        var scalex = sprite.projectedSize.x / sprite.image.width;
+        var scaley = sprite.projectedSize.y / sprite.image.height;
         var x = sprite.projectedPosition.x - sprite.projectedSize.x / 2;
         var y = sprite.projectedPosition.y - sprite.projectedSize.y / 2;
-        this.renderer2d.drawImage(x, y, sprite.projectedPosition.z, sprite.image, scale);
+        this.renderer2d.drawImage(sprite.image, x, y, sprite.projectedPosition.z, scalex, scaley);
+    }
+
+    private drawTile(tile: Tile) {
+        
     }
 
     private drawMesh(m: Mesh, light: Light) {
+
+        var linesColor = new BABYLON.Color4(1, 1, 1, 1);
+                
         for (var indexFaces = 0; indexFaces < m.faces.length; indexFaces++) {
             var currentFace = m.faces[indexFaces];
 
@@ -1140,8 +1169,16 @@ class Renderer3d extends Renderer {
             var vb = m.projectedVertices[currentFace.b];
             var vc = m.projectedVertices[currentFace.c];
 
-            var color = 1.0;
-            this.drawTriangle(va, vb, vc, new BABYLON.Color4(color, color, color, 1), light, this.renderSettings.showTextures ? m.texture : null);
+            if (this.renderSettings.showFaces) {
+                var color = new BABYLON.Color4(1, 1, 1, 1);
+                this.drawTriangle(va, vb, vc, color, light, this.renderSettings.showTextures ? m.texture : null);
+            }
+
+            if (this.renderSettings.showMeshes) {
+                this.renderer2d.drawLine(va.coordinates.x, va.coordinates.y, vb.coordinates.x, vb.coordinates.y, 0, linesColor);
+                this.renderer2d.drawLine(vb.coordinates.x, vb.coordinates.y, vc.coordinates.x, vc.coordinates.y, 0, linesColor);
+                this.renderer2d.drawLine(vc.coordinates.x, vc.coordinates.y, va.coordinates.x, va.coordinates.y, 0, linesColor);
+            }
         }
     }
 
@@ -1322,7 +1359,6 @@ class Renderer3d extends Renderer {
         var sv = this.interpolate(data.va, data.vb, gradient1);
         var ev = this.interpolate(data.vc, data.vd, gradient2);
 
-        var white = new BABYLON.Color4(1, 1, 1, 1);
         // drawing a line from left (sx) to right (ex) 
         for (var x = Math.max(0, sx), exx = Math.min(ex, this.output.width); x < exx; x++) {
             var gradient: number = (x - sx) / (ex - sx);
@@ -1759,7 +1795,7 @@ class App {
     public handleKeyboardEvent(eventArgs: KeyboardEventArgs) {
 
         var k = eventArgs.pressedKey;
-        var cameraDelta = 3;
+        var cameraDelta = 1;
 
         if (this.scene) {
             if (k == 189) {
@@ -1774,7 +1810,8 @@ class App {
 
     public handleMouseEvent(eventArgs: MouseEventArgs) {
 
-        if (this.scene)
-            this.scene.camera.position.z += eventArgs.wheelDelta / 50;
+        if (this.scene) {
+            this.scene.camera.position.z += eventArgs.wheelDelta / 150;
+        }
     }
 }

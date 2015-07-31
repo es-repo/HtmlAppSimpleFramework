@@ -637,6 +637,15 @@ var Sprite = (function (_super) {
     }
     return Sprite;
 })(Figure);
+var Tile = (function (_super) {
+    __extends(Tile, _super);
+    function Tile(image) {
+        _super.call(this, image);
+        this.width = 1;
+        this.height = 1;
+    }
+    return Tile;
+})(Sprite);
 var Texture = (function () {
     // Working with a fix sized texture (512x512, 1024x1024, etc.).
     function Texture(width, height) {
@@ -821,6 +830,7 @@ var Scene = (function () {
 })();
 var RendererOutput = (function () {
     function RendererOutput(colorBuffer) {
+        this.depthBufferMaxValue = 10000000;
         this.colorBuffer = colorBuffer;
         this.width = colorBuffer.width;
         this.height = colorBuffer.height;
@@ -833,9 +843,17 @@ var RendererOutput = (function () {
         }
         this.resetDepthBuffer();
     };
+    RendererOutput.prototype.checkDepth = function (x, y, z) {
+        var i = this.depthBuffer.get_index(x, y);
+        if (this.depthBuffer.array[i] >= z) {
+            this.depthBuffer.array[i] = z;
+            return true;
+        }
+        return false;
+    };
     RendererOutput.prototype.resetDepthBuffer = function () {
         for (var i = 0; i < this.depthBuffer.array.length; i++) {
-            this.depthBuffer.array[i] = 10000000; // Max possible value 
+            this.depthBuffer.array[i] = this.depthBufferMaxValue;
         }
     };
     return RendererOutput;
@@ -858,18 +876,10 @@ var Renderer2d = (function (_super) {
         x = x >> 0;
         y = y >> 0;
         if (x >= 0 && y >= 0 && x < this.output.width && y < this.output.height) {
-            if (this.checkDepth(x, y, z)) {
+            if (this.output.checkDepth(x, y, z)) {
                 this.output.colorBuffer.setColor(x, y, r, g, b, a);
             }
         }
-    };
-    Renderer2d.prototype.checkDepth = function (x, y, z) {
-        var i = this.output.depthBuffer.get_index(x, y);
-        if (this.output.depthBuffer.array[i] >= z) {
-            this.output.depthBuffer.array[i] = z;
-            return true;
-        }
-        return false;
     };
     Renderer2d.prototype.drawLine = function (x0, y0, x1, y1, z, c) {
         x0 = x0 >> 0;
@@ -927,12 +937,21 @@ var Renderer2d = (function (_super) {
                 if (x * x + y * y <= radius * radius)
                     this.drawPoint(cx + x, cy + y, z, color);
     };
-    Renderer2d.prototype.drawImage = function (x, y, z, image, scale) {
+    Renderer2d.prototype.drawImage = function (image, x, y, z, scalex, scaley) {
         var _this = this;
-        if (scale === void 0) { scale = null; }
-        if (scale == null)
-            scale = new BABYLON.Vector2(1, 1);
-        ImageTransformer.scale(image, this.output.colorBuffer, scale.x, scale.y, x, y, function (ox, oy) { return _this.checkDepth(ox, oy, z); });
+        if (scalex === void 0) { scalex = 1; }
+        if (scaley === void 0) { scaley = 1; }
+        ImageTransformer.scale(image, this.output.colorBuffer, scalex, scaley, x, y, function (ox, oy) { return _this.output.checkDepth(ox, oy, z); });
+    };
+    Renderer2d.prototype.drawTiles = function (image, x, y, z, tilesx, tilesy, scalex, scaley) {
+        if (tilesy === void 0) { tilesy = 1; }
+        if (scalex === void 0) { scalex = 1; }
+        if (scaley === void 0) { scaley = 1; }
+        for (var ty = 0, theight = image.height * scaley, py = y; ty < tilesy; ty++, py += theight) {
+            for (var tx = 0, twidth = image.width * scalex, px = x; tx < tilesx; tx++, px += twidth) {
+                this.drawImage(image, px, py, z, scalex, scaley);
+            }
+        }
     };
     Renderer2d.prototype.drawRectangle = function (x, y, z, width, height, color) {
         this.drawLine(x, y, x + width, y, z, color);
@@ -959,17 +978,20 @@ var Renderer2d = (function (_super) {
     return Renderer2d;
 })(Renderer);
 // THE CODE IS BASED ON http://blogs.msdn.com/b/davrous/archive/2013/06/13/tutorial-series-learning-how-to-write-a-3d-soft-engine-from-scratch-in-c-typescript-or-javascript.aspx
-var Renderer3dSettings = (function () {
-    function Renderer3dSettings() {
+var Render3dSettings = (function () {
+    function Render3dSettings() {
         this.showTextures = true;
+        this.showMeshes = false;
+        this.showFaces = true;
+        this.showCoordinates = false;
     }
-    return Renderer3dSettings;
+    return Render3dSettings;
 })();
 var Renderer3d = (function (_super) {
     __extends(Renderer3d, _super);
     function Renderer3d(output) {
         _super.call(this, output);
-        this.renderSettings = new Renderer3dSettings();
+        this.renderSettings = new Render3dSettings();
         this.renderer2d = new Renderer2d(output);
     }
     Renderer3d.prototype.get_viewProjectionMatrix = function (camera) {
@@ -1037,6 +1059,9 @@ var Renderer3d = (function (_super) {
         else if (f instanceof Sprite) {
             this.drawSprite(f);
         }
+        else if (f instanceof Tile) {
+            this.drawTile(f);
+        }
         else if (f instanceof Mesh) {
             this.drawMesh(f, light);
         }
@@ -1045,21 +1070,30 @@ var Renderer3d = (function (_super) {
         this.renderer2d.drawFilledCircle(circle.projectedPosition.x, circle.projectedPosition.y, circle.projectedPosition.z, circle.get_projectedRadius(), circle.color);
     };
     Renderer3d.prototype.drawSprite = function (sprite) {
-        var scale = new BABYLON.Vector2(1, 1);
-        scale.x = sprite.projectedSize.x / sprite.image.width;
-        scale.y = sprite.projectedSize.y / sprite.image.height;
+        var scalex = sprite.projectedSize.x / sprite.image.width;
+        var scaley = sprite.projectedSize.y / sprite.image.height;
         var x = sprite.projectedPosition.x - sprite.projectedSize.x / 2;
         var y = sprite.projectedPosition.y - sprite.projectedSize.y / 2;
-        this.renderer2d.drawImage(x, y, sprite.projectedPosition.z, sprite.image, scale);
+        this.renderer2d.drawImage(sprite.image, x, y, sprite.projectedPosition.z, scalex, scaley);
+    };
+    Renderer3d.prototype.drawTile = function (tile) {
     };
     Renderer3d.prototype.drawMesh = function (m, light) {
+        var linesColor = new BABYLON.Color4(1, 1, 1, 1);
         for (var indexFaces = 0; indexFaces < m.faces.length; indexFaces++) {
             var currentFace = m.faces[indexFaces];
             var va = m.projectedVertices[currentFace.a];
             var vb = m.projectedVertices[currentFace.b];
             var vc = m.projectedVertices[currentFace.c];
-            var color = 1.0;
-            this.drawTriangle(va, vb, vc, new BABYLON.Color4(color, color, color, 1), light, this.renderSettings.showTextures ? m.texture : null);
+            if (this.renderSettings.showFaces) {
+                var color = new BABYLON.Color4(1, 1, 1, 1);
+                this.drawTriangle(va, vb, vc, color, light, this.renderSettings.showTextures ? m.texture : null);
+            }
+            if (this.renderSettings.showMeshes) {
+                this.renderer2d.drawLine(va.coordinates.x, va.coordinates.y, vb.coordinates.x, vb.coordinates.y, 0, linesColor);
+                this.renderer2d.drawLine(vb.coordinates.x, vb.coordinates.y, vc.coordinates.x, vc.coordinates.y, 0, linesColor);
+                this.renderer2d.drawLine(vc.coordinates.x, vc.coordinates.y, va.coordinates.x, va.coordinates.y, 0, linesColor);
+            }
         }
     };
     Renderer3d.prototype.drawTriangle = function (v1, v2, v3, color, light, texture) {
@@ -1209,7 +1243,6 @@ var Renderer3d = (function (_super) {
         var eu = this.interpolate(data.uc, data.ud, gradient2);
         var sv = this.interpolate(data.va, data.vb, gradient1);
         var ev = this.interpolate(data.vc, data.vd, gradient2);
-        var white = new BABYLON.Color4(1, 1, 1, 1);
         for (var x = Math.max(0, sx), exx = Math.min(ex, this.output.width); x < exx; x++) {
             var gradient = (x - sx) / (ex - sx);
             // Interpolating Z, normal and texture coordinates on X
@@ -1594,7 +1627,7 @@ var App = (function () {
     };
     App.prototype.handleKeyboardEvent = function (eventArgs) {
         var k = eventArgs.pressedKey;
-        var cameraDelta = 3;
+        var cameraDelta = 1;
         if (this.scene) {
             if (k == 189) {
                 this.scene.camera.position.z += cameraDelta;
@@ -1605,8 +1638,9 @@ var App = (function () {
         }
     };
     App.prototype.handleMouseEvent = function (eventArgs) {
-        if (this.scene)
-            this.scene.camera.position.z += eventArgs.wheelDelta / 50;
+        if (this.scene) {
+            this.scene.camera.position.z += eventArgs.wheelDelta / 150;
+        }
     };
     return App;
 })();

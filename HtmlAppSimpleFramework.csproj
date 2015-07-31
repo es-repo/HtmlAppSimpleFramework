@@ -28,6 +28,8 @@
     <Content Include="index.html" />
     <Content Include="samples\3dObject\monkey.jpg" />
     <Content Include="samples\blur\index.html" />
+    <Content Include="samples\runner\index.html" />
+    <Content Include="samples\runner\resources\images\tile.png" />
     <Content Include="samples\stencil\index.html" />
     <Content Include="samples\paintBrush\index.html" />
     <Content Include="samples\stencil\maze128.png" />
@@ -69,6 +71,7 @@
     <TypeScriptCompile Include="colorBuffer.ts" />
     <TypeScriptCompile Include="samples\blur\blurApp.ts" />
     <TypeScriptCompile Include="imageEffects.ts" />
+    <TypeScriptCompile Include="samples\runner\runnerApp.ts" />
     <TypeScriptCompile Include="samples\stencil\Coord.ts" />
     <TypeScriptCompile Include="samples\stencil\stencilApp.ts" />
     <TypeScriptCompile Include="samples\paintBrush\paintBrushdApp.ts" />

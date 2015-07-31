@@ -13,19 +13,10 @@
         x = x >> 0;
         y = y >> 0;
         if (x >= 0 && y >= 0 && x < this.output.width && y < this.output.height) {
-            if (this.checkDepth(x, y, z)) {
+            if (this.output.checkDepth(x, y, z)) {
                 this.output.colorBuffer.setColor(x, y, r, g, b, a);
             }
         }
-    }
-
-    private checkDepth(x: number, y: number, z: number) {
-        var i = this.output.depthBuffer.get_index(x, y);
-        if (this.output.depthBuffer.array[i] >= z) {
-            this.output.depthBuffer.array[i] = z;
-            return true;
-        }
-        return false;
     }
 
     public drawLine(x0: number, y0: number, x1: number, y1: number, z: number, c: BABYLON.Color4): void {
@@ -92,10 +83,16 @@
                     this.drawPoint(cx + x, cy + y, z, color);
     }
 
-    public drawImage(x: number, y: number, z: number, image: ColorBuffer, scale: BABYLON.Vector2 = null) {
-        if (scale == null)
-            scale = new BABYLON.Vector2(1, 1);
-        ImageTransformer.scale(image, this.output.colorBuffer, scale.x, scale.y, x, y,(ox, oy) => this.checkDepth(ox, oy, z));
+    public drawImage(image: ColorBuffer, x: number, y: number, z: number, scalex = 1, scaley = 1) {
+        ImageTransformer.scale(image, this.output.colorBuffer, scalex, scaley, x, y,(ox, oy) => this.output.checkDepth(ox, oy, z));
+    }
+
+    public drawTiles(image: ColorBuffer, x: number, y: number, z: number, tilesx: number, tilesy = 1, scalex = 1, scaley = 1) {
+        for (var ty = 0, theight = image.height * scaley, py = y; ty < tilesy; ty++ , py += theight) {
+            for (var tx = 0, twidth = image.width * scalex, px = x; tx < tilesx; tx++ , px += twidth) {
+                this.drawImage(image, px, py, z, scalex, scaley);
+            }
+        }
     }
 
     public drawRectangle(x: number, y: number, z: number, width: number, height: number, color: BABYLON.Color4) {

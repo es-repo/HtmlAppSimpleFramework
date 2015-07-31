@@ -63,7 +63,7 @@ var App = (function () {
     };
     App.prototype.handleKeyboardEvent = function (eventArgs) {
         var k = eventArgs.pressedKey;
-        var cameraDelta = 3;
+        var cameraDelta = 1;
         if (this.scene) {
             if (k == 189) {
                 this.scene.camera.position.z += cameraDelta;
@@ -74,8 +74,9 @@ var App = (function () {
         }
     };
     App.prototype.handleMouseEvent = function (eventArgs) {
-        if (this.scene)
-            this.scene.camera.position.z += eventArgs.wheelDelta / 50;
+        if (this.scene) {
+            this.scene.camera.position.z += eventArgs.wheelDelta / 150;
+        }
     };
     return App;
 })();
