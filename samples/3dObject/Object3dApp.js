@@ -9,6 +9,7 @@ var Object3dApp = (function (_super) {
     function Object3dApp(graphicOutput, inputControllerHandlers) {
         _super.call(this, graphicOutput, inputControllerHandlers);
         this.rotateVector = new BABYLON.Vector3(0, Object3dApp.rotateDelta, 0);
+        this.showDebugInfo = true;
     }
     Object3dApp.prototype.createScene = function (continuation) {
         var scene = new Scene();
@@ -112,6 +113,12 @@ var Object3dApp = (function (_super) {
             m.rotation.z += rotationDelta.z;
         }
     };
+    Object3dApp.prototype.drawDebugInfo = function () {
+        _super.prototype.drawDebugInfo.call(this);
+        var o = this.scene.figures[0];
+        if (o)
+            this.drawVectorInfo(o.position, 10, 60, "object");
+    };
     Object3dApp.prototype.handleKeyboardEvent = function (eventArgs) {
         _super.prototype.handleKeyboardEvent.call(this, eventArgs);
         var k = eventArgs.pressedKey;
@@ -130,6 +137,9 @@ var Object3dApp = (function (_super) {
         }
         if (k == 32) {
             this.rotateVector = new BABYLON.Vector3(0, 0, 0);
+        }
+        if (k == 79) {
+            this.mouseWheelVectorControl = this.scene.figures[0].position;
         }
     };
     Object3dApp.prototype.handleMouseEvent = function (eventArgs) {

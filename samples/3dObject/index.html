@@ -34,6 +34,7 @@
 
         function onMonkeyRadioClick() {
             app.scene.figures = MeshFactory.createFromBabylonAndTextureBase64Data(Objects3dLib.monkey);
+            app.scene.figures[0].position.z = 0;
             Object3dApp.rotateScene(app.scene, new BABYLON.Vector3(0, Math.PI, 0));
         }
 

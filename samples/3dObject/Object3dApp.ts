@@ -6,6 +6,7 @@
     constructor(graphicOutput: GraphicOutput, inputControllerHandlers: InputDevices) {
         super(graphicOutput, inputControllerHandlers);
         this.rotateVector = new BABYLON.Vector3(0, Object3dApp.rotateDelta, 0);
+        this.showDebugInfo = true;
     }
 
     protected createScene(continuation: (Scene: Scene) => void) {
@@ -133,6 +134,13 @@
         }
     }
 
+    protected drawDebugInfo() {
+        super.drawDebugInfo();
+        var o = this.scene.figures[0];
+        if (o)
+            this.drawVectorInfo(o.position, 10, 60, "object");
+    }
+
     public handleKeyboardEvent(eventArgs: KeyboardEventArgs) {
 
         super.handleKeyboardEvent(eventArgs);
@@ -159,6 +167,10 @@
 
         if (k == 32) {
             this.rotateVector = new BABYLON.Vector3(0, 0, 0);
+        }
+
+        if (k == 79) {
+            this.mouseWheelVectorControl = this.scene.figures[0].position;
         }
     }
 

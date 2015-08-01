@@ -4,7 +4,6 @@ class Render3dSettings {
     public showTextures = true;
     public showMeshes = false;
     public showFaces = true;
-    public showCoordinates = false;
 }
 
 class Renderer3d extends Renderer {
@@ -32,13 +31,11 @@ class Renderer3d extends Renderer {
              
             var f = scene.figures[i];
 
-            var worldMatrix = BABYLON.Matrix.RotationYawPitchRoll(
-                f.rotation.y, f.rotation.x, f.rotation.z)
-                .multiply(BABYLON.Matrix.Translation(
-                f.position.x, f.position.y, f.position.z));
-
+            var rotMatrix = BABYLON.Matrix.RotationYawPitchRoll(f.rotation.y, f.rotation.x, f.rotation.z);
+            var worldMatrix = rotMatrix.multiply(BABYLON.Matrix.Translation(f.position.x, f.position.y, f.position.z));
             var transformMatrix = worldMatrix.multiply(viewProjectionMatrix);
-            this.projectFigure(f, worldMatrix, transformMatrix);
+
+            this.projectFigure(f, worldMatrix, transformMatrix, rotMatrix);
         }
     }
 
@@ -50,10 +47,10 @@ class Renderer3d extends Renderer {
         return (new BABYLON.Vector3(x, y, point.z));
     }
 
-    private projectVertex(vertex: Vertex, transMat: BABYLON.Matrix, worldMat: BABYLON.Matrix): Vertex {
+    private projectVertex(vertex: Vertex, transMat: BABYLON.Matrix, worldMat: BABYLON.Matrix, rotMatrix: BABYLON.Matrix): Vertex {
         
         var worldCoords = BABYLON.Vector3.TransformCoordinates(vertex.coordinates, worldMat);
-        var normal = BABYLON.Vector3.TransformCoordinates(vertex.normal, worldMat);
+        var normal = BABYLON.Vector3.TransformCoordinates(vertex.normal, rotMatrix);
         var coord = this.projectVector(vertex.coordinates, transMat);
 
         return ({
@@ -64,7 +61,7 @@ class Renderer3d extends Renderer {
         });
     }
 
-    public projectFigure(f: Figure, worldMatrix: BABYLON.Matrix, transformMatrix: BABYLON.Matrix) {
+    public projectFigure(f: Figure, worldMatrix: BABYLON.Matrix, transformMatrix: BABYLON.Matrix, rotMatrix: BABYLON.Matrix) {
            
         f.projectedPosition = this.projectVector(f.position, transformMatrix);
         var posPlusSize = f.position.add(f.size);
@@ -73,11 +70,11 @@ class Renderer3d extends Renderer {
         f.projectedSize.y = (-posPlusSizeProjected.y + f.projectedPosition.y) * 2;
 
         if (f instanceof Mesh) {
-            this.projectMesh(<Mesh>f, worldMatrix, transformMatrix);
+            this.projectMesh(<Mesh>f, worldMatrix, transformMatrix, rotMatrix);
         }
     }
 
-    private projectMesh(m: Mesh, worldMatrix: BABYLON.Matrix, transformMatrix: BABYLON.Matrix) {
+    private projectMesh(m: Mesh, worldMatrix: BABYLON.Matrix, transformMatrix: BABYLON.Matrix, rotMatrix: BABYLON.Matrix) {
 
         for (var indexFaces = 0; indexFaces < m.faces.length; indexFaces++) {
             var currentFace = m.faces[indexFaces];
@@ -85,9 +82,9 @@ class Renderer3d extends Renderer {
             var vertexB = m.vertices[currentFace.b];
             var vertexC = m.vertices[currentFace.c];
 
-            m.projectedVertices[currentFace.a] = this.projectVertex(vertexA, transformMatrix, worldMatrix);
-            m.projectedVertices[currentFace.b] = this.projectVertex(vertexB, transformMatrix, worldMatrix);
-            m.projectedVertices[currentFace.c] = this.projectVertex(vertexC, transformMatrix, worldMatrix);            
+            m.projectedVertices[currentFace.a] = this.projectVertex(vertexA, transformMatrix, worldMatrix, rotMatrix);
+            m.projectedVertices[currentFace.b] = this.projectVertex(vertexB, transformMatrix, worldMatrix, rotMatrix);
+            m.projectedVertices[currentFace.c] = this.projectVertex(vertexC, transformMatrix, worldMatrix, rotMatrix);            
         }
     }
 
@@ -356,13 +353,9 @@ class Renderer3d extends Renderer {
 
     // Compute the cosine of the angle between the light vector and the normal vector
     // Returns a value between 0 and 1
-    private computeNDotL(vertex: BABYLON.Vector3, normal: BABYLON.Vector3,
-        lightPosition: BABYLON.Vector3): number {
+    private computeNDotL(vertex: BABYLON.Vector3, normal: BABYLON.Vector3, lightPosition: BABYLON.Vector3): number {
         var lightDirection = lightPosition.subtract(vertex);
-
-        normal.normalize();
         lightDirection.normalize();
-
         return Math.max(0, BABYLON.Vector3.Dot(normal, lightDirection));
     }
 }

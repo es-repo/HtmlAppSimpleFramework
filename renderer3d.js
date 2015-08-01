@@ -10,7 +10,6 @@ var Render3dSettings = (function () {
         this.showTextures = true;
         this.showMeshes = false;
         this.showFaces = true;
-        this.showCoordinates = false;
     }
     return Render3dSettings;
 })();
@@ -30,9 +29,10 @@ var Renderer3d = (function (_super) {
         var viewProjectionMatrix = this.get_viewProjectionMatrix(scene.camera);
         for (var i = 0; i < scene.figures.length; i++) {
             var f = scene.figures[i];
-            var worldMatrix = BABYLON.Matrix.RotationYawPitchRoll(f.rotation.y, f.rotation.x, f.rotation.z).multiply(BABYLON.Matrix.Translation(f.position.x, f.position.y, f.position.z));
+            var rotMatrix = BABYLON.Matrix.RotationYawPitchRoll(f.rotation.y, f.rotation.x, f.rotation.z);
+            var worldMatrix = rotMatrix.multiply(BABYLON.Matrix.Translation(f.position.x, f.position.y, f.position.z));
             var transformMatrix = worldMatrix.multiply(viewProjectionMatrix);
-            this.projectFigure(f, worldMatrix, transformMatrix);
+            this.projectFigure(f, worldMatrix, transformMatrix, rotMatrix);
         }
     };
     Renderer3d.prototype.projectVector = function (v, transMat) {
@@ -41,9 +41,9 @@ var Renderer3d = (function (_super) {
         var y = -point.y * this.output.height + this.output.height / 2.0;
         return (new BABYLON.Vector3(x, y, point.z));
     };
-    Renderer3d.prototype.projectVertex = function (vertex, transMat, worldMat) {
+    Renderer3d.prototype.projectVertex = function (vertex, transMat, worldMat, rotMatrix) {
         var worldCoords = BABYLON.Vector3.TransformCoordinates(vertex.coordinates, worldMat);
-        var normal = BABYLON.Vector3.TransformCoordinates(vertex.normal, worldMat);
+        var normal = BABYLON.Vector3.TransformCoordinates(vertex.normal, rotMatrix);
         var coord = this.projectVector(vertex.coordinates, transMat);
         return ({
             coordinates: coord,
@@ -52,25 +52,25 @@ var Renderer3d = (function (_super) {
             textureCoordinates: vertex.textureCoordinates
         });
     };
-    Renderer3d.prototype.projectFigure = function (f, worldMatrix, transformMatrix) {
+    Renderer3d.prototype.projectFigure = function (f, worldMatrix, transformMatrix, rotMatrix) {
         f.projectedPosition = this.projectVector(f.position, transformMatrix);
         var posPlusSize = f.position.add(f.size);
         var posPlusSizeProjected = this.projectVector(posPlusSize, transformMatrix);
         f.projectedSize.x = (-posPlusSizeProjected.x + f.projectedPosition.x) * 2;
         f.projectedSize.y = (-posPlusSizeProjected.y + f.projectedPosition.y) * 2;
         if (f instanceof Mesh) {
-            this.projectMesh(f, worldMatrix, transformMatrix);
+            this.projectMesh(f, worldMatrix, transformMatrix, rotMatrix);
         }
     };
-    Renderer3d.prototype.projectMesh = function (m, worldMatrix, transformMatrix) {
+    Renderer3d.prototype.projectMesh = function (m, worldMatrix, transformMatrix, rotMatrix) {
         for (var indexFaces = 0; indexFaces < m.faces.length; indexFaces++) {
             var currentFace = m.faces[indexFaces];
             var vertexA = m.vertices[currentFace.a];
             var vertexB = m.vertices[currentFace.b];
             var vertexC = m.vertices[currentFace.c];
-            m.projectedVertices[currentFace.a] = this.projectVertex(vertexA, transformMatrix, worldMatrix);
-            m.projectedVertices[currentFace.b] = this.projectVertex(vertexB, transformMatrix, worldMatrix);
-            m.projectedVertices[currentFace.c] = this.projectVertex(vertexC, transformMatrix, worldMatrix);
+            m.projectedVertices[currentFace.a] = this.projectVertex(vertexA, transformMatrix, worldMatrix, rotMatrix);
+            m.projectedVertices[currentFace.b] = this.projectVertex(vertexB, transformMatrix, worldMatrix, rotMatrix);
+            m.projectedVertices[currentFace.c] = this.projectVertex(vertexC, transformMatrix, worldMatrix, rotMatrix);
         }
     };
     Renderer3d.prototype.drawScene = function (scene) {
@@ -288,7 +288,6 @@ var Renderer3d = (function (_super) {
     // Returns a value between 0 and 1
     Renderer3d.prototype.computeNDotL = function (vertex, normal, lightPosition) {
         var lightDirection = lightPosition.subtract(vertex);
-        normal.normalize();
         lightDirection.normalize();
         return Math.max(0, BABYLON.Vector3.Dot(normal, lightDirection));
     };

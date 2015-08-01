@@ -8,6 +8,9 @@
     protected inputDevices: InputDevices;
     private previousFrameTime: number;
 
+    protected showDebugInfo = false;
+    protected mouseWheelVectorControl: BABYLON.Vector3;
+
     constructor(graphicOutput: GraphicOutput, inputDevices: InputDevices) {
         this.graphicOutput = graphicOutput;
         this.phisics = new Phisics();
@@ -20,6 +23,7 @@
         this.onStart(() => {
             this.createScene((scene) => {
                 this.scene = scene;
+                this.mouseWheelVectorControl = this.scene.camera.position;
 
                 requestAnimationFrame(() => this.loopAnimation());
 
@@ -60,6 +64,8 @@
         this.doLogicStep();
         this.drawFrame();
         this.drawFps(fps);
+        if (this.showDebugInfo)
+            this.drawDebugInfo();
     }
 
     protected doLogicStep() {
@@ -81,10 +87,21 @@
         this.graphicOutput.drawText(fps.toString(), 10, 25);
     }
 
+    protected drawDebugInfo() {
+        this.drawVectorInfo(this.scene.camera.position, 10, 40, "camera");
+        this.drawVectorInfo(this.scene.light.position, 10, 50, "light");
+    }
+
+    protected drawVectorInfo(v: BABYLON.Vector3, x: number, y: number, description = "") {
+        if (description != "")
+            description += ": ";
+        this.graphicOutput.drawText(description + "(" + v.x + "," + v.y + "," + v.z + ")", x, y, "ffffff", 10);
+    }
+
     public handleKeyboardEvent(eventArgs: KeyboardEventArgs) {
 
         var k = eventArgs.pressedKey;
-        var cameraDelta = 1;
+        var cameraDelta = 3;
 
         if (this.scene) {
             if (k == 189) {
@@ -94,13 +111,19 @@
             if (k == 187) {
                 this.scene.camera.position.z -= cameraDelta;
             }
+
+            if (k == 67)
+                this.mouseWheelVectorControl = this.scene.camera.position;
+
+            if (k == 76)
+                this.mouseWheelVectorControl = this.scene.light.position;
         }
     }
 
     public handleMouseEvent(eventArgs: MouseEventArgs) {
 
         if (this.scene) {
-            this.scene.camera.position.z += eventArgs.wheelDelta / 150;
+            this.mouseWheelVectorControl.z += eventArgs.wheelDelta / 50;
         }
     }
 }
