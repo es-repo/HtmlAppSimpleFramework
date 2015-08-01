@@ -13,6 +13,8 @@ var Renderer2d = (function (_super) {
         this.drawPointC(x, y, z, c.r * 255, c.g * 255, c.b * 255, c.a * 255);
     };
     Renderer2d.prototype.drawPointC = function (x, y, z, r, g, b, a) {
+        if (a == 0)
+            return;
         x = x >> 0;
         y = y >> 0;
         if (x >= 0 && y >= 0 && x < this.output.width && y < this.output.height) {

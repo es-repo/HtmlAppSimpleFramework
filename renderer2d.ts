@@ -10,6 +10,9 @@
 
     public drawPointC(x: number, y: number, z: number, r: number, g: number, b: number, a: number) {
 
+        if (a == 0)
+            return;
+
         x = x >> 0;
         y = y >> 0;
         if (x >= 0 && y >= 0 && x < this.output.width && y < this.output.height) {

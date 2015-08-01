@@ -12,17 +12,17 @@ var XBubbleScene = (function (_super) {
         for (var i = 0; i < 5; i++)
             for (var j = 0; j < 5; j++) {
                 var bubble = new Bubble();
-                bubble.position.x = -12 + i * 6;
-                bubble.position.y = -12 + j * 6;
-                bubble.set_radius(Math.random() * 2.5 + 0.5);
+                bubble.position.x = -6 + i * 3;
+                bubble.position.y = -6 + j * 3;
+                bubble.set_radius(Math.random() * 1.25 + 0.25);
                 bubble.color = new BABYLON.Color4(1, 0, 0, 1);
                 this.figures.push(bubble);
                 this.bubbles.push(bubble);
             }
         this.player = new Player();
-        this.player.position.x = -18;
-        this.player.position.y = -16;
-        this.player.set_radius(2);
+        this.player.position.x = -9;
+        this.player.position.y = -8;
+        this.player.set_radius(1);
         this.player.color = new BABYLON.Color4(1, 1, 1, 1);
         this.figures.push(this.player);
     }

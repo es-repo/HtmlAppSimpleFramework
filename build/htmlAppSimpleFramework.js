@@ -805,7 +805,7 @@ var MeshFactory = (function () {
 })();
 var Camera = (function () {
     function Camera() {
-        this.position = new BABYLON.Vector3(0, 0, 200);
+        this.position = new BABYLON.Vector3(0, 0, 100);
         this.direction = new BABYLON.Vector3(0, 0, -1);
         this.up = BABYLON.Vector3.Up();
         this.fov = 0.78;
@@ -873,6 +873,8 @@ var Renderer2d = (function (_super) {
         this.drawPointC(x, y, z, c.r * 255, c.g * 255, c.b * 255, c.a * 255);
     };
     Renderer2d.prototype.drawPointC = function (x, y, z, r, g, b, a) {
+        if (a == 0)
+            return;
         x = x >> 0;
         y = y >> 0;
         if (x >= 0 && y >= 0 && x < this.output.width && y < this.output.height) {
@@ -1636,6 +1638,7 @@ var App = (function () {
         if (description === void 0) { description = ""; }
         if (description != "")
             description += ": ";
+        this.graphicOutput.drawText(description + "(" + v.x + "," + v.y + "," + v.z + ")", x + 1, y + 1, "000000", 10);
         this.graphicOutput.drawText(description + "(" + v.x + "," + v.y + "," + v.z + ")", x, y, "ffffff", 10);
     };
     App.prototype.handleKeyboardEvent = function (eventArgs) {

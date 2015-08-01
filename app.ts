@@ -95,6 +95,7 @@
     protected drawVectorInfo(v: BABYLON.Vector3, x: number, y: number, description = "") {
         if (description != "")
             description += ": ";
+        this.graphicOutput.drawText(description + "(" + v.x + "," + v.y + "," + v.z + ")", x + 1, y + 1, "000000", 10);
         this.graphicOutput.drawText(description + "(" + v.x + "," + v.y + "," + v.z + ")", x, y, "ffffff", 10);
     }
 

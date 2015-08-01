@@ -73,6 +73,7 @@ var App = (function () {
         if (description === void 0) { description = ""; }
         if (description != "")
             description += ": ";
+        this.graphicOutput.drawText(description + "(" + v.x + "," + v.y + "," + v.z + ")", x + 1, y + 1, "000000", 10);
         this.graphicOutput.drawText(description + "(" + v.x + "," + v.y + "," + v.z + ")", x, y, "ffffff", 10);
     };
     App.prototype.handleKeyboardEvent = function (eventArgs) {

@@ -8,7 +8,7 @@ var Player = (function (_super) {
     __extends(Player, _super);
     function Player() {
         _super.apply(this, arguments);
-        this.velocityDelta = 0.01;
+        this.velocityDelta = 0.005;
     }
     return Player;
 })(Bubble);

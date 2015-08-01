@@ -842,7 +842,7 @@ class MeshFactory {
     }
 } 
 class Camera {
-    public position: BABYLON.Vector3 = new BABYLON.Vector3(0, 0, 200);
+    public position: BABYLON.Vector3 = new BABYLON.Vector3(0, 0, 100);
     public direction: BABYLON.Vector3 = new BABYLON.Vector3(0, 0, -1);
     public up: BABYLON.Vector3 = BABYLON.Vector3.Up();
     public fov: number = 0.78;
@@ -913,6 +913,9 @@ class Renderer2d extends Renderer {
     }
 
     public drawPointC(x: number, y: number, z: number, r: number, g: number, b: number, a: number) {
+
+        if (a == 0)
+            return;
 
         x = x >> 0;
         y = y >> 0;
@@ -1799,6 +1802,7 @@ class App {
     protected drawVectorInfo(v: BABYLON.Vector3, x: number, y: number, description = "") {
         if (description != "")
             description += ": ";
+        this.graphicOutput.drawText(description + "(" + v.x + "," + v.y + "," + v.z + ")", x + 1, y + 1, "000000", 10);
         this.graphicOutput.drawText(description + "(" + v.x + "," + v.y + "," + v.z + ")", x, y, "ffffff", 10);
     }
 

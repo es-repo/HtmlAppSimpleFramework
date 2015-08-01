@@ -37,11 +37,11 @@
 
             var changeBubbleVelocity = Math.random() < 0.05;
             if (changeBubbleVelocity) {
-                var maxSpeed = 0.1;
+                var maxSpeed = 0.05;
                 b.nextVelocity = new BABYLON.Vector3((-0.5 + Math.random()) * maxSpeed, (-0.5 + Math.random()) * maxSpeed, 0);
             }
 
-            var velocityDelta = 0.001;
+            var velocityDelta = 0.0005;
             XBubbleApp.tendVectorTo(b.velocity, b.nextVelocity, velocityDelta);
         }
 
