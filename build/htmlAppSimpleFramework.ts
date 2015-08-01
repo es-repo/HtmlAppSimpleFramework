@@ -842,15 +842,15 @@ class MeshFactory {
     }
 } 
 class Camera {
-    public position: BABYLON.Vector3 = new BABYLON.Vector3(0, 0, 100);
-    public direction: BABYLON.Vector3 = new BABYLON.Vector3(0, 0, -1);
+    public position: BABYLON.Vector3 = new BABYLON.Vector3(0, 0, -100);
+    public direction: BABYLON.Vector3 = new BABYLON.Vector3(0, 0, 1);
     public up: BABYLON.Vector3 = BABYLON.Vector3.Up();
     public fov: number = 0.78;
     public zNear: number = 0.01;
     public zFar: number = 1.0;
 }
  class Light {
-     public position = new BABYLON.Vector3(0, 0, 1000);
+     public position = new BABYLON.Vector3(0, 0, -1000);
  }
  class Scene {
      public figures: Figure[] = [];
@@ -1096,7 +1096,7 @@ class Renderer3d extends Renderer {
         f.projectedPosition = this.projectVector(f.position, transformMatrix);
         var posPlusSize = f.position.add(f.size);
         var posPlusSizeProjected = this.projectVector(posPlusSize, transformMatrix);
-        f.projectedSize.x = (-posPlusSizeProjected.x + f.projectedPosition.x) * 2;
+        f.projectedSize.x = (posPlusSizeProjected.x - f.projectedPosition.x) * 2;
         f.projectedSize.y = (-posPlusSizeProjected.y + f.projectedPosition.y) * 2;
 
         if (f instanceof Mesh) {
@@ -1812,11 +1812,11 @@ class App {
         var cameraDelta = 3;
 
         if (this.scene) {
-            if (k == 189) {
+            if (k == 187) {
                 this.scene.camera.position.z += cameraDelta;
             }
 
-            if (k == 187) {
+            if (k == 189) {
                 this.scene.camera.position.z -= cameraDelta;
             }
 
@@ -1831,7 +1831,9 @@ class App {
     public handleMouseEvent(eventArgs: MouseEventArgs) {
 
         if (this.scene) {
-            this.mouseWheelVectorControl.z += eventArgs.wheelDelta / 50;
+            if (eventArgs.wheelDelta != 0) {
+                this.mouseWheelVectorControl.z -= eventArgs.wheelDelta / 50;
+            }
         }
     }
 }

@@ -66,7 +66,7 @@ class Renderer3d extends Renderer {
         f.projectedPosition = this.projectVector(f.position, transformMatrix);
         var posPlusSize = f.position.add(f.size);
         var posPlusSizeProjected = this.projectVector(posPlusSize, transformMatrix);
-        f.projectedSize.x = (-posPlusSizeProjected.x + f.projectedPosition.x) * 2;
+        f.projectedSize.x = (posPlusSizeProjected.x - f.projectedPosition.x) * 2;
         f.projectedSize.y = (-posPlusSizeProjected.y + f.projectedPosition.y) * 2;
 
         if (f instanceof Mesh) {

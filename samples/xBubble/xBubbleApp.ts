@@ -105,7 +105,7 @@
         var xBubbleScene = <XBubbleScene>this.scene;
 
         if (k == 37) {
-            xBubbleScene.player.velocity.x += xBubbleScene.player.velocityDelta;
+            xBubbleScene.player.velocity.x -= xBubbleScene.player.velocityDelta;
         }
 
         if (k == 38) {
@@ -113,7 +113,7 @@
         }
 
         if (k == 39) {
-            xBubbleScene.player.velocity.x -= xBubbleScene.player.velocityDelta;
+            xBubbleScene.player.velocity.x += xBubbleScene.player.velocityDelta;
         }
 
         if (k == 40) {
@@ -128,10 +128,10 @@
 
         if (eventArgs.leftButtonClicked) {
             var mv = new BABYLON.Vector3(eventArgs.x, eventArgs.y, 0);
-            var dv = xBubbleScene.player.projectedPosition.subtract(mv);
+            var dv = mv.subtract(xBubbleScene.player.projectedPosition);
             dv.normalize();
             xBubbleScene.player.velocity.x += dv.x * xBubbleScene.player.velocityDelta;
-            xBubbleScene.player.velocity.y += dv.y * xBubbleScene.player.velocityDelta;
+            xBubbleScene.player.velocity.y -= dv.y * xBubbleScene.player.velocityDelta;
         }
     }
 }

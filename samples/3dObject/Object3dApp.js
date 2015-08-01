@@ -13,7 +13,7 @@ var Object3dApp = (function (_super) {
     }
     Object3dApp.prototype.createScene = function (continuation) {
         var scene = new Scene();
-        scene.camera.position.z = 10;
+        scene.camera.position.z = -10;
         continuation((scene));
         //MeshFactory.loadFromBabylonJsonFileAsync("monkey.babylon", meshes => {
         //    var scene = new Scene();

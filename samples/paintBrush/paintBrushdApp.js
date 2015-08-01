@@ -101,7 +101,7 @@ var PaintBrushApp = (function (_super) {
                 case 1 /* move */:
                     var dx = eventArgs.deltaX * this.sprite.size.x / this.sprite.projectedSize.x;
                     var dy = eventArgs.deltaY * this.sprite.size.y / this.sprite.projectedSize.y;
-                    this.sprite.position.x -= dx;
+                    this.sprite.position.x += dx;
                     this.sprite.position.y -= dy;
                     break;
                 case 0 /* brush */:

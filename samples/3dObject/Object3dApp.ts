@@ -12,7 +12,7 @@
     protected createScene(continuation: (Scene: Scene) => void) {
 
         var scene = new Scene();
-        scene.camera.position.z = 10;
+        scene.camera.position.z = -10;
         continuation((scene));
             
         //MeshFactory.loadFromBabylonJsonFileAsync("monkey.babylon", meshes => {

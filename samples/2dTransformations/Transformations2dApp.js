@@ -15,8 +15,8 @@ var Transformations2dApp = (function (_super) {
     }
     Transformations2dApp.prototype.createScene = function (continuation) {
         var scene = new Scene();
-        this.starZMax = scene.camera.position.z - 10;
-        this.starZMin = -100;
+        this.starZMax = 100;
+        this.starZMin = scene.camera.position.z + 10;
         var r = 0.05;
         var d = 5;
         this.stars = [];
@@ -53,9 +53,9 @@ var Transformations2dApp = (function (_super) {
         this.rotateAngle += this.rotateDelta;
         for (var i = 0, p; i < this.stars.length; i++) {
             p = this.stars[i].position;
-            p.z = p.z + 1;
-            if (p.z > this.starZMax)
-                p.z = this.starZMin;
+            p.z--;
+            if (p.z < this.starZMin)
+                p.z = this.starZMax;
         }
     };
     Transformations2dApp.prototype.drawFrame = function () {
@@ -108,7 +108,7 @@ var Transformations2dApp = (function (_super) {
         if (eventArgs.leftButtonClicked) {
             this.imagePos.x += eventArgs.deltaX;
             this.imagePos.y += eventArgs.deltaY;
-            this.scene.camera.position.x += eventArgs.deltaX / 10;
+            this.scene.camera.position.x -= eventArgs.deltaX / 10;
             this.scene.camera.position.y += eventArgs.deltaY / 10;
         }
     };

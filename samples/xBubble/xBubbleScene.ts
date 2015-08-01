@@ -22,7 +22,7 @@
         this.player.position.y = -8;
         this.player.set_radius(1);
         this.player.color = new BABYLON.Color4(1, 1, 1, 1);
-        
+
         this.figures.push(this.player);
     }
 } 

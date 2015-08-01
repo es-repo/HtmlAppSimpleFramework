@@ -80,10 +80,10 @@ var App = (function () {
         var k = eventArgs.pressedKey;
         var cameraDelta = 3;
         if (this.scene) {
-            if (k == 189) {
+            if (k == 187) {
                 this.scene.camera.position.z += cameraDelta;
             }
-            if (k == 187) {
+            if (k == 189) {
                 this.scene.camera.position.z -= cameraDelta;
             }
             if (k == 67)
@@ -94,7 +94,9 @@ var App = (function () {
     };
     App.prototype.handleMouseEvent = function (eventArgs) {
         if (this.scene) {
-            this.mouseWheelVectorControl.z += eventArgs.wheelDelta / 50;
+            if (eventArgs.wheelDelta != 0) {
+                this.mouseWheelVectorControl.z -= eventArgs.wheelDelta / 50;
+            }
         }
     };
     return App;

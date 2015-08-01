@@ -805,8 +805,8 @@ var MeshFactory = (function () {
 })();
 var Camera = (function () {
     function Camera() {
-        this.position = new BABYLON.Vector3(0, 0, 100);
-        this.direction = new BABYLON.Vector3(0, 0, -1);
+        this.position = new BABYLON.Vector3(0, 0, -100);
+        this.direction = new BABYLON.Vector3(0, 0, 1);
         this.up = BABYLON.Vector3.Up();
         this.fov = 0.78;
         this.zNear = 0.01;
@@ -816,7 +816,7 @@ var Camera = (function () {
 })();
 var Light = (function () {
     function Light() {
-        this.position = new BABYLON.Vector3(0, 0, 1000);
+        this.position = new BABYLON.Vector3(0, 0, -1000);
     }
     return Light;
 })();
@@ -1031,7 +1031,7 @@ var Renderer3d = (function (_super) {
         f.projectedPosition = this.projectVector(f.position, transformMatrix);
         var posPlusSize = f.position.add(f.size);
         var posPlusSizeProjected = this.projectVector(posPlusSize, transformMatrix);
-        f.projectedSize.x = (-posPlusSizeProjected.x + f.projectedPosition.x) * 2;
+        f.projectedSize.x = (posPlusSizeProjected.x - f.projectedPosition.x) * 2;
         f.projectedSize.y = (-posPlusSizeProjected.y + f.projectedPosition.y) * 2;
         if (f instanceof Mesh) {
             this.projectMesh(f, worldMatrix, transformMatrix, rotMatrix);
@@ -1645,10 +1645,10 @@ var App = (function () {
         var k = eventArgs.pressedKey;
         var cameraDelta = 3;
         if (this.scene) {
-            if (k == 189) {
+            if (k == 187) {
                 this.scene.camera.position.z += cameraDelta;
             }
-            if (k == 187) {
+            if (k == 189) {
                 this.scene.camera.position.z -= cameraDelta;
             }
             if (k == 67)
@@ -1659,7 +1659,9 @@ var App = (function () {
     };
     App.prototype.handleMouseEvent = function (eventArgs) {
         if (this.scene) {
-            this.mouseWheelVectorControl.z += eventArgs.wheelDelta / 50;
+            if (eventArgs.wheelDelta != 0) {
+                this.mouseWheelVectorControl.z -= eventArgs.wheelDelta / 50;
+            }
         }
     };
     return App;
