@@ -85,12 +85,12 @@ var Renderer2d = (function (_super) {
         if (scaley === void 0) { scaley = 1; }
         ImageTransformer.scale(image, this.output.colorBuffer, scalex, scaley, x, y, function (ox, oy) { return _this.output.checkDepth(ox, oy, z); });
     };
-    Renderer2d.prototype.drawTiles = function (image, x, y, z, tilesx, tilesy, scalex, scaley) {
-        if (tilesy === void 0) { tilesy = 1; }
+    Renderer2d.prototype.drawTiles = function (image, x, y, z, countH, countV, scalex, scaley) {
+        if (countV === void 0) { countV = 1; }
         if (scalex === void 0) { scalex = 1; }
         if (scaley === void 0) { scaley = 1; }
-        for (var ty = 0, theight = image.height * scaley, py = y; ty < tilesy; ty++, py += theight) {
-            for (var tx = 0, twidth = image.width * scalex, px = x; tx < tilesx; tx++, px += twidth) {
+        for (var ty = 0, theight = image.height * scaley, py = y; ty < countV; ty++, py += theight) {
+            for (var tx = 0, twidth = image.width * scalex, px = x; tx < countH; tx++, px += twidth) {
                 this.drawImage(image, px, py, z, scalex, scaley);
             }
         }

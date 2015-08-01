@@ -101,11 +101,11 @@ class Renderer3d extends Renderer {
         if (f instanceof Circle) {
             this.drawCircle(<Circle>f);
         }
-        else if (f instanceof Sprite) {
-            this.drawSprite(<Sprite>f);
-        }
         else if (f instanceof Tile) {
             this.drawTile(<Tile>f);
+        }
+        else if (f instanceof Sprite) {
+            this.drawSprite(<Sprite>f);
         }
         else if (f instanceof Mesh) {
             this.drawMesh(<Mesh>f, light);
@@ -125,7 +125,11 @@ class Renderer3d extends Renderer {
     }
 
     private drawTile(tile: Tile) {
-        
+        var scalex = tile.projectedSize.x / tile.image.width;
+        var scaley = tile.projectedSize.y / tile.image.height;
+        var x = tile.projectedPosition.x - tile.projectedSize.x / 2;
+        var y = tile.projectedPosition.y - tile.projectedSize.y / 2;
+        this.renderer2d.drawTiles(tile.image, x, y, tile.projectedPosition.z, tile.countH, tile.countV, scalex, scaley);
     }
 
     private drawMesh(m: Mesh, light: Light) {

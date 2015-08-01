@@ -624,15 +624,16 @@ class Circle extends Figure {
 class Sprite extends Figure {
     public image: ColorBuffer;
 
-    constructor(image) {
+    constructor(image: ColorBuffer) {
         super();
         this.image = image;
     }
 }
 
 class Tile extends Sprite {
-    public width = 1;
-    public height = 1;
+    
+    public countH = 1;
+    public countV = 1;
 
     constructor(image) {
         super(image);
@@ -994,9 +995,9 @@ class Renderer2d extends Renderer {
         ImageTransformer.scale(image, this.output.colorBuffer, scalex, scaley, x, y,(ox, oy) => this.output.checkDepth(ox, oy, z));
     }
 
-    public drawTiles(image: ColorBuffer, x: number, y: number, z: number, tilesx: number, tilesy = 1, scalex = 1, scaley = 1) {
-        for (var ty = 0, theight = image.height * scaley, py = y; ty < tilesy; ty++ , py += theight) {
-            for (var tx = 0, twidth = image.width * scalex, px = x; tx < tilesx; tx++ , px += twidth) {
+    public drawTiles(image: ColorBuffer, x: number, y: number, z: number, countH: number, countV = 1, scalex = 1, scaley = 1) {
+        for (var ty = 0, theight = image.height * scaley, py = y; ty < countV; ty++ , py += theight) {
+            for (var tx = 0, twidth = image.width * scalex, px = x; tx < countH; tx++ , px += twidth) {
                 this.drawImage(image, px, py, z, scalex, scaley);
             }
         }
@@ -1131,11 +1132,11 @@ class Renderer3d extends Renderer {
         if (f instanceof Circle) {
             this.drawCircle(<Circle>f);
         }
-        else if (f instanceof Sprite) {
-            this.drawSprite(<Sprite>f);
-        }
         else if (f instanceof Tile) {
             this.drawTile(<Tile>f);
+        }
+        else if (f instanceof Sprite) {
+            this.drawSprite(<Sprite>f);
         }
         else if (f instanceof Mesh) {
             this.drawMesh(<Mesh>f, light);
@@ -1155,7 +1156,11 @@ class Renderer3d extends Renderer {
     }
 
     private drawTile(tile: Tile) {
-        
+        var scalex = tile.projectedSize.x / tile.image.width;
+        var scaley = tile.projectedSize.y / tile.image.height;
+        var x = tile.projectedPosition.x - tile.projectedSize.x / 2;
+        var y = tile.projectedPosition.y - tile.projectedSize.y / 2;
+        this.renderer2d.drawTiles(tile.image, x, y, tile.projectedPosition.z, tile.countH, tile.countV, scalex, scaley);
     }
 
     private drawMesh(m: Mesh, light: Light) {
@@ -1443,12 +1448,12 @@ class ImageTransformer {
 
         for (var iy = sy, oy = y >> 0, fullpy = 0; iy < input.height && oy < output.height; iy++) {
             fullpy += scaleY;
-            if (fullpy >= 1) {
-                while (fullpy >= 1) {
+            if (fullpy >= 1 || (fullpy > 0 && iy == input.height - 1)) {
+                while (fullpy > 0) {
                     for (var ix = sx, ox = x >> 0, fullpx = 0; ix < input.width && ox < output.width; ix++) {
                         fullpx += scaleX;
-                        if (fullpx >= 1) {
-                            while (fullpx >= 1) {
+                        if (fullpx >= 1 || (fullpx > 0 && ix == input.width - 1)) {
+                            while (fullpx >= 0) {
                                 if (filter == null || filter(ox, oy)) {
                                     output.copyColor(ox, oy, input, ix, iy);
                                 }

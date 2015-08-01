@@ -90,9 +90,9 @@
         ImageTransformer.scale(image, this.output.colorBuffer, scalex, scaley, x, y,(ox, oy) => this.output.checkDepth(ox, oy, z));
     }
 
-    public drawTiles(image: ColorBuffer, x: number, y: number, z: number, tilesx: number, tilesy = 1, scalex = 1, scaley = 1) {
-        for (var ty = 0, theight = image.height * scaley, py = y; ty < tilesy; ty++ , py += theight) {
-            for (var tx = 0, twidth = image.width * scalex, px = x; tx < tilesx; tx++ , px += twidth) {
+    public drawTiles(image: ColorBuffer, x: number, y: number, z: number, countH: number, countV = 1, scalex = 1, scaley = 1) {
+        for (var ty = 0, theight = image.height * scaley, py = y; ty < countV; ty++ , py += theight) {
+            for (var tx = 0, twidth = image.width * scalex, px = x; tx < countH; tx++ , px += twidth) {
                 this.drawImage(image, px, py, z, scalex, scaley);
             }
         }

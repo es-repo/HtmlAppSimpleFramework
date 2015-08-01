@@ -23,15 +23,16 @@ class Circle extends Figure {
 class Sprite extends Figure {
     public image: ColorBuffer;
 
-    constructor(image) {
+    constructor(image: ColorBuffer) {
         super();
         this.image = image;
     }
 }
 
 class Tile extends Sprite {
-    public width = 1;
-    public height = 1;
+    
+    public countH = 1;
+    public countV = 1;
 
     constructor(image) {
         super(image);

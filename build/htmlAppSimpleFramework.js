@@ -641,8 +641,8 @@ var Tile = (function (_super) {
     __extends(Tile, _super);
     function Tile(image) {
         _super.call(this, image);
-        this.width = 1;
-        this.height = 1;
+        this.countH = 1;
+        this.countV = 1;
     }
     return Tile;
 })(Sprite);
@@ -945,12 +945,12 @@ var Renderer2d = (function (_super) {
         if (scaley === void 0) { scaley = 1; }
         ImageTransformer.scale(image, this.output.colorBuffer, scalex, scaley, x, y, function (ox, oy) { return _this.output.checkDepth(ox, oy, z); });
     };
-    Renderer2d.prototype.drawTiles = function (image, x, y, z, tilesx, tilesy, scalex, scaley) {
-        if (tilesy === void 0) { tilesy = 1; }
+    Renderer2d.prototype.drawTiles = function (image, x, y, z, countH, countV, scalex, scaley) {
+        if (countV === void 0) { countV = 1; }
         if (scalex === void 0) { scalex = 1; }
         if (scaley === void 0) { scaley = 1; }
-        for (var ty = 0, theight = image.height * scaley, py = y; ty < tilesy; ty++, py += theight) {
-            for (var tx = 0, twidth = image.width * scalex, px = x; tx < tilesx; tx++, px += twidth) {
+        for (var ty = 0, theight = image.height * scaley, py = y; ty < countV; ty++, py += theight) {
+            for (var tx = 0, twidth = image.width * scalex, px = x; tx < countH; tx++, px += twidth) {
                 this.drawImage(image, px, py, z, scalex, scaley);
             }
         }
@@ -1058,11 +1058,11 @@ var Renderer3d = (function (_super) {
         if (f instanceof Circle) {
             this.drawCircle(f);
         }
-        else if (f instanceof Sprite) {
-            this.drawSprite(f);
-        }
         else if (f instanceof Tile) {
             this.drawTile(f);
+        }
+        else if (f instanceof Sprite) {
+            this.drawSprite(f);
         }
         else if (f instanceof Mesh) {
             this.drawMesh(f, light);
@@ -1079,6 +1079,11 @@ var Renderer3d = (function (_super) {
         this.renderer2d.drawImage(sprite.image, x, y, sprite.projectedPosition.z, scalex, scaley);
     };
     Renderer3d.prototype.drawTile = function (tile) {
+        var scalex = tile.projectedSize.x / tile.image.width;
+        var scaley = tile.projectedSize.y / tile.image.height;
+        var x = tile.projectedPosition.x - tile.projectedSize.x / 2;
+        var y = tile.projectedPosition.y - tile.projectedSize.y / 2;
+        this.renderer2d.drawTiles(tile.image, x, y, tile.projectedPosition.z, tile.countH, tile.countV, scalex, scaley);
     };
     Renderer3d.prototype.drawMesh = function (m, light) {
         var linesColor = new BABYLON.Color4(1, 1, 1, 1);
@@ -1316,12 +1321,12 @@ var ImageTransformer = (function () {
         }
         for (var iy = sy, oy = y >> 0, fullpy = 0; iy < input.height && oy < output.height; iy++) {
             fullpy += scaleY;
-            if (fullpy >= 1) {
-                while (fullpy >= 1) {
+            if (fullpy >= 1 || (fullpy > 0 && iy == input.height - 1)) {
+                while (fullpy > 0) {
                     for (var ix = sx, ox = x >> 0, fullpx = 0; ix < input.width && ox < output.width; ix++) {
                         fullpx += scaleX;
-                        if (fullpx >= 1) {
-                            while (fullpx >= 1) {
+                        if (fullpx >= 1 || (fullpx > 0 && ix == input.width - 1)) {
+                            while (fullpx >= 0) {
                                 if (filter == null || filter(ox, oy)) {
                                     output.copyColor(ox, oy, input, ix, iy);
                                 }

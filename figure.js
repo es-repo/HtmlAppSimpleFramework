@@ -56,8 +56,8 @@ var Tile = (function (_super) {
     __extends(Tile, _super);
     function Tile(image) {
         _super.call(this, image);
-        this.width = 1;
-        this.height = 1;
+        this.countH = 1;
+        this.countV = 1;
     }
     return Tile;
 })(Sprite);
