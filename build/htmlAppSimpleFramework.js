@@ -994,7 +994,7 @@ var Renderer3d = (function (_super) {
         this.renderer2d = new Renderer2d(output);
     }
     Renderer3d.prototype.get_viewProjectionMatrix = function (camera) {
-        var viewMatrix = BABYLON.Matrix.LookAtLH(camera.position, camera.direction, camera.up);
+        var viewMatrix = BABYLON.Matrix.LookAtLH(camera.position, camera.position.add(camera.direction), camera.up);
         var projectionMatrix = BABYLON.Matrix.PerspectiveFovLH(camera.fov, this.output.width / this.output.height, camera.zNear, camera.zFar);
         return viewMatrix.multiply(projectionMatrix);
     };
