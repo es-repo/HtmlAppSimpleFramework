@@ -4,11 +4,17 @@
 
     constructor() {
         this.images["tile"] = null;
-        this.images["runner"] = null;
+        this.images["runner1"] = null;
         this.images["runner2"] = null;
+        this.images["runner3"] = null;
         this.images["coin"] = null;
 
         this.sounds["coin"] = null;
+        this.sounds["song"] = null;
+        this.sounds["start"] = null;
+        this.sounds["jump"] = null;
+        this.sounds["step"] = null;
+        this.sounds["death"] = null;
     }
 
     public isReady(): boolean {
@@ -35,10 +41,13 @@ class Runner extends Sprite {
     private images: ColorBuffer[];
     private currentImageIndex = 0;
 
-    public speed = 0.2;
+    public speed = 0.3;
     public gravyAcc = -0.03;
     public jumpAcc = 0.5;
     public gatheredCoins = 0;
+
+    public jumpSound;
+    public stepSound;
 
     constructor(images: ColorBuffer[]) {
         super(images[0]);
@@ -47,17 +56,22 @@ class Runner extends Sprite {
 
     public tick() {
         this.ticks++;
-        if (this.ticks % 5 == 0) {
+        if (this.ticks % 4 == 0) {
             this.currentImageIndex++;
             if (this.currentImageIndex >= this.images.length)
                 this.currentImageIndex = 0;
             this.image = this.images[this.currentImageIndex];
         }
+
+        if (this.velocity.y == 0)
+            this.stepSound.play();
     }
 
     public jump() {
-        if (this.velocity.y == 0)
+        if (this.velocity.y == 0) {
             this.velocity.y = this.jumpAcc;
+            this.jumpSound.play();
+        }
     }
 }
 
@@ -74,11 +88,15 @@ class Coin extends Sprite {
 
 class RunnerApp extends App {
 
+    private gameStarted = false;
+    private gameEnded = false;
+    private inMenu = true;
+
     private wallTileSize = 1.3;
     private walls: Wall[][];
-    private wallsMaxDistance = this.wallTileSize * 4;
-    private wallsMinDistance = this.wallTileSize;
-    private wallsMaxLenght = this.wallTileSize * 15;
+    private wallsMaxDistance = this.wallTileSize * 10;
+    private wallsMinDistance = this.wallTileSize * 2;
+    private wallsMaxLenght = this.wallTileSize * 12;
     private wallsMinLenght = this.wallTileSize * 3;
     private wallUpdatePosX = -this.wallTileSize * 40;
 
@@ -113,13 +131,12 @@ class RunnerApp extends App {
             }
         }
 
-        this.rearrangeWalls();
-
-        this.runner = new Runner([this.resources.images["runner"], this.resources.images["runner2"]]);
-        this.runner.size.x = this.wallTileSize;
-        this.runner.size.y = this.wallTileSize;
-        this.runner.position.x = -8;
-        this.runner.position.y = this.walls[0][0].get_boundingBox()[1].y + this.wallTileSize / 2;
+        this.runner = new Runner([this.resources.images["runner1"], this.resources.images["runner2"], this.resources.images["runner3"], this.resources.images["runner2"]]);
+        this.runner.size.x = this.wallTileSize * 1.5;
+        this.runner.size.y = this.wallTileSize * 1.5;
+        this.runner.position.x = this.wallUpdatePosX;
+        this.runner.jumpSound = this.resources.sounds["jump"];
+        this.runner.stepSound = this.resources.sounds["step"];
 
         scene.figures.push(this.runner);
 
@@ -143,23 +160,16 @@ class RunnerApp extends App {
             c.sound = this.resources.sounds["coin"];
             this.availableCoins.push(c);
         }
-
+        this.resources.sounds["start"].play();
         continuation(scene);
     }
 
-    protected doLogicStep() {
-        for (var l = 0; l < this.walls.length; l++) {
-            for (var i = 0; i < this.walls[l].length; i++) {
-                this.walls[l][i].position.x -= this.runner.speed;
-            }
-            this.rearrangeWalls();
-        }
+    private initRunnerPosition() {
+        this.runner.position.x = -8;
+        this.runner.position.y = this.walls[0][0].get_boundingBox()[1].y + this.runner.size.y / 2;
+    }
 
-        for (var i = 0; i < this.coins.length; i++) {
-            this.coins[i].position.x -= this.runner.speed;
-        }
-        this.rearrangeCoins();
-        this.takeCoin();
+    protected doLogicStep() {
 
         for (var i = 0; i < this.particles.length; i++) {
             var p = this.particles[i];
@@ -169,38 +179,72 @@ class RunnerApp extends App {
             }
         }
 
-        this.runner.position.y += this.runner.velocity.y;
+        if (this.gameStarted) {
+            for (var l = 0; l < this.walls.length; l++) {
+                for (var i = 0; i < this.walls[l].length; i++) {
+                    this.walls[l][i].position.x -= this.runner.speed;
+                }
+                this.rearrangeWalls();
+            }
 
-        var onWall = null;
-        for (var l = 0; l < this.walls.length; l++) {
-            for (var i = 0; i < this.walls[l].length; i++) {
-                var w = this.walls[l][i];
-                if (RunnerApp.isRunnerOnWall(this.runner, w)) {
-                    onWall = w;
+            for (var i = 0; i < this.coins.length; i++) {
+                this.coins[i].position.x -= this.runner.speed;
+            }
+            this.rearrangeCoins();
+            this.takeCoin();
+
+            this.runner.position.y += this.runner.velocity.y;
+
+            var onWall = null;
+            for (var l = 0; l < this.walls.length; l++) {
+                for (var i = 0; i < this.walls[l].length; i++) {
+                    var w = this.walls[l][i];
+                    if (RunnerApp.isRunnerOnWall(this.runner, w)) {
+                        onWall = w;
+                        break;
+                    }
+                }
+                if (onWall != null)
                     break;
+            }
+
+            if (onWall == null) {
+                this.runner.velocity.y += this.runner.gravyAcc;
+            } else {
+                if (this.runner.velocity.y < 0) {
+                    this.runner.velocity.y = 0;
+                    this.runner.position.y = onWall.boundingBox[1].y + this.runner.size.y / 2;
                 }
             }
-            if (onWall != null)
-                break;
-        }
 
-        if (onWall == null) {
-            this.runner.velocity.y += this.runner.gravyAcc;
+            var bottom = - 15;
+            //var top = 10;
+            if (this.runner.position.y < bottom) {
+                //this.runner.position.y = top;
+                this.gameEnded = true;
+                this.gameStarted = false;
+                this.resources.sounds["song"].pause();
+                this.resources.sounds["death"].play();
+                this.hideWallsCoinsAndRunner();
+            }
+
+            this.runner.tick();
         }
-        else {
-            if (this.runner.velocity.y < 0) {
-                this.runner.velocity.y = 0;
-                this.runner.position.y = onWall.boundingBox[1].y + this.wallTileSize / 2;
+    }
+
+    private hideWallsCoinsAndRunner() {
+        for (var l = 0; l < this.walls.length; l++) {
+            for (var i = 0; i < this.walls[l].length; i++) {
+                this.walls[l][i].position.x = this.wallUpdatePosX;
             }
         }
 
-        var bottom = - 15;
-        var top = 10;
-        if (this.runner.position.y < bottom) {
-            this.runner.position.y = top;
-        }
+        this.runner.position.x = this.wallUpdatePosX;
 
-        this.runner.tick();
+        for (var i = 0; i < this.coins.length; i++) {
+            var c = this.coins[i];
+            c.position.x = this.wallUpdatePosX;
+        }
     }
 
     private rearrangeWalls() {
@@ -215,7 +259,7 @@ class RunnerApp extends App {
             var lw = walls[walls.length - 1];
 
             if (w.position.x <= this.wallUpdatePosX) {
-                w.position.x = lw.position.x + lw.size.x * lw.countH + this.wallsMinDistance + /*Math.random() **/ this.wallsMaxDistance >> 0;
+                w.position.x = lw.position.x + lw.size.x * lw.countH + this.wallsMinDistance + Math.random() * this.wallsMaxDistance >> 0;
                 w.countH = this.wallsMinLenght + Math.random() * this.wallsMaxLenght >> 0;
                 walls.splice(0, 1);
                 walls.push(w);
@@ -262,6 +306,7 @@ class RunnerApp extends App {
                 var sceneIdx = this.scene.figures.indexOf(c);
                 this.scene.figures.splice(sceneIdx, 1);
                 this.availableCoins.push(c);
+                c.sound.currentTime = 0;
                 c.sound.play();
                 break;
             }
@@ -273,11 +318,25 @@ class RunnerApp extends App {
     }
 
     private static isRunnerNearCoin(runner: Runner, coin: Coin): boolean {
-        return RunnerApp.isPointInsideBox(runner.get_boundingBox()[1], coin.get_boundingBox()) || RunnerApp.isPointInsideBox(runner.get_boundingBox()[0], coin.get_boundingBox());
+        return RunnerApp.areBoxesIntersects(runner.get_boundingBox(), coin.get_boundingBox());
     }
 
     private static isPointInsideBox(point: BABYLON.Vector3, box: BABYLON.Vector3[]) {
         return point.x >= box[0].x && point.x <= box[1].x && point.y >= box[0].y && point.y <= box[1].y;
+    }
+
+    private static areBoxesIntersects(box1: BABYLON.Vector3[], box2: BABYLON.Vector3[]) {
+        return RunnerApp.isPointInsideBox(box1[0], box2) || RunnerApp.isPointInsideBox(box1[1], box2) ||
+            RunnerApp.isPointInsideBox(box2[0], box1) || RunnerApp.isPointInsideBox(box2[1], box1);
+    }
+
+    private static playAudioInLoop(audio) {
+        audio.currentTime = 0;
+        audio.addEventListener('ended', () => {
+            audio.currentTime = 0;
+            audio.play();
+        }, false);
+        audio.play();
     }
 
     public handleKeyboardEvent(eventArgs: KeyboardEventArgs) {
@@ -287,7 +346,7 @@ class RunnerApp extends App {
         var k = eventArgs.pressedKey;
 
         if (k == 32) {
-            this.runner.jump();
+            this.onAction();
         }
     }
 
@@ -295,14 +354,45 @@ class RunnerApp extends App {
         super.handleMouseEvent(eventArgs);
 
         if (eventArgs.leftButtonClicked) {
+            this.onAction();
+        }
+    }
+
+    private onAction() {
+        if (this.inMenu) {
+            this.inMenu = false;
+            this.gameStarted = true;
+            this.initRunnerPosition();
+            this.rearrangeWalls();
+            this.runner.gatheredCoins = 0;
+            RunnerApp.playAudioInLoop(this.resources.sounds["song"]);
+        }
+        else if (this.gameStarted) {
             this.runner.jump();
+        }
+        else if (this.gameEnded) {
+            this.inMenu = true;
+            this.gameEnded = false;
+            this.resources.sounds["start"].play();
         }
     }
 
     protected drawFrame() {
         super.drawFrame();
-        var s = "score: " + this.runner.gatheredCoins;
-        this.graphicOutput.drawText(s, this.graphicOutput.get_width() - 200, 30, "000000", 32, "Lucida Console");
-        this.graphicOutput.drawText(s, this.graphicOutput.get_width() - 198, 32, "ffff00", 32, "Lucida Console");
+        
+        if (this.inMenu) {
+            this.graphicOutput.drawText("RUNNER", this.graphicOutput.get_width() / 2 - 140, this.graphicOutput.get_height() / 2 - 50, "ffffff", 80, "Lucida Console");
+            this.graphicOutput.drawText("Press space or", this.graphicOutput.get_width() / 2 - 125, this.graphicOutput.get_height() / 2 + 50, "ffffff", 30, "Lucida Console");
+            this.graphicOutput.drawText("left mouse button", this.graphicOutput.get_width() / 2 - 150, this.graphicOutput.get_height() / 2 + 80, "ffffff", 30, "Lucida Console");
+            this.graphicOutput.drawText("to start!", this.graphicOutput.get_width() / 2 - 80, this.graphicOutput.get_height() / 2 + 110, "ffffff", 30, "Lucida Console");
+        }
+        else {
+            var s = "score:" + this.runner.gatheredCoins;
+            this.graphicOutput.drawText(s, this.graphicOutput.get_width() - 200, 30, "ffffff", 32, "Lucida Console");
+
+            if (this.gameEnded) {
+                this.graphicOutput.drawText("Game over!", this.graphicOutput.get_width() / 2 - 240, this.graphicOutput.get_height() / 2 + 30, "ffffff", 80, "Lucida Console");
+            }
+        }
     }
 }

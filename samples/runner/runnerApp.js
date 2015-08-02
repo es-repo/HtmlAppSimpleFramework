@@ -9,10 +9,16 @@ var RunnerAppResources = (function () {
         this.images = {};
         this.sounds = {};
         this.images["tile"] = null;
-        this.images["runner"] = null;
+        this.images["runner1"] = null;
         this.images["runner2"] = null;
+        this.images["runner3"] = null;
         this.images["coin"] = null;
         this.sounds["coin"] = null;
+        this.sounds["song"] = null;
+        this.sounds["start"] = null;
+        this.sounds["jump"] = null;
+        this.sounds["step"] = null;
+        this.sounds["death"] = null;
     }
     RunnerAppResources.prototype.isReady = function () {
         for (var i in this.images)
@@ -38,7 +44,7 @@ var Runner = (function (_super) {
         _super.call(this, images[0]);
         this.ticks = 0;
         this.currentImageIndex = 0;
-        this.speed = 0.2;
+        this.speed = 0.3;
         this.gravyAcc = -0.03;
         this.jumpAcc = 0.5;
         this.gatheredCoins = 0;
@@ -46,16 +52,20 @@ var Runner = (function (_super) {
     }
     Runner.prototype.tick = function () {
         this.ticks++;
-        if (this.ticks % 5 == 0) {
+        if (this.ticks % 4 == 0) {
             this.currentImageIndex++;
             if (this.currentImageIndex >= this.images.length)
                 this.currentImageIndex = 0;
             this.image = this.images[this.currentImageIndex];
         }
+        if (this.velocity.y == 0)
+            this.stepSound.play();
     };
     Runner.prototype.jump = function () {
-        if (this.velocity.y == 0)
+        if (this.velocity.y == 0) {
             this.velocity.y = this.jumpAcc;
+            this.jumpSound.play();
+        }
     };
     return Runner;
 })(Sprite);
@@ -78,10 +88,13 @@ var RunnerApp = (function (_super) {
     __extends(RunnerApp, _super);
     function RunnerApp() {
         _super.apply(this, arguments);
+        this.gameStarted = false;
+        this.gameEnded = false;
+        this.inMenu = true;
         this.wallTileSize = 1.3;
-        this.wallsMaxDistance = this.wallTileSize * 4;
-        this.wallsMinDistance = this.wallTileSize;
-        this.wallsMaxLenght = this.wallTileSize * 15;
+        this.wallsMaxDistance = this.wallTileSize * 10;
+        this.wallsMinDistance = this.wallTileSize * 2;
+        this.wallsMaxLenght = this.wallTileSize * 12;
         this.wallsMinLenght = this.wallTileSize * 3;
         this.wallUpdatePosX = -this.wallTileSize * 40;
         this.resources = new RunnerAppResources();
@@ -107,12 +120,12 @@ var RunnerApp = (function (_super) {
                 scene.figures.push(w);
             }
         }
-        this.rearrangeWalls();
-        this.runner = new Runner([this.resources.images["runner"], this.resources.images["runner2"]]);
-        this.runner.size.x = this.wallTileSize;
-        this.runner.size.y = this.wallTileSize;
-        this.runner.position.x = -8;
-        this.runner.position.y = this.walls[0][0].get_boundingBox()[1].y + this.wallTileSize / 2;
+        this.runner = new Runner([this.resources.images["runner1"], this.resources.images["runner2"], this.resources.images["runner3"], this.resources.images["runner2"]]);
+        this.runner.size.x = this.wallTileSize * 1.5;
+        this.runner.size.y = this.wallTileSize * 1.5;
+        this.runner.position.x = this.wallUpdatePosX;
+        this.runner.jumpSound = this.resources.sounds["jump"];
+        this.runner.stepSound = this.resources.sounds["step"];
         scene.figures.push(this.runner);
         this.particles = [];
         for (var i = 0; i < 100; i++) {
@@ -133,20 +146,14 @@ var RunnerApp = (function (_super) {
             c.sound = this.resources.sounds["coin"];
             this.availableCoins.push(c);
         }
+        this.resources.sounds["start"].play();
         continuation(scene);
     };
+    RunnerApp.prototype.initRunnerPosition = function () {
+        this.runner.position.x = -8;
+        this.runner.position.y = this.walls[0][0].get_boundingBox()[1].y + this.runner.size.y / 2;
+    };
     RunnerApp.prototype.doLogicStep = function () {
-        for (var l = 0; l < this.walls.length; l++) {
-            for (var i = 0; i < this.walls[l].length; i++) {
-                this.walls[l][i].position.x -= this.runner.speed;
-            }
-            this.rearrangeWalls();
-        }
-        for (var i = 0; i < this.coins.length; i++) {
-            this.coins[i].position.x -= this.runner.speed;
-        }
-        this.rearrangeCoins();
-        this.takeCoin();
         for (var i = 0; i < this.particles.length; i++) {
             var p = this.particles[i];
             p.position.x -= this.runner.speed;
@@ -154,34 +161,64 @@ var RunnerApp = (function (_super) {
                 p.position.x = 70;
             }
         }
-        this.runner.position.y += this.runner.velocity.y;
-        var onWall = null;
-        for (var l = 0; l < this.walls.length; l++) {
-            for (var i = 0; i < this.walls[l].length; i++) {
-                var w = this.walls[l][i];
-                if (RunnerApp.isRunnerOnWall(this.runner, w)) {
-                    onWall = w;
+        if (this.gameStarted) {
+            for (var l = 0; l < this.walls.length; l++) {
+                for (var i = 0; i < this.walls[l].length; i++) {
+                    this.walls[l][i].position.x -= this.runner.speed;
+                }
+                this.rearrangeWalls();
+            }
+            for (var i = 0; i < this.coins.length; i++) {
+                this.coins[i].position.x -= this.runner.speed;
+            }
+            this.rearrangeCoins();
+            this.takeCoin();
+            this.runner.position.y += this.runner.velocity.y;
+            var onWall = null;
+            for (var l = 0; l < this.walls.length; l++) {
+                for (var i = 0; i < this.walls[l].length; i++) {
+                    var w = this.walls[l][i];
+                    if (RunnerApp.isRunnerOnWall(this.runner, w)) {
+                        onWall = w;
+                        break;
+                    }
+                }
+                if (onWall != null)
                     break;
+            }
+            if (onWall == null) {
+                this.runner.velocity.y += this.runner.gravyAcc;
+            }
+            else {
+                if (this.runner.velocity.y < 0) {
+                    this.runner.velocity.y = 0;
+                    this.runner.position.y = onWall.boundingBox[1].y + this.runner.size.y / 2;
                 }
             }
-            if (onWall != null)
-                break;
+            var bottom = -15;
+            //var top = 10;
+            if (this.runner.position.y < bottom) {
+                //this.runner.position.y = top;
+                this.gameEnded = true;
+                this.gameStarted = false;
+                this.resources.sounds["song"].pause();
+                this.resources.sounds["death"].play();
+                this.hideWallsCoinsAndRunner();
+            }
+            this.runner.tick();
         }
-        if (onWall == null) {
-            this.runner.velocity.y += this.runner.gravyAcc;
-        }
-        else {
-            if (this.runner.velocity.y < 0) {
-                this.runner.velocity.y = 0;
-                this.runner.position.y = onWall.boundingBox[1].y + this.wallTileSize / 2;
+    };
+    RunnerApp.prototype.hideWallsCoinsAndRunner = function () {
+        for (var l = 0; l < this.walls.length; l++) {
+            for (var i = 0; i < this.walls[l].length; i++) {
+                this.walls[l][i].position.x = this.wallUpdatePosX;
             }
         }
-        var bottom = -15;
-        var top = 10;
-        if (this.runner.position.y < bottom) {
-            this.runner.position.y = top;
+        this.runner.position.x = this.wallUpdatePosX;
+        for (var i = 0; i < this.coins.length; i++) {
+            var c = this.coins[i];
+            c.position.x = this.wallUpdatePosX;
         }
-        this.runner.tick();
     };
     RunnerApp.prototype.rearrangeWalls = function () {
         for (var i = 0; i < this.walls.length; i++) {
@@ -193,7 +230,7 @@ var RunnerApp = (function (_super) {
             var w = walls[0];
             var lw = walls[walls.length - 1];
             if (w.position.x <= this.wallUpdatePosX) {
-                w.position.x = lw.position.x + lw.size.x * lw.countH + this.wallsMinDistance + this.wallsMaxDistance >> 0;
+                w.position.x = lw.position.x + lw.size.x * lw.countH + this.wallsMinDistance + Math.random() * this.wallsMaxDistance >> 0;
                 w.countH = this.wallsMinLenght + Math.random() * this.wallsMaxLenght >> 0;
                 walls.splice(0, 1);
                 walls.push(w);
@@ -236,6 +273,7 @@ var RunnerApp = (function (_super) {
                 var sceneIdx = this.scene.figures.indexOf(c);
                 this.scene.figures.splice(sceneIdx, 1);
                 this.availableCoins.push(c);
+                c.sound.currentTime = 0;
                 c.sound.play();
                 break;
             }
@@ -245,29 +283,68 @@ var RunnerApp = (function (_super) {
         return RunnerApp.isPointInsideBox(runner.get_boundingBox()[0], wall.get_boundingBox());
     };
     RunnerApp.isRunnerNearCoin = function (runner, coin) {
-        return RunnerApp.isPointInsideBox(runner.get_boundingBox()[1], coin.get_boundingBox()) || RunnerApp.isPointInsideBox(runner.get_boundingBox()[0], coin.get_boundingBox());
+        return RunnerApp.areBoxesIntersects(runner.get_boundingBox(), coin.get_boundingBox());
     };
     RunnerApp.isPointInsideBox = function (point, box) {
         return point.x >= box[0].x && point.x <= box[1].x && point.y >= box[0].y && point.y <= box[1].y;
+    };
+    RunnerApp.areBoxesIntersects = function (box1, box2) {
+        return RunnerApp.isPointInsideBox(box1[0], box2) || RunnerApp.isPointInsideBox(box1[1], box2) || RunnerApp.isPointInsideBox(box2[0], box1) || RunnerApp.isPointInsideBox(box2[1], box1);
+    };
+    RunnerApp.playAudioInLoop = function (audio) {
+        audio.currentTime = 0;
+        audio.addEventListener('ended', function () {
+            audio.currentTime = 0;
+            audio.play();
+        }, false);
+        audio.play();
     };
     RunnerApp.prototype.handleKeyboardEvent = function (eventArgs) {
         _super.prototype.handleKeyboardEvent.call(this, eventArgs);
         var k = eventArgs.pressedKey;
         if (k == 32) {
-            this.runner.jump();
+            this.onAction();
         }
     };
     RunnerApp.prototype.handleMouseEvent = function (eventArgs) {
         _super.prototype.handleMouseEvent.call(this, eventArgs);
         if (eventArgs.leftButtonClicked) {
+            this.onAction();
+        }
+    };
+    RunnerApp.prototype.onAction = function () {
+        if (this.inMenu) {
+            this.inMenu = false;
+            this.gameStarted = true;
+            this.initRunnerPosition();
+            this.rearrangeWalls();
+            this.runner.gatheredCoins = 0;
+            RunnerApp.playAudioInLoop(this.resources.sounds["song"]);
+        }
+        else if (this.gameStarted) {
             this.runner.jump();
+        }
+        else if (this.gameEnded) {
+            this.inMenu = true;
+            this.gameEnded = false;
+            this.resources.sounds["start"].play();
         }
     };
     RunnerApp.prototype.drawFrame = function () {
         _super.prototype.drawFrame.call(this);
-        var s = "score: " + this.runner.gatheredCoins;
-        this.graphicOutput.drawText(s, this.graphicOutput.get_width() - 200, 30, "000000", 32, "Lucida Console");
-        this.graphicOutput.drawText(s, this.graphicOutput.get_width() - 198, 32, "ffff00", 32, "Lucida Console");
+        if (this.inMenu) {
+            this.graphicOutput.drawText("RUNNER", this.graphicOutput.get_width() / 2 - 140, this.graphicOutput.get_height() / 2 - 50, "ffffff", 80, "Lucida Console");
+            this.graphicOutput.drawText("Press space or", this.graphicOutput.get_width() / 2 - 125, this.graphicOutput.get_height() / 2 + 50, "ffffff", 30, "Lucida Console");
+            this.graphicOutput.drawText("left mouse button", this.graphicOutput.get_width() / 2 - 150, this.graphicOutput.get_height() / 2 + 80, "ffffff", 30, "Lucida Console");
+            this.graphicOutput.drawText("to start!", this.graphicOutput.get_width() / 2 - 80, this.graphicOutput.get_height() / 2 + 110, "ffffff", 30, "Lucida Console");
+        }
+        else {
+            var s = "score:" + this.runner.gatheredCoins;
+            this.graphicOutput.drawText(s, this.graphicOutput.get_width() - 200, 30, "ffffff", 32, "Lucida Console");
+            if (this.gameEnded) {
+                this.graphicOutput.drawText("Game over!", this.graphicOutput.get_width() / 2 - 240, this.graphicOutput.get_height() / 2 + 30, "ffffff", 80, "Lucida Console");
+            }
+        }
     };
     return RunnerApp;
 })(App);
