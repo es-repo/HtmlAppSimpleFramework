@@ -29,7 +29,11 @@
     <Content Include="samples\3dObject\monkey.jpg" />
     <Content Include="samples\blur\index.html" />
     <Content Include="samples\runner\index.html" />
+    <Content Include="samples\runner\resources\images\coin.png" />
+    <Content Include="samples\runner\resources\images\runner.png" />
+    <Content Include="samples\runner\resources\images\runner2.png" />
     <Content Include="samples\runner\resources\images\tile.png" />
+    <Content Include="samples\runner\resources\sounds\coin.mp3" />
     <Content Include="samples\stencil\index.html" />
     <Content Include="samples\paintBrush\index.html" />
     <Content Include="samples\stencil\maze128.png" />
