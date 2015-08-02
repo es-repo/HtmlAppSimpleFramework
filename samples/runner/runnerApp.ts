@@ -56,22 +56,32 @@ class Runner extends Sprite {
 
     public tick() {
         this.ticks++;
-        if (this.ticks % 4 == 0) {
-            this.currentImageIndex++;
-            if (this.currentImageIndex >= this.images.length)
-                this.currentImageIndex = 0;
-            this.image = this.images[this.currentImageIndex];
+
+        if (this.isInJumpOrInFall()) {
+            this.currentImageIndex = 2;
+        }
+        else {
+            if (this.ticks % 4 == 0) {
+                this.currentImageIndex++;
+                if (this.currentImageIndex >= this.images.length)
+                    this.currentImageIndex = 0;
+            }
+
+            this.stepSound.play();
         }
 
-        if (this.velocity.y == 0)
-            this.stepSound.play();
+        this.image = this.images[this.currentImageIndex];
     }
 
     public jump() {
-        if (this.velocity.y == 0) {
+        if (!this.isInJumpOrInFall()) {
             this.velocity.y = this.jumpAcc;
             this.jumpSound.play();
         }
+    }
+
+    public isInJumpOrInFall(): boolean {
+        return this.velocity.y != 0;
     }
 
     public isOnWall(wall: Wall): boolean {
@@ -364,7 +374,7 @@ class RunnerApp extends App {
 
     protected drawFrame() {
         super.drawFrame();
-        
+
         if (this.inMenu) {
             this.graphicOutput.drawText("RUNNER", this.graphicOutput.get_width() / 2 - 140, this.graphicOutput.get_height() / 2 - 50, "ffffff", 80, "Lucida Console");
             this.graphicOutput.drawText("Press space or", this.graphicOutput.get_width() / 2 - 125, this.graphicOutput.get_height() / 2 + 50, "ffffff", 30, "Lucida Console");

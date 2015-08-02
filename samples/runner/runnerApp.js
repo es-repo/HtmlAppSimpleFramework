@@ -52,20 +52,27 @@ var Runner = (function (_super) {
     }
     Runner.prototype.tick = function () {
         this.ticks++;
-        if (this.ticks % 4 == 0) {
-            this.currentImageIndex++;
-            if (this.currentImageIndex >= this.images.length)
-                this.currentImageIndex = 0;
-            this.image = this.images[this.currentImageIndex];
+        if (this.isInJumpOrInFall()) {
+            this.currentImageIndex = 2;
         }
-        if (this.velocity.y == 0)
+        else {
+            if (this.ticks % 4 == 0) {
+                this.currentImageIndex++;
+                if (this.currentImageIndex >= this.images.length)
+                    this.currentImageIndex = 0;
+            }
             this.stepSound.play();
+        }
+        this.image = this.images[this.currentImageIndex];
     };
     Runner.prototype.jump = function () {
-        if (this.velocity.y == 0) {
+        if (!this.isInJumpOrInFall()) {
             this.velocity.y = this.jumpAcc;
             this.jumpSound.play();
         }
+    };
+    Runner.prototype.isInJumpOrInFall = function () {
+        return this.velocity.y != 0;
     };
     Runner.prototype.isOnWall = function (wall) {
         var footCenterPoint = new BABYLON.Vector3(this.get_boundingBox()[0].x + this.size.x / 2, this.get_boundingBox()[0].y, this.get_boundingBox()[0].z);
