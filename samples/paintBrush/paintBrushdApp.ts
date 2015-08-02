@@ -21,7 +21,6 @@ class PaintBrushApp extends App {
         var rendererOutput = new RendererOutput(this.image);
         this.imageRenderer2d = new Renderer2d(rendererOutput);
         this.paintTool = PaintTool.brush;
-        this.showDebugInfo = true;
 
         var canvas = document.getElementById("canvas");
 

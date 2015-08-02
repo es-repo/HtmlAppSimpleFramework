@@ -22,7 +22,6 @@ var PaintBrushApp = (function (_super) {
         var rendererOutput = new RendererOutput(this.image);
         this.imageRenderer2d = new Renderer2d(rendererOutput);
         this.paintTool = 0 /* brush */;
-        this.showDebugInfo = true;
         var canvas = document.getElementById("canvas");
         var brushToolRadio = document.getElementById("brushToolRadio");
         brushToolRadio.addEventListener("click", function (ev) {
