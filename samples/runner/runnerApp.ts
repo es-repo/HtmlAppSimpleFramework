@@ -73,6 +73,16 @@ class Runner extends Sprite {
             this.jumpSound.play();
         }
     }
+
+    public isOnWall(wall: Wall): boolean {
+        var footCenterPoint = new BABYLON.Vector3(this.get_boundingBox()[0].x + this.size.x / 2, this.get_boundingBox()[0].y, this.get_boundingBox()[0].z);
+        return RunnerApp.isPointInsideBox(footCenterPoint, wall.get_boundingBox());
+    }
+
+    public isNearCoin(coin: Coin): boolean {
+        return RunnerApp.areBoxesIntersects(this.get_boundingBox(), coin.get_boundingBox());
+    }
+
 }
 
 class Particle extends Circle {
@@ -116,7 +126,7 @@ class RunnerApp extends App {
         }
 
         var scene = new Scene();
-        scene.camera.position.z = -70;
+        //scene.camera.position.z = -70;
         this.walls = [];
         this.coins = [];
         for (var l = 0; l < 4; l++) {
@@ -200,7 +210,7 @@ class RunnerApp extends App {
             for (var l = 0; l < this.walls.length; l++) {
                 for (var i = 0; i < this.walls[l].length; i++) {
                     var w = this.walls[l][i];
-                    if (RunnerApp.isRunnerOnWall(this.runner, w)) {
+                    if (this.runner.isOnWall(w)) {
                         onWall = w;
                         break;
                     }
@@ -301,7 +311,7 @@ class RunnerApp extends App {
     private takeCoin() {
         for (var i = 0; i < this.coins.length; i++) {
             var c = this.coins[i];
-            if (RunnerApp.isRunnerNearCoin(this.runner, c)) {
+            if (this.runner.isNearCoin(c)) {
                 this.runner.gatheredCoins++;
                 this.coins.splice(i, 1);
                 var sceneIdx = this.scene.figures.indexOf(c);
@@ -312,32 +322,6 @@ class RunnerApp extends App {
                 break;
             }
         }
-    }
-
-    private static isRunnerOnWall(runner: Runner, wall: Wall): boolean {
-        return RunnerApp.isPointInsideBox(runner.get_boundingBox()[0], wall.get_boundingBox());
-    }
-
-    private static isRunnerNearCoin(runner: Runner, coin: Coin): boolean {
-        return RunnerApp.areBoxesIntersects(runner.get_boundingBox(), coin.get_boundingBox());
-    }
-
-    private static isPointInsideBox(point: BABYLON.Vector3, box: BABYLON.Vector3[]) {
-        return point.x >= box[0].x && point.x <= box[1].x && point.y >= box[0].y && point.y <= box[1].y;
-    }
-
-    private static areBoxesIntersects(box1: BABYLON.Vector3[], box2: BABYLON.Vector3[]) {
-        return RunnerApp.isPointInsideBox(box1[0], box2) || RunnerApp.isPointInsideBox(box1[1], box2) ||
-            RunnerApp.isPointInsideBox(box2[0], box1) || RunnerApp.isPointInsideBox(box2[1], box1);
-    }
-
-    private static playAudioInLoop(audio) {
-        audio.currentTime = 0;
-        audio.addEventListener('ended', () => {
-            audio.currentTime = 0;
-            audio.play();
-        }, false);
-        audio.play();
     }
 
     public handleKeyboardEvent(eventArgs: KeyboardEventArgs) {
@@ -395,5 +379,23 @@ class RunnerApp extends App {
                 this.graphicOutput.drawText("Game over!", this.graphicOutput.get_width() / 2 - 240, this.graphicOutput.get_height() / 2 + 30, "ffffff", 80, "Lucida Console");
             }
         }
+    }
+
+    public static isPointInsideBox(point: BABYLON.Vector3, box: BABYLON.Vector3[]) {
+        return point.x >= box[0].x && point.x <= box[1].x && point.y >= box[0].y && point.y <= box[1].y;
+    }
+
+    public static areBoxesIntersects(box1: BABYLON.Vector3[], box2: BABYLON.Vector3[]) {
+        return RunnerApp.isPointInsideBox(box1[0], box2) || RunnerApp.isPointInsideBox(box1[1], box2) ||
+            RunnerApp.isPointInsideBox(box2[0], box1) || RunnerApp.isPointInsideBox(box2[1], box1);
+    }
+
+    private static playAudioInLoop(audio) {
+        audio.currentTime = 0;
+        audio.addEventListener('ended',() => {
+            audio.currentTime = 0;
+            audio.play();
+        }, false);
+        audio.play();
     }
 }

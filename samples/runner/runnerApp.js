@@ -67,6 +67,13 @@ var Runner = (function (_super) {
             this.jumpSound.play();
         }
     };
+    Runner.prototype.isOnWall = function (wall) {
+        var footCenterPoint = new BABYLON.Vector3(this.get_boundingBox()[0].x + this.size.x / 2, this.get_boundingBox()[0].y, this.get_boundingBox()[0].z);
+        return RunnerApp.isPointInsideBox(footCenterPoint, wall.get_boundingBox());
+    };
+    Runner.prototype.isNearCoin = function (coin) {
+        return RunnerApp.areBoxesIntersects(this.get_boundingBox(), coin.get_boundingBox());
+    };
     return Runner;
 })(Sprite);
 var Particle = (function (_super) {
@@ -106,7 +113,7 @@ var RunnerApp = (function (_super) {
             return;
         }
         var scene = new Scene();
-        scene.camera.position.z = -70;
+        //scene.camera.position.z = -70;
         this.walls = [];
         this.coins = [];
         for (var l = 0; l < 4; l++) {
@@ -179,7 +186,7 @@ var RunnerApp = (function (_super) {
             for (var l = 0; l < this.walls.length; l++) {
                 for (var i = 0; i < this.walls[l].length; i++) {
                     var w = this.walls[l][i];
-                    if (RunnerApp.isRunnerOnWall(this.runner, w)) {
+                    if (this.runner.isOnWall(w)) {
                         onWall = w;
                         break;
                     }
@@ -268,7 +275,7 @@ var RunnerApp = (function (_super) {
     RunnerApp.prototype.takeCoin = function () {
         for (var i = 0; i < this.coins.length; i++) {
             var c = this.coins[i];
-            if (RunnerApp.isRunnerNearCoin(this.runner, c)) {
+            if (this.runner.isNearCoin(c)) {
                 this.runner.gatheredCoins++;
                 this.coins.splice(i, 1);
                 var sceneIdx = this.scene.figures.indexOf(c);
@@ -279,26 +286,6 @@ var RunnerApp = (function (_super) {
                 break;
             }
         }
-    };
-    RunnerApp.isRunnerOnWall = function (runner, wall) {
-        return RunnerApp.isPointInsideBox(runner.get_boundingBox()[0], wall.get_boundingBox());
-    };
-    RunnerApp.isRunnerNearCoin = function (runner, coin) {
-        return RunnerApp.areBoxesIntersects(runner.get_boundingBox(), coin.get_boundingBox());
-    };
-    RunnerApp.isPointInsideBox = function (point, box) {
-        return point.x >= box[0].x && point.x <= box[1].x && point.y >= box[0].y && point.y <= box[1].y;
-    };
-    RunnerApp.areBoxesIntersects = function (box1, box2) {
-        return RunnerApp.isPointInsideBox(box1[0], box2) || RunnerApp.isPointInsideBox(box1[1], box2) || RunnerApp.isPointInsideBox(box2[0], box1) || RunnerApp.isPointInsideBox(box2[1], box1);
-    };
-    RunnerApp.playAudioInLoop = function (audio) {
-        audio.currentTime = 0;
-        audio.addEventListener('ended', function () {
-            audio.currentTime = 0;
-            audio.play();
-        }, false);
-        audio.play();
     };
     RunnerApp.prototype.handleKeyboardEvent = function (eventArgs) {
         _super.prototype.handleKeyboardEvent.call(this, eventArgs);
@@ -346,6 +333,20 @@ var RunnerApp = (function (_super) {
                 this.graphicOutput.drawText("Game over!", this.graphicOutput.get_width() / 2 - 240, this.graphicOutput.get_height() / 2 + 30, "ffffff", 80, "Lucida Console");
             }
         }
+    };
+    RunnerApp.isPointInsideBox = function (point, box) {
+        return point.x >= box[0].x && point.x <= box[1].x && point.y >= box[0].y && point.y <= box[1].y;
+    };
+    RunnerApp.areBoxesIntersects = function (box1, box2) {
+        return RunnerApp.isPointInsideBox(box1[0], box2) || RunnerApp.isPointInsideBox(box1[1], box2) || RunnerApp.isPointInsideBox(box2[0], box1) || RunnerApp.isPointInsideBox(box2[1], box1);
+    };
+    RunnerApp.playAudioInLoop = function (audio) {
+        audio.currentTime = 0;
+        audio.addEventListener('ended', function () {
+            audio.currentTime = 0;
+            audio.play();
+        }, false);
+        audio.play();
     };
     return RunnerApp;
 })(App);
