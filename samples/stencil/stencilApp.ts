@@ -219,6 +219,7 @@
 
             if (this.showMeshes)
                 this.drawMeshes();
+            console.log(this.imageScale.x + " " + this.imageScale.y);
             this.renderer2d.drawImage(this.imageRenderer2d.output.colorBuffer, this.imagePos.x, this.imagePos.y, this.imagePos.z, this.imageScale.x, this.imageScale.y);
         }
         this.graphicOutput.drawBuffer();
