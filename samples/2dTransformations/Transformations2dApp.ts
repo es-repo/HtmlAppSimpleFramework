@@ -12,6 +12,7 @@
     private starZMax;
     private starZMin;
     private stars: Circle[];
+
     
     constructor(graphicOutput: GraphicOutput, inputControllerHandlers: InputDevices) {
         super(graphicOutput, inputControllerHandlers);
