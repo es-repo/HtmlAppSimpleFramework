@@ -164,9 +164,10 @@ var RunnerApp = (function (_super) {
         this.resources.sounds["start"].play();
         continuation(scene);
     };
-    RunnerApp.prototype.initRunnerPosition = function () {
+    RunnerApp.prototype.initRunner = function () {
         this.runner.position.x = -8;
         this.runner.position.y = this.walls[0][0].get_boundingBox()[1].y + this.runner.size.y / 2;
+        this.runner.velocity.y = 0;
     };
     RunnerApp.prototype.doLogicStep = function () {
         for (var i = 0; i < this.particles.length; i++) {
@@ -311,7 +312,7 @@ var RunnerApp = (function (_super) {
         if (this.inMenu) {
             this.inMenu = false;
             this.gameStarted = true;
-            this.initRunnerPosition();
+            this.initRunner();
             this.rearrangeWalls();
             this.runner.gatheredCoins = 0;
             RunnerApp.playAudioInLoop(this.resources.sounds["song"]);

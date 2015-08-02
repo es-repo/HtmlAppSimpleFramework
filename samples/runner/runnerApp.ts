@@ -185,9 +185,10 @@ class RunnerApp extends App {
         continuation(scene);
     }
 
-    private initRunnerPosition() {
+    private initRunner() {
         this.runner.position.x = -8;
         this.runner.position.y = this.walls[0][0].get_boundingBox()[1].y + this.runner.size.y / 2;
+        this.runner.velocity.y = 0;
     }
 
     protected doLogicStep() {
@@ -357,7 +358,7 @@ class RunnerApp extends App {
         if (this.inMenu) {
             this.inMenu = false;
             this.gameStarted = true;
-            this.initRunnerPosition();
+            this.initRunner();
             this.rearrangeWalls();
             this.runner.gatheredCoins = 0;
             RunnerApp.playAudioInLoop(this.resources.sounds["song"]);
