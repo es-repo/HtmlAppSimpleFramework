@@ -106,6 +106,7 @@ var RunnerApp = (function (_super) {
             return;
         }
         var scene = new Scene();
+        scene.camera.position.z = -70;
         this.walls = [];
         this.coins = [];
         for (var l = 0; l < 4; l++) {
