@@ -13,7 +13,7 @@ var Array1dAs2d = (function () {
         return this.array[this.get_index(x, y)];
     };
     Array1dAs2d.prototype.set = function (x, y, v) {
-        return this.array[this.get_index(x, y)] = v;
+        this.array[this.get_index(x, y)] = v;
     };
     Array1dAs2d.prototype.setAll = function (v) {
         for (var i = 0; i < this.array.length; i++)

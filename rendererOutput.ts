@@ -21,7 +21,7 @@
         this.resetDepthBuffer();
     }
 
-    public checkDepth(x: number, y: number, z: number) {
+    public checkDepth(x: number, y: number, z: number): boolean {
         var i = this.depthBuffer.get_index(x, y);
         if (this.depthBuffer.array[i] >= z) {
             this.depthBuffer.array[i] = z;

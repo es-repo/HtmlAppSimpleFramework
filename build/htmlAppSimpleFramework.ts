@@ -490,16 +490,16 @@ class Array1dAs2d<T> {
         this.step = step;
     }
 
-    public get_index(x: number, y: number) {
+    public get_index(x: number, y: number) : number {
         return (y * this.width + x) * this.step; 
     }
 
-    public get(x: number, y: number) {
+    public get(x: number, y: number): T {
         return this.array[this.get_index(x, y)];
     }
 
     public set(x: number, y: number, v: T) {
-        return this.array[this.get_index(x, y)] = v;
+        this.array[this.get_index(x, y)] = v;
     }
 
     public setAll(v: T) {
@@ -940,7 +940,7 @@ class RendererOutput {
         this.resetDepthBuffer();
     }
 
-    public checkDepth(x: number, y: number, z: number) {
+    public checkDepth(x: number, y: number, z: number): boolean {
         var i = this.depthBuffer.get_index(x, y);
         if (this.depthBuffer.array[i] >= z) {
             this.depthBuffer.array[i] = z;
