@@ -1,4 +1,4 @@
-var __extends = this.__extends || function (d, b) {
+var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     __.prototype = b.prototype;
@@ -13,15 +13,9 @@ var HtmlCanvasOutput = (function (_super) {
         this.canvasImageData = this.canvasContext.getImageData(0, 0, canvas.width, canvas.height);
         this.colorBuffer = new ColorBuffer(this.canvasImageData.data, canvas.width);
     }
-    HtmlCanvasOutput.prototype.get_width = function () {
-        return this.canvasContext.canvas.width;
-    };
-    HtmlCanvasOutput.prototype.get_height = function () {
-        return this.canvasContext.canvas.height;
-    };
-    HtmlCanvasOutput.prototype.get_buffer = function () {
-        return this.colorBuffer;
-    };
+    HtmlCanvasOutput.prototype.get_width = function () { return this.canvasContext.canvas.width; };
+    HtmlCanvasOutput.prototype.get_height = function () { return this.canvasContext.canvas.height; };
+    HtmlCanvasOutput.prototype.get_buffer = function () { return this.colorBuffer; };
     HtmlCanvasOutput.prototype.drawBuffer = function () {
         this.canvasContext.putImageData(this.canvasImageData, 0, 0);
     };

@@ -9,7 +9,7 @@ public class TypeScriptToJavaConverter
             '+', '-', '/', '*', '=', 
             '{', '}', '(', ')', '[', ']', '<',  '>',
             '.', '!', '?', ';', ',',  ':',
-            '|'
+            '|', '&'
         };
 
     private static Regex tokenizeRegex;

@@ -1,4 +1,4 @@
-var __extends = this.__extends || function (d, b) {
+var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     __.prototype = b.prototype;
@@ -21,17 +21,17 @@ var PaintBrushApp = (function (_super) {
         this.image = ColorBuffer.create(imagewWidth, imageHeight);
         var rendererOutput = new RendererOutput(this.image);
         this.imageRenderer2d = new Renderer2d(rendererOutput);
-        this.paintTool = 0 /* brush */;
+        this.paintTool = PaintTool.brush;
         var canvas = document.getElementById("canvas");
         var brushToolRadio = document.getElementById("brushToolRadio");
         brushToolRadio.addEventListener("click", function (ev) {
             canvas.style.cursor = "pointer";
-            _this.paintTool = 0 /* brush */;
+            _this.paintTool = PaintTool.brush;
         });
         var moveToolRadio = document.getElementById("moveToolRadio");
         moveToolRadio.addEventListener("click", function (ev) {
             canvas.style.cursor = "move";
-            _this.paintTool = 1 /* move */;
+            _this.paintTool = PaintTool.move;
         });
         var drunkModeCheckbox = document.getElementById("drunkModeCheckbox");
         drunkModeCheckbox.addEventListener("click", function (ev) {
@@ -97,13 +97,13 @@ var PaintBrushApp = (function (_super) {
         _super.prototype.handleMouseEvent.call(this, eventArgs);
         if (eventArgs.leftButtonClicked) {
             switch (this.paintTool) {
-                case 1 /* move */:
+                case PaintTool.move:
                     var dx = eventArgs.deltaX * this.sprite.size.x / this.sprite.projectedSize.x;
                     var dy = eventArgs.deltaY * this.sprite.size.y / this.sprite.projectedSize.y;
                     this.sprite.position.x += dx;
                     this.sprite.position.y -= dy;
                     break;
-                case 0 /* brush */:
+                case PaintTool.brush:
                     var xy0 = this.displayToImageCoords(eventArgs.x - eventArgs.deltaX, eventArgs.y - eventArgs.deltaY);
                     var xy1 = this.displayToImageCoords(eventArgs.x, eventArgs.y);
                     this.imageRenderer2d.drawLine(xy0.x, xy0.y, xy1.x, xy1.y, this.sprite.projectedPosition.z, this.brushColor);

@@ -1,5 +1,5 @@
 // THE CODE IS BASED ON http://blogs.msdn.com/b/davrous/archive/2013/06/13/tutorial-series-learning-how-to-write-a-3d-soft-engine-from-scratch-in-c-typescript-or-javascript.aspx
-var __extends = this.__extends || function (d, b) {
+var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     __.prototype = b.prototype;
@@ -275,6 +275,7 @@ var Renderer3d = (function (_super) {
         var eu = this.interpolate(data.uc, data.ud, gradient2);
         var sv = this.interpolate(data.va, data.vb, gradient1);
         var ev = this.interpolate(data.vc, data.vd, gradient2);
+        // drawing a line from left (sx) to right (ex) 
         for (var x = Math.max(0, sx), exx = Math.min(ex, this.output.width); x < exx; x++) {
             var gradient = (x - sx) / (ex - sx);
             // Interpolating Z, normal and texture coordinates on X

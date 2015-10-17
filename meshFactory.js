@@ -33,6 +33,8 @@ var MeshFactory = (function () {
             var indicesArray = babylonData.meshes[meshIndex].indices;
             var uvCount = babylonData.meshes[meshIndex].uvCount;
             var verticesStep = 1;
+            // Depending of the number of texture's coordinates per vertex
+            // we're jumping in the vertices array  by 6, 8 & 10 windows frame
             switch (uvCount) {
                 case 0:
                     verticesStep = 6;
@@ -49,6 +51,7 @@ var MeshFactory = (function () {
             // number of faces is logically the size of the array divided by 3 (A, B, C)
             var facesCount = indicesArray.length / 3;
             var mesh = new Mesh(verticesCount, facesCount);
+            // Filling the Vertices array of our mesh first
             for (var index = 0; index < verticesCount; index++) {
                 var x = verticesArray[index * verticesStep];
                 var y = verticesArray[index * verticesStep + 1];
@@ -71,6 +74,7 @@ var MeshFactory = (function () {
                     mesh.vertices[index].textureCoordinates = new BABYLON.Vector2(0, 0);
                 }
             }
+            // Then filling the Faces array
             for (var index = 0; index < facesCount; index++) {
                 var a = indicesArray[index * 3];
                 var b = indicesArray[index * 3 + 1];

@@ -1,4 +1,4 @@
-var __extends = this.__extends || function (d, b) {
+var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     __.prototype = b.prototype;
@@ -346,7 +346,8 @@ var RunnerApp = (function (_super) {
         return point.x >= box[0].x && point.x <= box[1].x && point.y >= box[0].y && point.y <= box[1].y;
     };
     RunnerApp.areBoxesIntersects = function (box1, box2) {
-        return RunnerApp.isPointInsideBox(box1[0], box2) || RunnerApp.isPointInsideBox(box1[1], box2) || RunnerApp.isPointInsideBox(box2[0], box1) || RunnerApp.isPointInsideBox(box2[1], box1);
+        return RunnerApp.isPointInsideBox(box1[0], box2) || RunnerApp.isPointInsideBox(box1[1], box2) ||
+            RunnerApp.isPointInsideBox(box2[0], box1) || RunnerApp.isPointInsideBox(box2[1], box1);
     };
     RunnerApp.playAudioInLoop = function (audio) {
         audio.currentTime = 0;

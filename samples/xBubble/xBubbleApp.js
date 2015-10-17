@@ -1,4 +1,4 @@
-var __extends = this.__extends || function (d, b) {
+var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     __.prototype = b.prototype;
@@ -28,7 +28,11 @@ var XBubbleApp = (function (_super) {
         }
         for (var i = 0; i < xBubbleScene.bubbles.length; i++) {
             var b = xBubbleScene.bubbles[i];
-            b.color = xBubbleScene.player.canAbsorb(b) ? Bubble.canBeAbsorbedColor : xBubbleScene.player.canDamage(b) ? Bubble.canDamageColor : Bubble.canAnnihilateColor;
+            b.color = xBubbleScene.player.canAbsorb(b)
+                ? Bubble.canBeAbsorbedColor
+                : xBubbleScene.player.canDamage(b)
+                    ? Bubble.canDamageColor
+                    : Bubble.canAnnihilateColor;
             var changeBubbleVelocity = Math.random() < 0.05;
             if (changeBubbleVelocity) {
                 var maxSpeed = 0.05;

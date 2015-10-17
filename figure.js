@@ -1,4 +1,4 @@
-var __extends = this.__extends || function (d, b) {
+var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     __.prototype = b.prototype;
@@ -20,8 +20,7 @@ var Figure = (function () {
         this.projectedBoundingBox[0] = BABYLON.Vector3.Zero();
         this.projectedBoundingBox[1] = BABYLON.Vector3.Zero();
     }
-    Figure.prototype.set_size = function (v) {
-    };
+    Figure.prototype.set_size = function (v) { };
     Figure.prototype.get_boundingBox = function () {
         this.boundingBox[0].x = this.position.x - this.size.x / 2;
         this.boundingBox[0].y = this.position.y - this.size.y / 2;
@@ -43,27 +42,13 @@ var Circle = (function (_super) {
     function Circle() {
         _super.apply(this, arguments);
     }
-    Circle.prototype.get_diameter = function () {
-        return this.size.x;
-    };
-    Circle.prototype.set_diameter = function (d) {
-        this.size.x = d;
-    };
-    Circle.prototype.get_projectedDiameter = function () {
-        return this.projectedSize.x;
-    };
-    Circle.prototype.get_radius = function () {
-        return this.get_diameter() / 2.0;
-    };
-    Circle.prototype.set_radius = function (r) {
-        this.set_diameter(r * 2);
-    };
-    Circle.prototype.get_square = function () {
-        return this.get_radius() * this.get_radius() * Math.PI;
-    };
-    Circle.prototype.get_projectedRadius = function () {
-        return this.get_projectedDiameter() / 2.0;
-    };
+    Circle.prototype.get_diameter = function () { return this.size.x; };
+    Circle.prototype.set_diameter = function (d) { this.size.x = d; };
+    Circle.prototype.get_projectedDiameter = function () { return this.projectedSize.x; };
+    Circle.prototype.get_radius = function () { return this.get_diameter() / 2.0; };
+    Circle.prototype.set_radius = function (r) { this.set_diameter(r * 2); };
+    Circle.prototype.get_square = function () { return this.get_radius() * this.get_radius() * Math.PI; };
+    Circle.prototype.get_projectedRadius = function () { return this.get_projectedDiameter() / 2.0; };
     return Circle;
 })(Figure);
 var Sprite = (function (_super) {
