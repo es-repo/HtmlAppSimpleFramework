@@ -28,6 +28,7 @@
     <Content Include="app.css" />
     <Content Include="index.html" />
     <Content Include="samples\3dObject\monkey.jpg" />
+    <Content Include="samples\bezierCurve\index.html" />
     <Content Include="samples\blur\index.html" />
     <Content Include="samples\runner\index.html" />
     <Content Include="samples\runner\resources\images\coin.png" />
@@ -75,6 +76,7 @@
     <TypeScriptCompile Include="renderer3d.ts" />
     <TypeScriptCompile Include="array1dAs2d.ts" />
     <TypeScriptCompile Include="colorBuffer.ts" />
+    <TypeScriptCompile Include="samples\bezierCurve\bezierCurveApp.ts" />
     <TypeScriptCompile Include="samples\blur\blurApp.ts" />
     <TypeScriptCompile Include="imageEffects.ts" />
     <TypeScriptCompile Include="samples\runner\runnerApp.ts" />

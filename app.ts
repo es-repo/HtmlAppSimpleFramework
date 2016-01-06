@@ -15,7 +15,8 @@
         this.graphicOutput = graphicOutput;
         this.phisics = new Phisics();
         this.inputDevices = inputDevices;
-        this.renderer3d = new Renderer3d(this.createRendererOutput());
+        var rendererOutput = new RendererOutput(this.graphicOutput.get_buffer());
+        this.renderer3d = new Renderer3d(rendererOutput);
         this.renderer2d = this.renderer3d.renderer2d;
     }
 
@@ -42,11 +43,7 @@
 
     protected onStart(continuation: () => any) {
         continuation();
-    }
-
-    protected createRendererOutput(): RendererOutput {
-        return new RendererOutput(this.graphicOutput.get_buffer());
-    }
+    }    
 
     protected createScene(continuation: (scene: Scene) => void) {
         continuation(new Scene());

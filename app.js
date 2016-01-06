@@ -4,7 +4,8 @@ var App = (function () {
         this.graphicOutput = graphicOutput;
         this.phisics = new Phisics();
         this.inputDevices = inputDevices;
-        this.renderer3d = new Renderer3d(this.createRendererOutput());
+        var rendererOutput = new RendererOutput(this.graphicOutput.get_buffer());
+        this.renderer3d = new Renderer3d(rendererOutput);
         this.renderer2d = this.renderer3d.renderer2d;
     }
     App.prototype.start = function () {
@@ -27,9 +28,6 @@ var App = (function () {
     };
     App.prototype.onStart = function (continuation) {
         continuation();
-    };
-    App.prototype.createRendererOutput = function () {
-        return new RendererOutput(this.graphicOutput.get_buffer());
     };
     App.prototype.createScene = function (continuation) {
         continuation(new Scene());

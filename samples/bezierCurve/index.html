@@ -1,0 +1,25 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Bezier Curve</title>
+    <link rel="stylesheet" href="../../app.css" type="text/css" />
+    <script src="../../build/htmlAppSimpleFramework.js"></script>
+    </script><script src="bezierCurveApp.js"></script>
+</head>
+<body>
+    <canvas id="canvas" width="640" height="480"></canvas>    
+</body>
+<script>
+    window.onload = function () {
+
+        var inputDevices = new InputDevices();
+        inputDevices.keyboard = new HtmlKeyboard();
+        inputDevices.mouse = new HtmlMouse("canvas");
+        var app = new BezierCurveApp(new HtmlCanvasOutput("canvas"), inputDevices);
+        app.start();        
+    };
+
+</script>
+</html>
