@@ -10,8 +10,7 @@
             this.fromBrowserEventArgs(e, 'mousemove');
         });
 
-        elem.addEventListener('click', e => {
-             
+        elem.addEventListener('click', e => {           
             this.fromBrowserEventArgs(e, 'click');
         });
 
@@ -30,6 +29,7 @@
         }
         else if (eventName == "mousemove") {
             args.leftButtonClicked = evt.buttons == 1;
+            args.move = true;
         }
         else if (eventName == "wheel") {
             args.wheelDelta = evt.deltaY || evt.detail || evt.wheelDelta;

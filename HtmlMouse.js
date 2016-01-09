@@ -27,6 +27,7 @@ var HtmlMouse = (function (_super) {
         }
         else if (eventName == "mousemove") {
             args.leftButtonClicked = evt.buttons == 1;
+            args.move = true;
         }
         else if (eventName == "wheel") {
             args.wheelDelta = evt.deltaY || evt.detail || evt.wheelDelta;

@@ -1,5 +1,6 @@
 ﻿class MouseEventArgs extends InputDeviceEventArgs {
     public leftButtonClicked: boolean;
+    public move: boolean;
     public x: number;
     public y: number;
     public deltaX: number;
