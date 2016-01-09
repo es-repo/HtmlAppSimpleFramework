@@ -33,4 +33,4 @@ Get-Content babylon.math.ts, `
  app.ts `
  | Out-File build\htmlAppSimpleFramework.ts -Encoding UTF8
 
- &("C:\Program Files (x86)\Microsoft SDKs\TypeScript\1.4\tsc") --sourceMap build\htmlAppSimpleFramework.ts
+ &("C:\Program Files (x86)\Microsoft SDKs\TypeScript\1.7\tsc") --sourceMap build\htmlAppSimpleFramework.ts
