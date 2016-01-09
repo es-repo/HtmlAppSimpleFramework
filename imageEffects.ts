@@ -17,9 +17,9 @@ class ImageEffects {
         for (var i = 0; i < input.height; i++) {
             for (var j = 0; j < input.width; j++) {
                 idx = (i * input.width + j) * 4;
-                output.array[idx] = ImageEffects.blurPixelH(j, i, input, weights, wsum, radius, 0);
-                output.array[idx + 1] = ImageEffects.blurPixelH(j, i, input, weights, wsum, radius, 1);
-                output.array[idx + 2] = ImageEffects.blurPixelH(j, i, input, weights, wsum, radius, 2);
+                output.array[idx] = ImageEffects.blurPixelH(j, i, input, weights,  radius, 0);
+                output.array[idx + 1] = ImageEffects.blurPixelH(j, i, input, weights,  radius, 1);
+                output.array[idx + 2] = ImageEffects.blurPixelH(j, i, input, weights,  radius, 2);
                 output.array[idx + 3] = input.array[idx + 3];
             }
         }
@@ -27,36 +27,40 @@ class ImageEffects {
         for (var i = 0; i < input.height; i++) {
             for (var j = 0; j < input.width; j++) {
                 idx = (i * input.width + j) * 4;
-                output.array[idx] = ImageEffects.blurPixelV(j, i, output, weights, wsum, radius, 0);
-                output.array[idx + 1] = ImageEffects.blurPixelV(j, i, output, weights, wsum, radius, 1);
-                output.array[idx + 2] = ImageEffects.blurPixelV(j, i, output, weights, wsum, radius, 2);
+                output.array[idx] = ImageEffects.blurPixelV(j, i, output, weights, radius, 0);
+                output.array[idx + 1] = ImageEffects.blurPixelV(j, i, output, weights, radius, 1);
+                output.array[idx + 2] = ImageEffects.blurPixelV(j, i, output, weights, radius, 2);
             }
         }
     }
 
-    private static blurPixelH(x: number, y: number, simage: ColorBuffer, weights: number[], wsum: number, radius: number, offset: number): number {
+    private static blurPixelH(x: number, y: number, simage: ColorBuffer, weights: number[], radius: number, offset: number): number {
         var s = x - radius;
         if (s < 0) s = 0;
         var e = x + radius;
         if (e > simage.width) e = simage.width;
         var sum = 0;
+        var wsum = 0;
         for (var w = 0, i = s; i < e; i++ , w++) {
             var idx = simage.get_index(i, y) + offset;
             sum += simage.array[idx] * weights[w];
-        }
+            wsum += weights[w];
+        }        
 
         return sum / wsum;
     }
 
-    private static blurPixelV(x: number, y: number, simage: ColorBuffer, weights: number[], wsum: number, radius: number, offset: number): number {
+    private static blurPixelV(x: number, y: number, simage: ColorBuffer, weights: number[], radius: number, offset: number): number {
         var s = y - radius;
         if (s < 0) s = 0;
         var e = y + radius;
         if (e > simage.height) e = simage.height;
         var sum = 0;
+        var wsum = 0;
         for (var w = 0, i = s; i < e; i++ , w++) {
             var idx = simage.get_index(x, i) + offset;
             sum += simage.array[idx] * weights[w];
+            wsum += weights[w];
         }
         return sum / wsum;
     }
