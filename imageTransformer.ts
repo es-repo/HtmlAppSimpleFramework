@@ -53,11 +53,11 @@
         for (var iy = sy, oy = y >> 0, fullpy = 0; iy < input.height && oy < output.height; iy++) {
             fullpy += scaleY;
             if (fullpy >= 1 || (fullpy > 0.1 && iy == input.height - 1)) {
-                while (fullpy > 0.1) {
+                while (fullpy > 0.1 && oy < output.height) {
                     for (var ix = sx, ox = x >> 0, fullpx = 0; ix < input.width && ox < output.width; ix++) {
                         fullpx += scaleX;
-                        if (fullpx >= 1 || (fullpx > 0 && ix == input.width - 1)) {
-                            while (fullpx >= 0.1) {
+                        if (fullpx >= 1 || (fullpx > 0.1 && ix == input.width - 1)) {
+                            while (fullpx > 0.1 && ox < output.width) {
                                 if (filter == null || filter(ox, oy)) {
                                     output.copyColor(ox, oy, input, ix, iy);
                                 }

@@ -87,7 +87,7 @@
     }
 
     public drawImage(image: ColorBuffer, x: number, y: number, z: number, scalex = 1, scaley = 1) {
-        ImageTransformer.scale(image, this.output.colorBuffer, scalex, scaley, x, y,(ox, oy) => this.output.checkDepth(ox, oy, z));
+        ImageTransformer.scale(image, this.output.colorBuffer, scalex, scaley, x, y, (ox, oy) => this.output.checkDepth(ox, oy, z));
     }
 
     public drawTiles(image: ColorBuffer, x: number, y: number, z: number, countH: number, countV = 1, scalex = 1, scaley = 1) {
