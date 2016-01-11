@@ -5,8 +5,6 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var Figure = (function () {
     function Figure() {
-        this.boundingBox = new Array(2);
-        this.projectedBoundingBox = new Array(2);
         this.size = BABYLON.Vector3.Zero();
         this.projectedSize = BABYLON.Vector3.Zero();
         this.position = BABYLON.Vector3.Zero();
@@ -14,26 +12,7 @@ var Figure = (function () {
         this.rotation = BABYLON.Vector3.Zero();
         this.velocity = BABYLON.Vector3.Zero();
         this.color = new BABYLON.Color4(0, 0, 0, 0);
-        this.boundingBox[0] = BABYLON.Vector3.Zero();
-        this.boundingBox[1] = BABYLON.Vector3.Zero();
-        this.projectedBoundingBox[0] = BABYLON.Vector3.Zero();
-        this.projectedBoundingBox[1] = BABYLON.Vector3.Zero();
     }
-    Figure.prototype.set_size = function (v) { };
-    Figure.prototype.get_boundingBox = function () {
-        this.boundingBox[0].x = this.position.x - this.size.x / 2;
-        this.boundingBox[0].y = this.position.y - this.size.y / 2;
-        this.boundingBox[1].x = this.position.x + this.size.x / 2;
-        this.boundingBox[1].y = this.position.y + this.size.y / 2;
-        return this.boundingBox;
-    };
-    Figure.prototype.get_projectedBoundingBox = function () {
-        this.projectedBoundingBox[0].x = this.projectedPosition.x - this.projectedSize.x / 2;
-        this.projectedBoundingBox[0].y = this.projectedPosition.y - this.projectedSize.y / 2;
-        this.projectedBoundingBox[1].x = this.projectedPosition.x + this.projectedSize.x / 2;
-        this.projectedBoundingBox[1].y = this.projectedPosition.y + this.projectedSize.y / 2;
-        return this.projectedBoundingBox;
-    };
     return Figure;
 })();
 var Circle = (function (_super) {
@@ -67,27 +46,5 @@ var Tile = (function (_super) {
         this.countH = 1;
         this.countV = 1;
     }
-    Tile.prototype.get_boundingBox = function () {
-        _super.prototype.get_boundingBox.call(this);
-        this.boundingBox[1].x += (this.size.x * (this.countH - 1));
-        this.boundingBox[1].y += (this.size.y * (this.countV - 1));
-        return this.boundingBox;
-    };
-    Tile.prototype.get_projectedBoundingBox = function () {
-        _super.prototype.get_projectedBoundingBox.call(this);
-        this.projectedBoundingBox[1].x += (this.projectedSize.x * (this.countH - 1));
-        this.projectedBoundingBox[1].y += (this.projectedSize.y * (this.countV - 1));
-        return this.projectedBoundingBox;
-    };
-    Tile.prototype.get_fullSize = function () {
-        this.fullSize.x = this.size.x * this.countH;
-        this.fullSize.y = this.size.y * this.countV;
-        return this.fullSize;
-    };
-    Tile.prototype.get_fullProjectedSize = function () {
-        this.fullProjectedSize.x = this.projectedSize.x * this.countH;
-        this.fullProjectedSize.y = this.projectedSize.y * this.countV;
-        return this.fullProjectedSize;
-    };
     return Tile;
 })(Sprite);

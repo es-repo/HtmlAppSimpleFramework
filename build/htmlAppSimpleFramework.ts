@@ -477,6 +477,24 @@
         }
     }
 }
+module Geom {
+
+    export class Rectangle {
+
+        public static isPointInside(x: number, y: number, rx: number, ry: number, rw: number, rh: number): boolean {
+
+            return x >= rx && x <= (rx + rw) && y >= ry && y <= (ry + rh);            
+        }        
+
+        public static isIntersected(rx1: number, ry1: number, rw1: number, rh1: number,
+            rx2: number, ry2: number, rw2: number, rh2: number): boolean {
+
+            var intersectedByX = (rx2 >= rx1 && rx2 <= rx1 + rw1) || (rx1 >= rx2 && rx1 <= rx2 + rw2);
+            var intersectedByY = (ry2 >= ry1 && ry2 <= ry1 + rh1) || (ry1 >= ry2 && ry1 <= ry2 + rh2);
+            return intersectedByX && intersectedByY;         
+        }
+    }
+}
 class Array1dAs2d<T> {
     public array: T[];
     public width: number;
@@ -601,42 +619,14 @@ class HtmlCanvasOutput extends GraphicOutput {
 } 
 class Figure {
 
-    protected boundingBox: BABYLON.Vector3[] = new Array(2);
-    protected projectedBoundingBox: BABYLON.Vector3[] = new Array(2);
-
-    public set_size(v: BABYLON.Vector3) {}
-
     public size: BABYLON.Vector3 = BABYLON.Vector3.Zero();
     public projectedSize: BABYLON.Vector3 = BABYLON.Vector3.Zero();
     public position: BABYLON.Vector3 = BABYLON.Vector3.Zero();
     public projectedPosition: BABYLON.Vector3 = BABYLON.Vector3.Zero();
-
-    public get_boundingBox(): BABYLON.Vector3[] {
-        this.boundingBox[0].x = this.position.x - this.size.x / 2;
-        this.boundingBox[0].y = this.position.y - this.size.y / 2;
-        this.boundingBox[1].x = this.position.x + this.size.x / 2;
-        this.boundingBox[1].y = this.position.y + this.size.y / 2;
-        return this.boundingBox;
-    }
-
-    public get_projectedBoundingBox(): BABYLON.Vector3[] {
-        this.projectedBoundingBox[0].x = this.projectedPosition.x - this.projectedSize.x / 2;
-        this.projectedBoundingBox[0].y = this.projectedPosition.y - this.projectedSize.y / 2;
-        this.projectedBoundingBox[1].x = this.projectedPosition.x + this.projectedSize.x / 2;
-        this.projectedBoundingBox[1].y = this.projectedPosition.y + this.projectedSize.y / 2;
-        return this.projectedBoundingBox;
-    }
-
+    
     public rotation: BABYLON.Vector3 = BABYLON.Vector3.Zero();
     public velocity: BABYLON.Vector3 = BABYLON.Vector3.Zero();
     public color: BABYLON.Color4 = new BABYLON.Color4(0, 0, 0, 0);
-
-    constructor() {
-        this.boundingBox[0] = BABYLON.Vector3.Zero();
-        this.boundingBox[1] = BABYLON.Vector3.Zero();
-        this.projectedBoundingBox[0] = BABYLON.Vector3.Zero();
-        this.projectedBoundingBox[1] = BABYLON.Vector3.Zero();
-    }
 }
 
 class Circle extends Figure {
@@ -670,33 +660,7 @@ class Tile extends Sprite {
 
     constructor(image) {
         super(image);
-    }
-
-    public get_boundingBox(): BABYLON.Vector3[] {
-        super.get_boundingBox();
-        this.boundingBox[1].x += (this.size.x * (this.countH - 1));
-        this.boundingBox[1].y += (this.size.y * (this.countV - 1));
-        return this.boundingBox;
-    }
-
-    public get_projectedBoundingBox(): BABYLON.Vector3[]{
-        super.get_projectedBoundingBox();
-        this.projectedBoundingBox[1].x += (this.projectedSize.x * (this.countH - 1));
-        this.projectedBoundingBox[1].y += (this.projectedSize.y * (this.countV - 1));
-        return this.projectedBoundingBox;
-    }
-
-    public get_fullSize(): BABYLON.Vector3 {
-        this.fullSize.x = this.size.x * this.countH;
-        this.fullSize.y = this.size.y * this.countV;
-        return this.fullSize;
-    }
-
-    public get_fullProjectedSize(): BABYLON.Vector3 {
-        this.fullProjectedSize.x = this.projectedSize.x * this.countH;
-        this.fullProjectedSize.y = this.projectedSize.y * this.countV;
-        return this.fullProjectedSize;
-    }
+    }    
 }
 interface Vertex {
     normal: BABYLON.Vector3;
@@ -915,7 +879,7 @@ class Camera {
  class Scene {
      public figures: Figure[] = [];
      public camera: Camera = new Camera();
-     public light = new Light();
+     public light = new Light();     
  }
 class RendererOutput {
     
@@ -1051,7 +1015,7 @@ class Renderer2d extends Renderer {
     }
 
     public drawImage(image: ColorBuffer, x: number, y: number, z: number, scalex = 1, scaley = 1) {
-        ImageTransformer.scale(image, this.output.colorBuffer, scalex, scaley, x, y,(ox, oy) => this.output.checkDepth(ox, oy, z));
+        ImageTransformer.scale(image, this.output.colorBuffer, scalex, scaley, x, y, (ox, oy) => this.output.checkDepth(ox, oy, z));
     }
 
     public drawTiles(image: ColorBuffer, x: number, y: number, z: number, countH: number, countV = 1, scalex = 1, scaley = 1) {
@@ -1111,7 +1075,7 @@ class Renderer3d extends Renderer {
         var viewMatrix = BABYLON.Matrix.LookAtLH(camera.position, camera.position.add(camera.direction), camera.up);
         var projectionMatrix = BABYLON.Matrix.PerspectiveFovLH(camera.fov, this.output.width / this.output.height, camera.zNear, camera.zFar);
         return viewMatrix.multiply(projectionMatrix);
-    }
+    }    
 
     public projectScene(scene: Scene) {
 
@@ -1199,7 +1163,7 @@ class Renderer3d extends Renderer {
         }
         else if (f instanceof Mesh) {
             this.drawMesh(<Mesh>f, light);
-        }
+        }        
     }
 
     private drawCircle(circle: Circle) {
@@ -1508,11 +1472,11 @@ class ImageTransformer {
         for (var iy = sy, oy = y >> 0, fullpy = 0; iy < input.height && oy < output.height; iy++) {
             fullpy += scaleY;
             if (fullpy >= 1 || (fullpy > 0.1 && iy == input.height - 1)) {
-                while (fullpy > 0.1) {
+                while (fullpy > 0.1 && oy < output.height) {
                     for (var ix = sx, ox = x >> 0, fullpx = 0; ix < input.width && ox < output.width; ix++) {
                         fullpx += scaleX;
-                        if (fullpx >= 1 || (fullpx > 0 && ix == input.width - 1)) {
-                            while (fullpx >= 0.1) {
+                        if (fullpx >= 1 || (fullpx > 0.1 && ix == input.width - 1)) {
+                            while (fullpx > 0.1 && ox < output.width) {
                                 if (filter == null || filter(ox, oy)) {
                                     output.copyColor(ox, oy, input, ix, iy);
                                 }
@@ -1547,9 +1511,9 @@ class ImageEffects {
         for (var i = 0; i < input.height; i++) {
             for (var j = 0; j < input.width; j++) {
                 idx = (i * input.width + j) * 4;
-                output.array[idx] = ImageEffects.blurPixelH(j, i, input, weights, wsum, radius, 0);
-                output.array[idx + 1] = ImageEffects.blurPixelH(j, i, input, weights, wsum, radius, 1);
-                output.array[idx + 2] = ImageEffects.blurPixelH(j, i, input, weights, wsum, radius, 2);
+                output.array[idx] = ImageEffects.blurPixelH(j, i, input, weights,  radius, 0);
+                output.array[idx + 1] = ImageEffects.blurPixelH(j, i, input, weights,  radius, 1);
+                output.array[idx + 2] = ImageEffects.blurPixelH(j, i, input, weights,  radius, 2);
                 output.array[idx + 3] = input.array[idx + 3];
             }
         }
@@ -1557,36 +1521,40 @@ class ImageEffects {
         for (var i = 0; i < input.height; i++) {
             for (var j = 0; j < input.width; j++) {
                 idx = (i * input.width + j) * 4;
-                output.array[idx] = ImageEffects.blurPixelV(j, i, output, weights, wsum, radius, 0);
-                output.array[idx + 1] = ImageEffects.blurPixelV(j, i, output, weights, wsum, radius, 1);
-                output.array[idx + 2] = ImageEffects.blurPixelV(j, i, output, weights, wsum, radius, 2);
+                output.array[idx] = ImageEffects.blurPixelV(j, i, output, weights, radius, 0);
+                output.array[idx + 1] = ImageEffects.blurPixelV(j, i, output, weights, radius, 1);
+                output.array[idx + 2] = ImageEffects.blurPixelV(j, i, output, weights, radius, 2);
             }
         }
     }
 
-    private static blurPixelH(x: number, y: number, simage: ColorBuffer, weights: number[], wsum: number, radius: number, offset: number): number {
+    private static blurPixelH(x: number, y: number, simage: ColorBuffer, weights: number[], radius: number, offset: number): number {
         var s = x - radius;
         if (s < 0) s = 0;
         var e = x + radius;
         if (e > simage.width) e = simage.width;
         var sum = 0;
+        var wsum = 0;
         for (var w = 0, i = s; i < e; i++ , w++) {
             var idx = simage.get_index(i, y) + offset;
             sum += simage.array[idx] * weights[w];
-        }
+            wsum += weights[w];
+        }        
 
         return sum / wsum;
     }
 
-    private static blurPixelV(x: number, y: number, simage: ColorBuffer, weights: number[], wsum: number, radius: number, offset: number): number {
+    private static blurPixelV(x: number, y: number, simage: ColorBuffer, weights: number[], radius: number, offset: number): number {
         var s = y - radius;
         if (s < 0) s = 0;
         var e = y + radius;
         if (e > simage.height) e = simage.height;
         var sum = 0;
+        var wsum = 0;
         for (var w = 0, i = s; i < e; i++ , w++) {
             var idx = simage.get_index(x, i) + offset;
             sum += simage.array[idx] * weights[w];
+            wsum += weights[w];
         }
         return sum / wsum;
     }
@@ -1689,6 +1657,7 @@ class InputDevice<InputDeviceEventArgsT> {
 }
 class MouseEventArgs extends InputDeviceEventArgs {
     public leftButtonClicked: boolean;
+    public move: boolean;
     public x: number;
     public y: number;
     public deltaX: number;
@@ -1710,8 +1679,7 @@ class HtmlMouse extends Mouse {
             this.fromBrowserEventArgs(e, 'mousemove');
         });
 
-        elem.addEventListener('click', e => {
-             
+        elem.addEventListener('click', e => {           
             this.fromBrowserEventArgs(e, 'click');
         });
 
@@ -1730,6 +1698,7 @@ class HtmlMouse extends Mouse {
         }
         else if (eventName == "mousemove") {
             args.leftButtonClicked = evt.buttons == 1;
+            args.move = true;
         }
         else if (eventName == "wheel") {
             args.wheelDelta = evt.deltaY || evt.detail || evt.wheelDelta;

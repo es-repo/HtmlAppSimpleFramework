@@ -19,6 +19,7 @@
     <UseGlobalApplicationHostFile />
   </PropertyGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="geom.ts" />
     <TypeScriptCompile Include="imageTransformer.ts" />
     <TypeScriptCompile Include="light.ts" />
     <TypeScriptCompile Include="samples\2dTransformations\transformations2dApp.ts" />

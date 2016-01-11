@@ -1,8 +1,7 @@
-var __extends = this.__extends || function (d, b) {
+var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var BABYLON;
 (function (BABYLON) {
@@ -468,6 +467,23 @@ var BABYLON;
     })();
     BABYLON.Matrix = Matrix;
 })(BABYLON || (BABYLON = {}));
+var Geom;
+(function (Geom) {
+    var Rectangle = (function () {
+        function Rectangle() {
+        }
+        Rectangle.isPointInside = function (x, y, rx, ry, rw, rh) {
+            return x >= rx && x <= (rx + rw) && y >= ry && y <= (ry + rh);
+        };
+        Rectangle.isIntersected = function (rx1, ry1, rw1, rh1, rx2, ry2, rw2, rh2) {
+            var intersectedByX = (rx2 >= rx1 && rx2 <= rx1 + rw1) || (rx1 >= rx2 && rx1 <= rx2 + rw2);
+            var intersectedByY = (ry2 >= ry1 && ry2 <= ry1 + rh1) || (ry1 >= ry2 && ry1 <= ry2 + rh2);
+            return intersectedByX && intersectedByY;
+        };
+        return Rectangle;
+    })();
+    Geom.Rectangle = Rectangle;
+})(Geom || (Geom = {}));
 var Array1dAs2d = (function () {
     function Array1dAs2d(array, width, step) {
         if (step === void 0) { step = 1; }
@@ -538,18 +554,10 @@ var ColorBuffer = (function (_super) {
 var GraphicOutput = (function () {
     function GraphicOutput() {
     }
-    GraphicOutput.prototype.get_width = function () {
-        throw new Error("Abstract method.");
-    };
-    GraphicOutput.prototype.get_height = function () {
-        throw new Error("Abstract method.");
-    };
-    GraphicOutput.prototype.get_buffer = function () {
-        throw new Error("Abstract method.");
-    };
-    GraphicOutput.prototype.drawBuffer = function () {
-        throw new Error("Abstract method.");
-    };
+    GraphicOutput.prototype.get_width = function () { throw new Error("Abstract method."); };
+    GraphicOutput.prototype.get_height = function () { throw new Error("Abstract method."); };
+    GraphicOutput.prototype.get_buffer = function () { throw new Error("Abstract method."); };
+    GraphicOutput.prototype.drawBuffer = function () { throw new Error("Abstract method."); };
     GraphicOutput.prototype.drawText = function (text, x, y, color, size, font) {
         if (color === void 0) { color = "ffffff"; }
         if (size === void 0) { size = 30; }
@@ -567,15 +575,9 @@ var HtmlCanvasOutput = (function (_super) {
         this.canvasImageData = this.canvasContext.getImageData(0, 0, canvas.width, canvas.height);
         this.colorBuffer = new ColorBuffer(this.canvasImageData.data, canvas.width);
     }
-    HtmlCanvasOutput.prototype.get_width = function () {
-        return this.canvasContext.canvas.width;
-    };
-    HtmlCanvasOutput.prototype.get_height = function () {
-        return this.canvasContext.canvas.height;
-    };
-    HtmlCanvasOutput.prototype.get_buffer = function () {
-        return this.colorBuffer;
-    };
+    HtmlCanvasOutput.prototype.get_width = function () { return this.canvasContext.canvas.width; };
+    HtmlCanvasOutput.prototype.get_height = function () { return this.canvasContext.canvas.height; };
+    HtmlCanvasOutput.prototype.get_buffer = function () { return this.colorBuffer; };
     HtmlCanvasOutput.prototype.drawBuffer = function () {
         this.canvasContext.putImageData(this.canvasImageData, 0, 0);
     };
@@ -591,8 +593,6 @@ var HtmlCanvasOutput = (function (_super) {
 })(GraphicOutput);
 var Figure = (function () {
     function Figure() {
-        this.boundingBox = new Array(2);
-        this.projectedBoundingBox = new Array(2);
         this.size = BABYLON.Vector3.Zero();
         this.projectedSize = BABYLON.Vector3.Zero();
         this.position = BABYLON.Vector3.Zero();
@@ -600,27 +600,7 @@ var Figure = (function () {
         this.rotation = BABYLON.Vector3.Zero();
         this.velocity = BABYLON.Vector3.Zero();
         this.color = new BABYLON.Color4(0, 0, 0, 0);
-        this.boundingBox[0] = BABYLON.Vector3.Zero();
-        this.boundingBox[1] = BABYLON.Vector3.Zero();
-        this.projectedBoundingBox[0] = BABYLON.Vector3.Zero();
-        this.projectedBoundingBox[1] = BABYLON.Vector3.Zero();
     }
-    Figure.prototype.set_size = function (v) {
-    };
-    Figure.prototype.get_boundingBox = function () {
-        this.boundingBox[0].x = this.position.x - this.size.x / 2;
-        this.boundingBox[0].y = this.position.y - this.size.y / 2;
-        this.boundingBox[1].x = this.position.x + this.size.x / 2;
-        this.boundingBox[1].y = this.position.y + this.size.y / 2;
-        return this.boundingBox;
-    };
-    Figure.prototype.get_projectedBoundingBox = function () {
-        this.projectedBoundingBox[0].x = this.projectedPosition.x - this.projectedSize.x / 2;
-        this.projectedBoundingBox[0].y = this.projectedPosition.y - this.projectedSize.y / 2;
-        this.projectedBoundingBox[1].x = this.projectedPosition.x + this.projectedSize.x / 2;
-        this.projectedBoundingBox[1].y = this.projectedPosition.y + this.projectedSize.y / 2;
-        return this.projectedBoundingBox;
-    };
     return Figure;
 })();
 var Circle = (function (_super) {
@@ -628,27 +608,13 @@ var Circle = (function (_super) {
     function Circle() {
         _super.apply(this, arguments);
     }
-    Circle.prototype.get_diameter = function () {
-        return this.size.x;
-    };
-    Circle.prototype.set_diameter = function (d) {
-        this.size.x = d;
-    };
-    Circle.prototype.get_projectedDiameter = function () {
-        return this.projectedSize.x;
-    };
-    Circle.prototype.get_radius = function () {
-        return this.get_diameter() / 2.0;
-    };
-    Circle.prototype.set_radius = function (r) {
-        this.set_diameter(r * 2);
-    };
-    Circle.prototype.get_square = function () {
-        return this.get_radius() * this.get_radius() * Math.PI;
-    };
-    Circle.prototype.get_projectedRadius = function () {
-        return this.get_projectedDiameter() / 2.0;
-    };
+    Circle.prototype.get_diameter = function () { return this.size.x; };
+    Circle.prototype.set_diameter = function (d) { this.size.x = d; };
+    Circle.prototype.get_projectedDiameter = function () { return this.projectedSize.x; };
+    Circle.prototype.get_radius = function () { return this.get_diameter() / 2.0; };
+    Circle.prototype.set_radius = function (r) { this.set_diameter(r * 2); };
+    Circle.prototype.get_square = function () { return this.get_radius() * this.get_radius() * Math.PI; };
+    Circle.prototype.get_projectedRadius = function () { return this.get_projectedDiameter() / 2.0; };
     return Circle;
 })(Figure);
 var Sprite = (function (_super) {
@@ -668,28 +634,6 @@ var Tile = (function (_super) {
         this.countH = 1;
         this.countV = 1;
     }
-    Tile.prototype.get_boundingBox = function () {
-        _super.prototype.get_boundingBox.call(this);
-        this.boundingBox[1].x += (this.size.x * (this.countH - 1));
-        this.boundingBox[1].y += (this.size.y * (this.countV - 1));
-        return this.boundingBox;
-    };
-    Tile.prototype.get_projectedBoundingBox = function () {
-        _super.prototype.get_projectedBoundingBox.call(this);
-        this.projectedBoundingBox[1].x += (this.projectedSize.x * (this.countH - 1));
-        this.projectedBoundingBox[1].y += (this.projectedSize.y * (this.countV - 1));
-        return this.projectedBoundingBox;
-    };
-    Tile.prototype.get_fullSize = function () {
-        this.fullSize.x = this.size.x * this.countH;
-        this.fullSize.y = this.size.y * this.countV;
-        return this.fullSize;
-    };
-    Tile.prototype.get_fullProjectedSize = function () {
-        this.fullProjectedSize.x = this.projectedSize.x * this.countH;
-        this.fullProjectedSize.y = this.projectedSize.y * this.countV;
-        return this.fullProjectedSize;
-    };
     return Tile;
 })(Sprite);
 var Texture = (function () {
@@ -778,6 +722,8 @@ var MeshFactory = (function () {
             var indicesArray = babylonData.meshes[meshIndex].indices;
             var uvCount = babylonData.meshes[meshIndex].uvCount;
             var verticesStep = 1;
+            // Depending of the number of texture's coordinates per vertex
+            // we're jumping in the vertices array  by 6, 8 & 10 windows frame
             switch (uvCount) {
                 case 0:
                     verticesStep = 6;
@@ -794,6 +740,7 @@ var MeshFactory = (function () {
             // number of faces is logically the size of the array divided by 3 (A, B, C)
             var facesCount = indicesArray.length / 3;
             var mesh = new Mesh(verticesCount, facesCount);
+            // Filling the Vertices array of our mesh first
             for (var index = 0; index < verticesCount; index++) {
                 var x = verticesArray[index * verticesStep];
                 var y = verticesArray[index * verticesStep + 1];
@@ -816,6 +763,7 @@ var MeshFactory = (function () {
                     mesh.vertices[index].textureCoordinates = new BABYLON.Vector2(0, 0);
                 }
             }
+            // Then filling the Faces array
             for (var index = 0; index < facesCount; index++) {
                 var a = indicesArray[index * 3];
                 var b = indicesArray[index * 3 + 1];
@@ -1296,6 +1244,7 @@ var Renderer3d = (function (_super) {
         var eu = this.interpolate(data.uc, data.ud, gradient2);
         var sv = this.interpolate(data.va, data.vb, gradient1);
         var ev = this.interpolate(data.vc, data.vd, gradient2);
+        // drawing a line from left (sx) to right (ex) 
         for (var x = Math.max(0, sx), exx = Math.min(ex, this.output.width); x < exx; x++) {
             var gradient = (x - sx) / (ex - sx);
             // Interpolating Z, normal and texture coordinates on X
@@ -1368,11 +1317,11 @@ var ImageTransformer = (function () {
         for (var iy = sy, oy = y >> 0, fullpy = 0; iy < input.height && oy < output.height; iy++) {
             fullpy += scaleY;
             if (fullpy >= 1 || (fullpy > 0.1 && iy == input.height - 1)) {
-                while (fullpy > 0.1) {
+                while (fullpy > 0.1 && oy < output.height) {
                     for (var ix = sx, ox = x >> 0, fullpx = 0; ix < input.width && ox < output.width; ix++) {
                         fullpx += scaleX;
-                        if (fullpx >= 1 || (fullpx > 0 && ix == input.width - 1)) {
-                            while (fullpx >= 0.1) {
+                        if (fullpx >= 1 || (fullpx > 0.1 && ix == input.width - 1)) {
+                            while (fullpx > 0.1 && ox < output.width) {
                                 if (filter == null || filter(ox, oy)) {
                                     output.copyColor(ox, oy, input, ix, iy);
                                 }
@@ -1406,22 +1355,22 @@ var ImageEffects = (function () {
         for (var i = 0; i < input.height; i++) {
             for (var j = 0; j < input.width; j++) {
                 idx = (i * input.width + j) * 4;
-                output.array[idx] = ImageEffects.blurPixelH(j, i, input, weights, wsum, radius, 0);
-                output.array[idx + 1] = ImageEffects.blurPixelH(j, i, input, weights, wsum, radius, 1);
-                output.array[idx + 2] = ImageEffects.blurPixelH(j, i, input, weights, wsum, radius, 2);
+                output.array[idx] = ImageEffects.blurPixelH(j, i, input, weights, radius, 0);
+                output.array[idx + 1] = ImageEffects.blurPixelH(j, i, input, weights, radius, 1);
+                output.array[idx + 2] = ImageEffects.blurPixelH(j, i, input, weights, radius, 2);
                 output.array[idx + 3] = input.array[idx + 3];
             }
         }
         for (var i = 0; i < input.height; i++) {
             for (var j = 0; j < input.width; j++) {
                 idx = (i * input.width + j) * 4;
-                output.array[idx] = ImageEffects.blurPixelV(j, i, output, weights, wsum, radius, 0);
-                output.array[idx + 1] = ImageEffects.blurPixelV(j, i, output, weights, wsum, radius, 1);
-                output.array[idx + 2] = ImageEffects.blurPixelV(j, i, output, weights, wsum, radius, 2);
+                output.array[idx] = ImageEffects.blurPixelV(j, i, output, weights, radius, 0);
+                output.array[idx + 1] = ImageEffects.blurPixelV(j, i, output, weights, radius, 1);
+                output.array[idx + 2] = ImageEffects.blurPixelV(j, i, output, weights, radius, 2);
             }
         }
     };
-    ImageEffects.blurPixelH = function (x, y, simage, weights, wsum, radius, offset) {
+    ImageEffects.blurPixelH = function (x, y, simage, weights, radius, offset) {
         var s = x - radius;
         if (s < 0)
             s = 0;
@@ -1429,13 +1378,15 @@ var ImageEffects = (function () {
         if (e > simage.width)
             e = simage.width;
         var sum = 0;
+        var wsum = 0;
         for (var w = 0, i = s; i < e; i++, w++) {
             var idx = simage.get_index(i, y) + offset;
             sum += simage.array[idx] * weights[w];
+            wsum += weights[w];
         }
         return sum / wsum;
     };
-    ImageEffects.blurPixelV = function (x, y, simage, weights, wsum, radius, offset) {
+    ImageEffects.blurPixelV = function (x, y, simage, weights, radius, offset) {
         var s = y - radius;
         if (s < 0)
             s = 0;
@@ -1443,9 +1394,11 @@ var ImageEffects = (function () {
         if (e > simage.height)
             e = simage.height;
         var sum = 0;
+        var wsum = 0;
         for (var w = 0, i = s; i < e; i++, w++) {
             var idx = simage.get_index(x, i) + offset;
             sum += simage.array[idx] * weights[w];
+            wsum += weights[w];
         }
         return sum / wsum;
     };
@@ -1570,6 +1523,7 @@ var HtmlMouse = (function (_super) {
         }
         else if (eventName == "mousemove") {
             args.leftButtonClicked = evt.buttons == 1;
+            args.move = true;
         }
         else if (eventName == "wheel") {
             args.wheelDelta = evt.deltaY || evt.detail || evt.wheelDelta;
@@ -1620,7 +1574,8 @@ var App = (function () {
         this.graphicOutput = graphicOutput;
         this.phisics = new Phisics();
         this.inputDevices = inputDevices;
-        this.renderer3d = new Renderer3d(this.createRendererOutput());
+        var rendererOutput = new RendererOutput(this.graphicOutput.get_buffer());
+        this.renderer3d = new Renderer3d(rendererOutput);
         this.renderer2d = this.renderer3d.renderer2d;
     }
     App.prototype.start = function () {
@@ -1643,9 +1598,6 @@ var App = (function () {
     };
     App.prototype.onStart = function (continuation) {
         continuation();
-    };
-    App.prototype.createRendererOutput = function () {
-        return new RendererOutput(this.graphicOutput.get_buffer());
     };
     App.prototype.createScene = function (continuation) {
         continuation(new Scene());
