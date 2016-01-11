@@ -34,27 +34,23 @@ var Renderer3d = (function (_super) {
             this.projectFigure(f, worldMatrix, transformMatrix, rotMatrix);
         }
     };
-    Renderer3d.prototype.projectVector = function (v, transMat) {
+    Renderer3d.prototype.projectVector = function (v, transMat, pv) {
         var point = BABYLON.Vector3.TransformCoordinates(v, transMat);
-        var x = point.x * this.output.width + this.output.width / 2.0;
-        var y = -point.y * this.output.height + this.output.height / 2.0;
-        return (new BABYLON.Vector3(x, y, point.z));
+        pv.x = point.x * this.output.width + this.output.widthHalf;
+        pv.y = -point.y * this.output.height + this.output.heightHalf;
+        pv.z = point.z;
     };
-    Renderer3d.prototype.projectVertex = function (vertex, transMat, worldMat, rotMatrix) {
-        var worldCoords = BABYLON.Vector3.TransformCoordinates(vertex.coordinates, worldMat);
-        var normal = BABYLON.Vector3.TransformCoordinates(vertex.normal, rotMatrix);
-        var coord = this.projectVector(vertex.coordinates, transMat);
-        return ({
-            coordinates: coord,
-            normal: normal,
-            worldCoordinates: worldCoords,
-            textureCoordinates: vertex.textureCoordinates
-        });
+    Renderer3d.prototype.projectVertex = function (vertex, transMat, worldMat, rotMatrix, pvertex) {
+        pvertex.worldCoordinates = BABYLON.Vector3.TransformCoordinates(vertex.coordinates, worldMat);
+        pvertex.normal = BABYLON.Vector3.TransformCoordinates(vertex.normal, rotMatrix);
+        this.projectVector(vertex.coordinates, transMat, pvertex.coordinates);
+        pvertex.textureCoordinates = vertex.textureCoordinates;
     };
     Renderer3d.prototype.projectFigure = function (f, worldMatrix, transformMatrix, rotMatrix) {
-        f.projectedPosition = this.projectVector(f.position, transformMatrix);
+        this.projectVector(f.position, transformMatrix, f.projectedPosition);
         var posPlusSize = f.position.add(f.size);
-        var posPlusSizeProjected = this.projectVector(posPlusSize, transformMatrix);
+        var posPlusSizeProjected = BABYLON.Vector3.Zero();
+        this.projectVector(posPlusSize, transformMatrix, posPlusSizeProjected);
         f.projectedSize.x = (posPlusSizeProjected.x - f.projectedPosition.x) * 2;
         f.projectedSize.y = (-posPlusSizeProjected.y + f.projectedPosition.y) * 2;
         if (f instanceof Mesh) {
@@ -64,12 +60,9 @@ var Renderer3d = (function (_super) {
     Renderer3d.prototype.projectMesh = function (m, worldMatrix, transformMatrix, rotMatrix) {
         for (var indexFaces = 0; indexFaces < m.faces.length; indexFaces++) {
             var currentFace = m.faces[indexFaces];
-            var vertexA = m.vertices[currentFace.a];
-            var vertexB = m.vertices[currentFace.b];
-            var vertexC = m.vertices[currentFace.c];
-            m.projectedVertices[currentFace.a] = this.projectVertex(vertexA, transformMatrix, worldMatrix, rotMatrix);
-            m.projectedVertices[currentFace.b] = this.projectVertex(vertexB, transformMatrix, worldMatrix, rotMatrix);
-            m.projectedVertices[currentFace.c] = this.projectVertex(vertexC, transformMatrix, worldMatrix, rotMatrix);
+            this.projectVertex(m.vertices[currentFace.a], transformMatrix, worldMatrix, rotMatrix, m.projectedVertices[currentFace.a]);
+            this.projectVertex(m.vertices[currentFace.b], transformMatrix, worldMatrix, rotMatrix, m.projectedVertices[currentFace.b]);
+            this.projectVertex(m.vertices[currentFace.c], transformMatrix, worldMatrix, rotMatrix, m.projectedVertices[currentFace.c]);
         }
     };
     Renderer3d.prototype.drawScene = function (scene) {

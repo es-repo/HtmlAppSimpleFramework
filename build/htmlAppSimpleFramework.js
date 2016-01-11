@@ -603,6 +603,27 @@ var Figure = (function () {
     }
     return Figure;
 })();
+var Figure3d = (function (_super) {
+    __extends(Figure3d, _super);
+    function Figure3d() {
+        _super.apply(this, arguments);
+    }
+    return Figure3d;
+})(Figure);
+var Figure2d = (function (_super) {
+    __extends(Figure2d, _super);
+    function Figure2d() {
+        _super.apply(this, arguments);
+    }
+    return Figure2d;
+})(Figure);
+var Rectangle = (function (_super) {
+    __extends(Rectangle, _super);
+    function Rectangle() {
+        _super.apply(this, arguments);
+    }
+    return Rectangle;
+})(Figure2d);
 var Circle = (function (_super) {
     __extends(Circle, _super);
     function Circle() {
@@ -616,7 +637,7 @@ var Circle = (function (_super) {
     Circle.prototype.get_square = function () { return this.get_radius() * this.get_radius() * Math.PI; };
     Circle.prototype.get_projectedRadius = function () { return this.get_projectedDiameter() / 2.0; };
     return Circle;
-})(Figure);
+})(Figure2d);
 var Sprite = (function (_super) {
     __extends(Sprite, _super);
     function Sprite(image) {
@@ -624,7 +645,7 @@ var Sprite = (function (_super) {
         this.image = image;
     }
     return Sprite;
-})(Figure);
+})(Rectangle);
 var Tile = (function (_super) {
     __extends(Tile, _super);
     function Tile(image) {
@@ -681,12 +702,26 @@ var Mesh = (function (_super) {
     __extends(Mesh, _super);
     function Mesh(verticesCount, facesCount) {
         _super.call(this);
-        this.vertices = new Array(verticesCount);
-        this.projectedVertices = new Array(verticesCount);
+        this.vertices = Mesh.createArrayOfVertexes(verticesCount);
+        this.projectedVertices = Mesh.createArrayOfVertexes(verticesCount);
         this.faces = new Array(facesCount);
     }
+    Mesh.createVertex = function () {
+        return {
+            normal: BABYLON.Vector3.Zero(),
+            coordinates: BABYLON.Vector3.Zero(),
+            worldCoordinates: BABYLON.Vector3.Zero(),
+            textureCoordinates: BABYLON.Vector2.Zero()
+        };
+    };
+    Mesh.createArrayOfVertexes = function (c) {
+        var a = new Array(c);
+        for (var i = 0; i < c; i++)
+            a[i] = Mesh.createVertex();
+        return a;
+    };
     return Mesh;
-})(Figure);
+})(Figure3d);
 // THE CODE IS BASED ON http://blogs.msdn.com/b/davrous/archive/2013/06/13/tutorial-series-learning-how-to-write-a-3d-soft-engine-from-scratch-in-c-typescript-or-javascript.aspx
 var MeshFactory = (function () {
     function MeshFactory() {
@@ -827,7 +862,9 @@ var RendererOutput = (function () {
         this.depthBufferMaxValue = 10000000;
         this.colorBuffer = colorBuffer;
         this.width = colorBuffer.width;
+        this.widthHalf = this.width / 2;
         this.height = colorBuffer.height;
+        this.heightHalf = this.height / 2;
         this.depthBuffer = new Array1dAs2d(new Array(colorBuffer.width * colorBuffer.height), colorBuffer.width);
         this.resetDepthBuffer();
     }
@@ -1004,27 +1041,23 @@ var Renderer3d = (function (_super) {
             this.projectFigure(f, worldMatrix, transformMatrix, rotMatrix);
         }
     };
-    Renderer3d.prototype.projectVector = function (v, transMat) {
+    Renderer3d.prototype.projectVector = function (v, transMat, pv) {
         var point = BABYLON.Vector3.TransformCoordinates(v, transMat);
-        var x = point.x * this.output.width + this.output.width / 2.0;
-        var y = -point.y * this.output.height + this.output.height / 2.0;
-        return (new BABYLON.Vector3(x, y, point.z));
+        pv.x = point.x * this.output.width + this.output.widthHalf;
+        pv.y = -point.y * this.output.height + this.output.heightHalf;
+        pv.z = point.z;
     };
-    Renderer3d.prototype.projectVertex = function (vertex, transMat, worldMat, rotMatrix) {
-        var worldCoords = BABYLON.Vector3.TransformCoordinates(vertex.coordinates, worldMat);
-        var normal = BABYLON.Vector3.TransformCoordinates(vertex.normal, rotMatrix);
-        var coord = this.projectVector(vertex.coordinates, transMat);
-        return ({
-            coordinates: coord,
-            normal: normal,
-            worldCoordinates: worldCoords,
-            textureCoordinates: vertex.textureCoordinates
-        });
+    Renderer3d.prototype.projectVertex = function (vertex, transMat, worldMat, rotMatrix, pvertex) {
+        pvertex.worldCoordinates = BABYLON.Vector3.TransformCoordinates(vertex.coordinates, worldMat);
+        pvertex.normal = BABYLON.Vector3.TransformCoordinates(vertex.normal, rotMatrix);
+        this.projectVector(vertex.coordinates, transMat, pvertex.coordinates);
+        pvertex.textureCoordinates = vertex.textureCoordinates;
     };
     Renderer3d.prototype.projectFigure = function (f, worldMatrix, transformMatrix, rotMatrix) {
-        f.projectedPosition = this.projectVector(f.position, transformMatrix);
+        this.projectVector(f.position, transformMatrix, f.projectedPosition);
         var posPlusSize = f.position.add(f.size);
-        var posPlusSizeProjected = this.projectVector(posPlusSize, transformMatrix);
+        var posPlusSizeProjected = BABYLON.Vector3.Zero();
+        this.projectVector(posPlusSize, transformMatrix, posPlusSizeProjected);
         f.projectedSize.x = (posPlusSizeProjected.x - f.projectedPosition.x) * 2;
         f.projectedSize.y = (-posPlusSizeProjected.y + f.projectedPosition.y) * 2;
         if (f instanceof Mesh) {
@@ -1034,12 +1067,9 @@ var Renderer3d = (function (_super) {
     Renderer3d.prototype.projectMesh = function (m, worldMatrix, transformMatrix, rotMatrix) {
         for (var indexFaces = 0; indexFaces < m.faces.length; indexFaces++) {
             var currentFace = m.faces[indexFaces];
-            var vertexA = m.vertices[currentFace.a];
-            var vertexB = m.vertices[currentFace.b];
-            var vertexC = m.vertices[currentFace.c];
-            m.projectedVertices[currentFace.a] = this.projectVertex(vertexA, transformMatrix, worldMatrix, rotMatrix);
-            m.projectedVertices[currentFace.b] = this.projectVertex(vertexB, transformMatrix, worldMatrix, rotMatrix);
-            m.projectedVertices[currentFace.c] = this.projectVertex(vertexC, transformMatrix, worldMatrix, rotMatrix);
+            this.projectVertex(m.vertices[currentFace.a], transformMatrix, worldMatrix, rotMatrix, m.projectedVertices[currentFace.a]);
+            this.projectVertex(m.vertices[currentFace.b], transformMatrix, worldMatrix, rotMatrix, m.projectedVertices[currentFace.b]);
+            this.projectVertex(m.vertices[currentFace.c], transformMatrix, worldMatrix, rotMatrix, m.projectedVertices[currentFace.c]);
         }
     };
     Renderer3d.prototype.drawScene = function (scene) {

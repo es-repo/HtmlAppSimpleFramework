@@ -15,6 +15,27 @@ var Figure = (function () {
     }
     return Figure;
 })();
+var Figure3d = (function (_super) {
+    __extends(Figure3d, _super);
+    function Figure3d() {
+        _super.apply(this, arguments);
+    }
+    return Figure3d;
+})(Figure);
+var Figure2d = (function (_super) {
+    __extends(Figure2d, _super);
+    function Figure2d() {
+        _super.apply(this, arguments);
+    }
+    return Figure2d;
+})(Figure);
+var Rectangle = (function (_super) {
+    __extends(Rectangle, _super);
+    function Rectangle() {
+        _super.apply(this, arguments);
+    }
+    return Rectangle;
+})(Figure2d);
 var Circle = (function (_super) {
     __extends(Circle, _super);
     function Circle() {
@@ -28,7 +49,7 @@ var Circle = (function (_super) {
     Circle.prototype.get_square = function () { return this.get_radius() * this.get_radius() * Math.PI; };
     Circle.prototype.get_projectedRadius = function () { return this.get_projectedDiameter() / 2.0; };
     return Circle;
-})(Figure);
+})(Figure2d);
 var Sprite = (function (_super) {
     __extends(Sprite, _super);
     function Sprite(image) {
@@ -36,7 +57,7 @@ var Sprite = (function (_super) {
         this.image = image;
     }
     return Sprite;
-})(Figure);
+})(Rectangle);
 var Tile = (function (_super) {
     __extends(Tile, _super);
     function Tile(image) {

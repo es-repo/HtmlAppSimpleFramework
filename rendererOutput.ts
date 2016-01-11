@@ -5,11 +5,15 @@
     public depthBuffer: Array1dAs2d<number>;
     public width: number;
     public height: number;
+    public widthHalf: number;
+    public heightHalf: number;
 
     constructor(colorBuffer: ColorBuffer) {
         this.colorBuffer = colorBuffer;
         this.width = colorBuffer.width;
+        this.widthHalf = this.width / 2;
         this.height = colorBuffer.height;
+        this.heightHalf = this.height / 2; 
         this.depthBuffer = new Array1dAs2d(new Array(colorBuffer.width * colorBuffer.height), colorBuffer.width);
         this.resetDepthBuffer();
     }

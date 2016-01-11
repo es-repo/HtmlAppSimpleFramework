@@ -3,7 +3,9 @@ var RendererOutput = (function () {
         this.depthBufferMaxValue = 10000000;
         this.colorBuffer = colorBuffer;
         this.width = colorBuffer.width;
+        this.widthHalf = this.width / 2;
         this.height = colorBuffer.height;
+        this.heightHalf = this.height / 2;
         this.depthBuffer = new Array1dAs2d(new Array(colorBuffer.width * colorBuffer.height), colorBuffer.width);
         this.resetDepthBuffer();
     }

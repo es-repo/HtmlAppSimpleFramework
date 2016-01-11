@@ -10,7 +10,17 @@
     public color: BABYLON.Color4 = new BABYLON.Color4(0, 0, 0, 0);
 }
 
-class Circle extends Figure {
+class Figure3d extends Figure {
+}
+
+class Figure2d extends Figure {
+}
+
+class Rectangle extends Figure2d {
+
+}
+
+class Circle extends Figure2d {
 
     public get_diameter(): number { return this.size.x; }
     public set_diameter(d: number) { this.size.x = d; }
@@ -22,7 +32,7 @@ class Circle extends Figure {
     public get_projectedRadius(): number { return this.get_projectedDiameter() / 2.0; }
 }
 
-class Sprite extends Figure {
+class Sprite extends Rectangle {
     public image: ColorBuffer;
 
     constructor(image: ColorBuffer) {
