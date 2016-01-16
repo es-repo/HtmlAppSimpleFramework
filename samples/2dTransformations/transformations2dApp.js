@@ -28,7 +28,7 @@ var Transformations2dApp = (function (_super) {
             var s = new Circle();
             s.color = new BABYLON.Color4(1, 1, 1, 1);
             s.position = new BABYLON.Vector3(x, y, z);
-            s.set_radius(r);
+            s.radius = r;
             scene.figures.push(s);
             this.stars.push(s);
         }

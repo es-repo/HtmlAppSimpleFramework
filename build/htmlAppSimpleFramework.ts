@@ -42,9 +42,11 @@
         public negate(): Vector2 {
             return new Vector2(-this.x, -this.y);
         }
+
         public scale(scale: number): Vector2 {
             return new Vector2(this.x * scale, this.y * scale);
         }
+
         public equals(otherVector: Vector2): boolean {
             return this.x === otherVector.x && this.y === otherVector.y;
         }
@@ -112,34 +114,46 @@
 
         public toString(): string {
             return "{X: " + this.x + " Y:" + this.y + " Z:" + this.z + "}";
+        }        
+
+        public add(vector: Vector3): Vector3 {
+            this.x += vector.x;
+            this.y += vector.y;
+            this.z += vector.z;
+            return this;            
         }
-        public add(otherVector: Vector3): Vector3 {
-            return new Vector3(this.x + otherVector.x, this.y + otherVector.y, this.z + otherVector.z);
-        }
+
         public subtract(otherVector: Vector3): Vector3 {
             return new Vector3(this.x - otherVector.x, this.y - otherVector.y, this.z - otherVector.z);
-        }
-        public negate(): Vector3 {
-            return new Vector3(-this.x, -this.y, -this.z);
-        }
+        }        
+
         public scale(scale: number): Vector3 {
-            return new Vector3(this.x * scale, this.y * scale, this.z * scale);
+            this.x *= scale;
+            this.y *= scale;
+            this.z *= scale;
+            return this;
         }
+
         public equals(otherVector: Vector3): boolean {
             return this.x === otherVector.x && this.y === otherVector.y && this.z === otherVector.z;
         }
+
         public multiply(otherVector: Vector3): Vector3 {
             return new Vector3(this.x * otherVector.x, this.y * otherVector.y, this.z * otherVector.z);
         }
+
         public divide(otherVector: Vector3): Vector3 {
             return new Vector3(this.x / otherVector.x, this.y / otherVector.y, this.z / otherVector.z);
         }
+
         public length(): number {
             return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
         }
+
         public lengthSquared(): number {
             return (this.x * this.x + this.y * this.y + this.z * this.z);
         }
+
         public normalize(): void {
             var len = this.length();
             if (len === 0) {
@@ -151,22 +165,29 @@
             this.z *= num;
         }
 
-        static FromArray(array, offset): Vector3 {
-            if (!offset) {
-                offset = 0;
-            }
-            return new Vector3(array[offset], array[offset + 1], array[offset + 2]);
+        static from(v: Vector3): Vector3 {
+            return new Vector3(v.x, v.y, v.z);
         }
-        static Zero(): Vector3 {
+
+        static zero(): Vector3 {
             return new Vector3(0, 0, 0);
         }
-        static Up(): Vector3 {
+
+        static up(): Vector3 {
             return new Vector3(0, 1.0, 0);
         }
-        static Copy(source: Vector3): Vector3 {
-            return new Vector3(source.x, source.y, source.z);
+
+        public copyTo(v: Vector3) {
+            v.x = this.x;
+            v.y = this.y;
+            v.z = this.z;            
         }
-        static TransformCoordinates(vector: Vector3, transformation: Matrix, resultVector: Vector3) {
+
+        //public copy(): Vector3 {
+        //    return new Vector3(this.x, this.y, this.z);
+        //}
+
+        static transformCoordinates(vector: Vector3, transformation: Matrix, resultVector: Vector3) {
             var x = (vector.x * transformation.m[0]) + (vector.y * transformation.m[4]) + (vector.z * transformation.m[8]) + transformation.m[12];
             var y = (vector.x * transformation.m[1]) + (vector.y * transformation.m[5]) + (vector.z * transformation.m[9]) + transformation.m[13];
             var z = (vector.x * transformation.m[2]) + (vector.y * transformation.m[6]) + (vector.z * transformation.m[10]) + transformation.m[14];
@@ -175,30 +196,30 @@
             resultVector.y = y / w;
             resultVector.z = z / w;            
         }
-        static TransformNormal(vector: Vector3, transformation: Matrix): Vector3 {
+
+        static transformNormal(vector: Vector3, transformation: Matrix): Vector3 {
             var x = (vector.x * transformation.m[0]) + (vector.y * transformation.m[4]) + (vector.z * transformation.m[8]);
             var y = (vector.x * transformation.m[1]) + (vector.y * transformation.m[5]) + (vector.z * transformation.m[9]);
             var z = (vector.x * transformation.m[2]) + (vector.y * transformation.m[6]) + (vector.z * transformation.m[10]);
             return new Vector3(x, y, z);
         }
-        public static Dot(left: Vector3, right: Vector3): number {
+
+        public static dot(left: Vector3, right: Vector3): number {
             return (left.x * right.x + left.y * right.y + left.z * right.z);
         }
-        static Cross(left: Vector3, right: Vector3) {
+
+        static cross(left: Vector3, right: Vector3) {
             var x = left.y * right.z - left.z * right.y;
             var y = left.z * right.x - left.x * right.z;
             var z = left.x * right.y - left.y * right.x;
             return new Vector3(x, y, z);
+        }        
+
+        static distance(value1: Vector3, value2: Vector3): number {
+            return Math.sqrt(Vector3.distanceSquared(value1, value2));
         }
-        static Normalize(vector: Vector3): Vector3 {
-            var newVector = Vector3.Copy(vector);
-            newVector.normalize();
-            return newVector;
-        }
-        static Distance(value1: Vector3, value2: Vector3): number {
-            return Math.sqrt(Vector3.DistanceSquared(value1, value2));
-        }
-        static DistanceSquared(value1: Vector3, value2: Vector3): number {
+
+        static distanceSquared(value1: Vector3, value2: Vector3): number {
             var x = value1.x - value2.x;
             var y = value1.y - value2.y;
             var z = value1.z - value2.z;
@@ -421,13 +442,13 @@
         static LookAtLH(eye: Vector3, target: Vector3, up: Vector3): Matrix {
             var zAxis = target.subtract(eye);
             zAxis.normalize();
-            var xAxis = Vector3.Cross(up, zAxis);
+            var xAxis = Vector3.cross(up, zAxis);
             xAxis.normalize();
-            var yAxis = Vector3.Cross(zAxis, xAxis);
+            var yAxis = Vector3.cross(zAxis, xAxis);
             yAxis.normalize();
-            var ex = -Vector3.Dot(xAxis, eye);
-            var ey = -Vector3.Dot(yAxis, eye);
-            var ez = -Vector3.Dot(zAxis, eye);
+            var ex = -Vector3.dot(xAxis, eye);
+            var ey = -Vector3.dot(yAxis, eye);
+            var ez = -Vector3.dot(zAxis, eye);
             return Matrix.FromValues(xAxis.x, yAxis.x, zAxis.x, 0, xAxis.y, yAxis.y, zAxis.y, 0, xAxis.z, yAxis.z, zAxis.z, 0, ex, ey, ez, 1);
         }
         static PerspectiveLH(width: number, height: number, znear: number, zfar: number): Matrix {
@@ -621,14 +642,19 @@ class HtmlCanvasOutput extends GraphicOutput {
 } 
 class Figure {
 
-    public size: BABYLON.Vector3 = BABYLON.Vector3.Zero();
-    public projectedSize: BABYLON.Vector3 = BABYLON.Vector3.Zero();
-    public position: BABYLON.Vector3 = BABYLON.Vector3.Zero();
-    public projectedPosition: BABYLON.Vector3 = BABYLON.Vector3.Zero();
+    public position: BABYLON.Vector3 = BABYLON.Vector3.zero();
+    public projectedPosition: BABYLON.Vector3 = BABYLON.Vector3.zero();
     
-    public rotation: BABYLON.Vector3 = BABYLON.Vector3.Zero();
-    public velocity: BABYLON.Vector3 = BABYLON.Vector3.Zero();
+    public rotation: BABYLON.Vector3 = BABYLON.Vector3.zero();
+    public velocity: BABYLON.Vector3 = BABYLON.Vector3.zero();
     public color: BABYLON.Color4 = new BABYLON.Color4(0, 0, 0, 0);
+
+    public project(renderer: Renderer3d, worldMatrix: BABYLON.Matrix, transformMatrix: BABYLON.Matrix, rotMatrix: BABYLON.Matrix) {
+        renderer.projectVector(this.position, transformMatrix, this.projectedPosition);
+    }
+
+    public draw(renderer: Renderer3d, light: Light) {        
+    }
 }
 
 class Figure3d extends Figure {
@@ -639,18 +665,42 @@ class Figure2d extends Figure {
 
 class Rectangle extends Figure2d {
 
+    private tempVector: BABYLON.Vector3 = BABYLON.Vector3.zero();
+    private tempVector2: BABYLON.Vector3 = BABYLON.Vector3.zero();  
+
+    public size: BABYLON.Vector3 = BABYLON.Vector3.zero();
+    public projectedSize: BABYLON.Vector3 = BABYLON.Vector3.zero();    
+
+    public project(renderer: Renderer3d, worldMatrix: BABYLON.Matrix, transformMatrix: BABYLON.Matrix, rotMatrix: BABYLON.Matrix) {
+        super.project(renderer, worldMatrix, transformMatrix, rotMatrix);
+        this.position.copyTo(this.tempVector);
+        this.tempVector.add(this.size);
+        renderer.projectVector(this.tempVector, transformMatrix, this.tempVector2);
+        this.projectedSize.x = (this.tempVector2.x - this.projectedPosition.x) * 2;
+        this.projectedSize.y = (-this.tempVector2.y + this.projectedPosition.y) * 2;
+    } 
 }
 
 class Circle extends Figure2d {
 
-    public get_diameter(): number { return this.size.x; }
-    public set_diameter(d: number) { this.size.x = d; }
-    public get_projectedDiameter(): number { return this.projectedSize.x; }
+    private tempVector: BABYLON.Vector3 = BABYLON.Vector3.zero();
+    private tempVector2: BABYLON.Vector3 = BABYLON.Vector3.zero();   
+   
+    public radius: number;
+    public projectedRadius: number;    
+    public get_square() { return this.radius * this.radius * Math.PI; }   
+    
+    public project(renderer: Renderer3d, worldMatrix: BABYLON.Matrix, transformMatrix: BABYLON.Matrix, rotMatrix: BABYLON.Matrix) {
+        super.project(renderer, worldMatrix, transformMatrix, rotMatrix);
+        this.position.copyTo(this.tempVector);
+        this.tempVector.x += this.radius;
+        renderer.projectVector(this.tempVector, transformMatrix, this.tempVector2);
+        this.projectedRadius = (this.tempVector2.x - this.projectedPosition.x) * 2;
+    } 
 
-    public get_radius(): number { return this.get_diameter() / 2.0; }
-    public set_radius(r: number) { this.set_diameter(r * 2); }
-    public get_square() { return this.get_radius() * this.get_radius() * Math.PI; }
-    public get_projectedRadius(): number { return this.get_projectedDiameter() / 2.0; }
+    public draw(renderer: Renderer3d, light: Light) {
+        renderer.renderer2d.drawFilledCircle(this.projectedPosition.x, this.projectedPosition.y, this.projectedPosition.z, this.projectedRadius, this.color);
+    }
 }
 
 class Sprite extends Rectangle {
@@ -660,18 +710,34 @@ class Sprite extends Rectangle {
         super();
         this.image = image;
     }
+
+    public draw(renderer: Renderer3d, light: Light) {
+        var scalex = this.projectedSize.x / this.image.width;
+        var scaley = this.projectedSize.y / this.image.height;
+        var x = this.projectedPosition.x - this.projectedSize.x / 2;
+        var y = this.projectedPosition.y - this.projectedSize.y / 2;
+        renderer.renderer2d.drawImage(this.image, x, y, this.projectedPosition.z, scalex, scaley);
+    }
 }
 
 class Tile extends Sprite {
     
-    private fullSize: BABYLON.Vector3 = BABYLON.Vector3.Zero();
-    private fullProjectedSize: BABYLON.Vector3 = BABYLON.Vector3.Zero();
+    private fullSize: BABYLON.Vector3 = BABYLON.Vector3.zero();
+    private fullProjectedSize: BABYLON.Vector3 = BABYLON.Vector3.zero();
 
     public countH = 1;
     public countV = 1;
 
     constructor(image) {
         super(image);
+    }    
+
+    public draw(renderer: Renderer3d, light: Light) {
+        var scalex = this.projectedSize.x / this.image.width;
+        var scaley = this.projectedSize.y / this.image.height;
+        var x = this.projectedPosition.x - this.projectedSize.x / 2;
+        var y = this.projectedPosition.y - this.projectedSize.y / 2;
+        renderer.renderer2d.drawTiles(this.image, x, y, this.projectedPosition.z, this.countH, this.countV, scalex, scaley);
     }    
 }
 interface Vertex {
@@ -753,11 +819,44 @@ class Mesh extends Figure3d {
         this.faces = new Array(facesCount);
     }
 
+    public project(renderer: Renderer3d, worldMatrix: BABYLON.Matrix, transformMatrix: BABYLON.Matrix, rotMatrix: BABYLON.Matrix) {
+        for (var indexFaces = 0; indexFaces < this.faces.length; indexFaces++) {
+            var currentFace = this.faces[indexFaces];
+            renderer.projectVertex(this.vertices[currentFace.a], transformMatrix, worldMatrix, rotMatrix, this.projectedVertices[currentFace.a]);
+            renderer.projectVertex(this.vertices[currentFace.b], transformMatrix, worldMatrix, rotMatrix, this.projectedVertices[currentFace.b]);
+            renderer.projectVertex(this.vertices[currentFace.c], transformMatrix, worldMatrix, rotMatrix, this.projectedVertices[currentFace.c]);
+        }
+    }
+
+    public draw(renderer: Renderer3d, light: Light) {
+
+        var linesColor = new BABYLON.Color4(1, 1, 1, 1);
+
+        for (var indexFaces = 0; indexFaces < this.faces.length; indexFaces++) {
+            var currentFace = this.faces[indexFaces];
+
+            var va = this.projectedVertices[currentFace.a];
+            var vb = this.projectedVertices[currentFace.b];
+            var vc = this.projectedVertices[currentFace.c];
+
+            if (renderer.renderSettings.showFaces) {
+                var color = new BABYLON.Color4(1, 1, 1, 1);
+                renderer.drawTriangle(va, vb, vc, color, light, renderer.renderSettings.showTextures ? this.texture : null);
+            }
+
+            if (renderer.renderSettings.showMeshes) {
+                renderer.renderer2d.drawLine(va.coordinates.x, va.coordinates.y, vb.coordinates.x, vb.coordinates.y, 0, linesColor);
+                renderer.renderer2d.drawLine(vb.coordinates.x, vb.coordinates.y, vc.coordinates.x, vc.coordinates.y, 0, linesColor);
+                renderer.renderer2d.drawLine(vc.coordinates.x, vc.coordinates.y, va.coordinates.x, va.coordinates.y, 0, linesColor);
+            }
+        }
+    }
+
     private static createVertex(): Vertex {
         return {
-            normal: BABYLON.Vector3.Zero(),
-            coordinates: BABYLON.Vector3.Zero(),
-            worldCoordinates: BABYLON.Vector3.Zero(),
+            normal: BABYLON.Vector3.zero(),
+            coordinates: BABYLON.Vector3.zero(),
+            worldCoordinates: BABYLON.Vector3.zero(),
             textureCoordinates: BABYLON.Vector2.Zero()
         }
     }
@@ -896,7 +995,7 @@ class MeshFactory {
 class Camera {
     public position: BABYLON.Vector3 = new BABYLON.Vector3(0, 0, -100);
     public direction: BABYLON.Vector3 = new BABYLON.Vector3(0, 0, 1);
-    public up: BABYLON.Vector3 = BABYLON.Vector3.Up();
+    public up: BABYLON.Vector3 = BABYLON.Vector3.up();
     public fov: number = 0.78;
     public zNear: number = 0.01;
     public zFar: number = 1.0;
@@ -1103,8 +1202,9 @@ class Renderer3d extends Renderer {
         this.renderer2d = new Renderer2d(output);
     }
 
-    public get_viewProjectionMatrix(camera: Camera) {
-        var viewMatrix = BABYLON.Matrix.LookAtLH(camera.position, camera.position.add(camera.direction), camera.up);
+    private get_viewProjectionMatrix(camera: Camera) {
+        var target = BABYLON.Vector3.from(camera.position);        
+        var viewMatrix = BABYLON.Matrix.LookAtLH(camera.position, target.add(camera.direction), camera.up);
         var projectionMatrix = BABYLON.Matrix.PerspectiveFovLH(camera.fov, this.output.width / this.output.height, camera.zNear, camera.zFar);
         return viewMatrix.multiply(projectionMatrix);
     }
@@ -1121,116 +1221,33 @@ class Renderer3d extends Renderer {
             var worldMatrix = rotMatrix.multiply(BABYLON.Matrix.Translation(f.position.x, f.position.y, f.position.z));
             var transformMatrix = worldMatrix.multiply(viewProjectionMatrix);
 
-            this.projectFigure(f, worldMatrix, transformMatrix, rotMatrix);
+            f.project(this, worldMatrix, transformMatrix, rotMatrix);
         }
     }
 
     public projectVector(v: BABYLON.Vector3, transMat: BABYLON.Matrix, pv: BABYLON.Vector3) {    
-        BABYLON.Vector3.TransformCoordinates(v, transMat, pv);
+        BABYLON.Vector3.transformCoordinates(v, transMat, pv);
         pv.x = pv.x * this.output.width + this.output.widthHalf;
         pv.y = -pv.y * this.output.height + this.output.heightHalf;
         pv.z = pv.z;                      
     }
 
-    private projectVertex(vertex: Vertex, transMat: BABYLON.Matrix, worldMat: BABYLON.Matrix, rotMatrix: BABYLON.Matrix, pvertex: Vertex) {
+    public projectVertex(vertex: Vertex, transMat: BABYLON.Matrix, worldMat: BABYLON.Matrix, rotMatrix: BABYLON.Matrix, pvertex: Vertex) {
 
-        BABYLON.Vector3.TransformCoordinates(vertex.coordinates, worldMat, pvertex.worldCoordinates);
-        BABYLON.Vector3.TransformCoordinates(vertex.normal, rotMatrix, pvertex.normal);        
+        BABYLON.Vector3.transformCoordinates(vertex.coordinates, worldMat, pvertex.worldCoordinates);
+        BABYLON.Vector3.transformCoordinates(vertex.normal, rotMatrix, pvertex.normal);        
         this.projectVector(vertex.coordinates, transMat, pvertex.coordinates);
         pvertex.textureCoordinates = vertex.textureCoordinates;
-    }
-
-    public projectFigure(f: Figure, worldMatrix: BABYLON.Matrix, transformMatrix: BABYLON.Matrix, rotMatrix: BABYLON.Matrix) {
-           
-        this.projectVector(f.position, transformMatrix, f.projectedPosition);
-        var posPlusSize = f.position.add(f.size);
-        var posPlusSizeProjected = BABYLON.Vector3.Zero();
-        this.projectVector(posPlusSize, transformMatrix, posPlusSizeProjected);
-        f.projectedSize.x = (posPlusSizeProjected.x - f.projectedPosition.x) * 2;
-        f.projectedSize.y = (-posPlusSizeProjected.y + f.projectedPosition.y) * 2;
-
-        if (f instanceof Mesh) {
-            this.projectMesh(<Mesh>f, worldMatrix, transformMatrix, rotMatrix);
-        }
-    }
-
-    private projectMesh(m: Mesh, worldMatrix: BABYLON.Matrix, transformMatrix: BABYLON.Matrix, rotMatrix: BABYLON.Matrix) {
-
-        for (var indexFaces = 0; indexFaces < m.faces.length; indexFaces++) {
-            var currentFace = m.faces[indexFaces];
-            this.projectVertex(m.vertices[currentFace.a], transformMatrix, worldMatrix, rotMatrix, m.projectedVertices[currentFace.a]);
-            this.projectVertex(m.vertices[currentFace.b], transformMatrix, worldMatrix, rotMatrix, m.projectedVertices[currentFace.b]);
-            this.projectVertex(m.vertices[currentFace.c], transformMatrix, worldMatrix, rotMatrix, m.projectedVertices[currentFace.c]);            
-        }
-    }
+    }        
 
     public drawScene(scene: Scene) {
 
         this.projectScene(scene);
 
         for (var i = 0; i < scene.figures.length; i++) {
-            this.drawFigure(scene.figures[i], scene.light);
+            scene.figures[i].draw(this, scene.light);            
         } 
-    }
-
-    public drawFigure(f: Figure, light: Light) {
-        if (f instanceof Circle) {
-            this.drawCircle(<Circle>f);
-        }
-        else if (f instanceof Tile) {
-            this.drawTile(<Tile>f);
-        }
-        else if (f instanceof Sprite) {
-            this.drawSprite(<Sprite>f);
-        }
-        else if (f instanceof Mesh) {
-            this.drawMesh(<Mesh>f, light);
-        }
-    }
-
-    private drawCircle(circle: Circle) {
-        this.renderer2d.drawFilledCircle(circle.projectedPosition.x, circle.projectedPosition.y, circle.projectedPosition.z, circle.get_projectedRadius(), circle.color);
-    }
-
-    private drawSprite(sprite: Sprite) {
-        var scalex = sprite.projectedSize.x / sprite.image.width;
-        var scaley = sprite.projectedSize.y / sprite.image.height;
-        var x = sprite.projectedPosition.x - sprite.projectedSize.x / 2;
-        var y = sprite.projectedPosition.y - sprite.projectedSize.y / 2;
-        this.renderer2d.drawImage(sprite.image, x, y, sprite.projectedPosition.z, scalex, scaley);
-    }
-
-    private drawTile(tile: Tile) {
-        var scalex = tile.projectedSize.x / tile.image.width;
-        var scaley = tile.projectedSize.y / tile.image.height;
-        var x = tile.projectedPosition.x - tile.projectedSize.x / 2;
-        var y = tile.projectedPosition.y - tile.projectedSize.y / 2;
-        this.renderer2d.drawTiles(tile.image, x, y, tile.projectedPosition.z, tile.countH, tile.countV, scalex, scaley);
-    }
-
-    private drawMesh(m: Mesh, light: Light) {
-
-        var linesColor = new BABYLON.Color4(1, 1, 1, 1);
-                
-        for (var indexFaces = 0; indexFaces < m.faces.length; indexFaces++) {
-            var currentFace = m.faces[indexFaces];
-
-            var va = m.projectedVertices[currentFace.a];
-            var vb = m.projectedVertices[currentFace.b];
-            var vc = m.projectedVertices[currentFace.c];
-
-            if (this.renderSettings.showFaces) {
-                var color = new BABYLON.Color4(1, 1, 1, 1);
-                this.drawTriangle(va, vb, vc, color, light, this.renderSettings.showTextures ? m.texture : null);
-            }
-
-            if (this.renderSettings.showMeshes) {
-                this.renderer2d.drawLine(va.coordinates.x, va.coordinates.y, vb.coordinates.x, vb.coordinates.y, 0, linesColor);
-                this.renderer2d.drawLine(vb.coordinates.x, vb.coordinates.y, vc.coordinates.x, vc.coordinates.y, 0, linesColor);
-                this.renderer2d.drawLine(vc.coordinates.x, vc.coordinates.y, va.coordinates.x, va.coordinates.y, 0, linesColor);
-            }
-        }
-    }
+    }    
 
     public drawTriangle(v1: Vertex, v2: Vertex, v3: Vertex, color: BABYLON.Color4, light: Light, texture?: Texture): void {
         // Sorting the points in order to always have this order on screen p1, p2 & p3
@@ -1436,7 +1453,7 @@ class Renderer3d extends Renderer {
     private computeNDotL(vertex: BABYLON.Vector3, normal: BABYLON.Vector3, lightPosition: BABYLON.Vector3): number {
         var lightDirection = lightPosition.subtract(vertex);
         lightDirection.normalize();
-        return Math.max(0, BABYLON.Vector3.Dot(normal, lightDirection));
+        return Math.max(0, BABYLON.Vector3.dot(normal, lightDirection));
     }
 }
 class ImageTransformer {
@@ -1627,7 +1644,7 @@ class Phisics {
     private areCirclesCollided(c1: Circle, c2: Circle): boolean {
         var xd = c1.position.x - c2.position.x;
         var yd = c1.position.y - c2.position.y;
-        var rs = c1.get_radius() + c2.get_radius();
+        var rs = c1.radius + c2.radius;
         return xd * xd + yd * yd <= rs * rs;
     }
 } 

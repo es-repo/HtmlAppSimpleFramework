@@ -104,17 +104,20 @@ var BABYLON;
         Vector3.prototype.toString = function () {
             return "{X: " + this.x + " Y:" + this.y + " Z:" + this.z + "}";
         };
-        Vector3.prototype.add = function (otherVector) {
-            return new Vector3(this.x + otherVector.x, this.y + otherVector.y, this.z + otherVector.z);
+        Vector3.prototype.add = function (vector) {
+            this.x += vector.x;
+            this.y += vector.y;
+            this.z += vector.z;
+            return this;
         };
         Vector3.prototype.subtract = function (otherVector) {
             return new Vector3(this.x - otherVector.x, this.y - otherVector.y, this.z - otherVector.z);
         };
-        Vector3.prototype.negate = function () {
-            return new Vector3(-this.x, -this.y, -this.z);
-        };
         Vector3.prototype.scale = function (scale) {
-            return new Vector3(this.x * scale, this.y * scale, this.z * scale);
+            this.x *= scale;
+            this.y *= scale;
+            this.z *= scale;
+            return this;
         };
         Vector3.prototype.equals = function (otherVector) {
             return this.x === otherVector.x && this.y === otherVector.y && this.z === otherVector.z;
@@ -141,22 +144,24 @@ var BABYLON;
             this.y *= num;
             this.z *= num;
         };
-        Vector3.FromArray = function (array, offset) {
-            if (!offset) {
-                offset = 0;
-            }
-            return new Vector3(array[offset], array[offset + 1], array[offset + 2]);
+        Vector3.from = function (v) {
+            return new Vector3(v.x, v.y, v.z);
         };
-        Vector3.Zero = function () {
+        Vector3.zero = function () {
             return new Vector3(0, 0, 0);
         };
-        Vector3.Up = function () {
+        Vector3.up = function () {
             return new Vector3(0, 1.0, 0);
         };
-        Vector3.Copy = function (source) {
-            return new Vector3(source.x, source.y, source.z);
+        Vector3.prototype.copyTo = function (v) {
+            v.x = this.x;
+            v.y = this.y;
+            v.z = this.z;
         };
-        Vector3.TransformCoordinates = function (vector, transformation, resultVector) {
+        //public copy(): Vector3 {
+        //    return new Vector3(this.x, this.y, this.z);
+        //}
+        Vector3.transformCoordinates = function (vector, transformation, resultVector) {
             var x = (vector.x * transformation.m[0]) + (vector.y * transformation.m[4]) + (vector.z * transformation.m[8]) + transformation.m[12];
             var y = (vector.x * transformation.m[1]) + (vector.y * transformation.m[5]) + (vector.z * transformation.m[9]) + transformation.m[13];
             var z = (vector.x * transformation.m[2]) + (vector.y * transformation.m[6]) + (vector.z * transformation.m[10]) + transformation.m[14];
@@ -165,30 +170,25 @@ var BABYLON;
             resultVector.y = y / w;
             resultVector.z = z / w;
         };
-        Vector3.TransformNormal = function (vector, transformation) {
+        Vector3.transformNormal = function (vector, transformation) {
             var x = (vector.x * transformation.m[0]) + (vector.y * transformation.m[4]) + (vector.z * transformation.m[8]);
             var y = (vector.x * transformation.m[1]) + (vector.y * transformation.m[5]) + (vector.z * transformation.m[9]);
             var z = (vector.x * transformation.m[2]) + (vector.y * transformation.m[6]) + (vector.z * transformation.m[10]);
             return new Vector3(x, y, z);
         };
-        Vector3.Dot = function (left, right) {
+        Vector3.dot = function (left, right) {
             return (left.x * right.x + left.y * right.y + left.z * right.z);
         };
-        Vector3.Cross = function (left, right) {
+        Vector3.cross = function (left, right) {
             var x = left.y * right.z - left.z * right.y;
             var y = left.z * right.x - left.x * right.z;
             var z = left.x * right.y - left.y * right.x;
             return new Vector3(x, y, z);
         };
-        Vector3.Normalize = function (vector) {
-            var newVector = Vector3.Copy(vector);
-            newVector.normalize();
-            return newVector;
+        Vector3.distance = function (value1, value2) {
+            return Math.sqrt(Vector3.distanceSquared(value1, value2));
         };
-        Vector3.Distance = function (value1, value2) {
-            return Math.sqrt(Vector3.DistanceSquared(value1, value2));
-        };
-        Vector3.DistanceSquared = function (value1, value2) {
+        Vector3.distanceSquared = function (value1, value2) {
             var x = value1.x - value2.x;
             var y = value1.y - value2.y;
             var z = value1.z - value2.z;
@@ -409,13 +409,13 @@ var BABYLON;
         Matrix.LookAtLH = function (eye, target, up) {
             var zAxis = target.subtract(eye);
             zAxis.normalize();
-            var xAxis = Vector3.Cross(up, zAxis);
+            var xAxis = Vector3.cross(up, zAxis);
             xAxis.normalize();
-            var yAxis = Vector3.Cross(zAxis, xAxis);
+            var yAxis = Vector3.cross(zAxis, xAxis);
             yAxis.normalize();
-            var ex = -Vector3.Dot(xAxis, eye);
-            var ey = -Vector3.Dot(yAxis, eye);
-            var ez = -Vector3.Dot(zAxis, eye);
+            var ex = -Vector3.dot(xAxis, eye);
+            var ey = -Vector3.dot(yAxis, eye);
+            var ez = -Vector3.dot(zAxis, eye);
             return Matrix.FromValues(xAxis.x, yAxis.x, zAxis.x, 0, xAxis.y, yAxis.y, zAxis.y, 0, xAxis.z, yAxis.z, zAxis.z, 0, ex, ey, ez, 1);
         };
         Matrix.PerspectiveLH = function (width, height, znear, zfar) {
@@ -595,14 +595,17 @@ var HtmlCanvasOutput = (function (_super) {
 })(GraphicOutput);
 var Figure = (function () {
     function Figure() {
-        this.size = BABYLON.Vector3.Zero();
-        this.projectedSize = BABYLON.Vector3.Zero();
-        this.position = BABYLON.Vector3.Zero();
-        this.projectedPosition = BABYLON.Vector3.Zero();
-        this.rotation = BABYLON.Vector3.Zero();
-        this.velocity = BABYLON.Vector3.Zero();
+        this.position = BABYLON.Vector3.zero();
+        this.projectedPosition = BABYLON.Vector3.zero();
+        this.rotation = BABYLON.Vector3.zero();
+        this.velocity = BABYLON.Vector3.zero();
         this.color = new BABYLON.Color4(0, 0, 0, 0);
     }
+    Figure.prototype.project = function (renderer, worldMatrix, transformMatrix, rotMatrix) {
+        renderer.projectVector(this.position, transformMatrix, this.projectedPosition);
+    };
+    Figure.prototype.draw = function (renderer, light) {
+    };
     return Figure;
 })();
 var Figure3d = (function (_super) {
@@ -623,21 +626,39 @@ var Rectangle = (function (_super) {
     __extends(Rectangle, _super);
     function Rectangle() {
         _super.apply(this, arguments);
+        this.tempVector = BABYLON.Vector3.zero();
+        this.tempVector2 = BABYLON.Vector3.zero();
+        this.size = BABYLON.Vector3.zero();
+        this.projectedSize = BABYLON.Vector3.zero();
     }
+    Rectangle.prototype.project = function (renderer, worldMatrix, transformMatrix, rotMatrix) {
+        _super.prototype.project.call(this, renderer, worldMatrix, transformMatrix, rotMatrix);
+        this.position.copyTo(this.tempVector);
+        this.tempVector.add(this.size);
+        renderer.projectVector(this.tempVector, transformMatrix, this.tempVector2);
+        this.projectedSize.x = (this.tempVector2.x - this.projectedPosition.x) * 2;
+        this.projectedSize.y = (-this.tempVector2.y + this.projectedPosition.y) * 2;
+    };
     return Rectangle;
 })(Figure2d);
 var Circle = (function (_super) {
     __extends(Circle, _super);
     function Circle() {
         _super.apply(this, arguments);
+        this.tempVector = BABYLON.Vector3.zero();
+        this.tempVector2 = BABYLON.Vector3.zero();
     }
-    Circle.prototype.get_diameter = function () { return this.size.x; };
-    Circle.prototype.set_diameter = function (d) { this.size.x = d; };
-    Circle.prototype.get_projectedDiameter = function () { return this.projectedSize.x; };
-    Circle.prototype.get_radius = function () { return this.get_diameter() / 2.0; };
-    Circle.prototype.set_radius = function (r) { this.set_diameter(r * 2); };
-    Circle.prototype.get_square = function () { return this.get_radius() * this.get_radius() * Math.PI; };
-    Circle.prototype.get_projectedRadius = function () { return this.get_projectedDiameter() / 2.0; };
+    Circle.prototype.get_square = function () { return this.radius * this.radius * Math.PI; };
+    Circle.prototype.project = function (renderer, worldMatrix, transformMatrix, rotMatrix) {
+        _super.prototype.project.call(this, renderer, worldMatrix, transformMatrix, rotMatrix);
+        this.position.copyTo(this.tempVector);
+        this.tempVector.x += this.radius;
+        renderer.projectVector(this.tempVector, transformMatrix, this.tempVector2);
+        this.projectedRadius = (this.tempVector2.x - this.projectedPosition.x) * 2;
+    };
+    Circle.prototype.draw = function (renderer, light) {
+        renderer.renderer2d.drawFilledCircle(this.projectedPosition.x, this.projectedPosition.y, this.projectedPosition.z, this.projectedRadius, this.color);
+    };
     return Circle;
 })(Figure2d);
 var Sprite = (function (_super) {
@@ -646,17 +667,31 @@ var Sprite = (function (_super) {
         _super.call(this);
         this.image = image;
     }
+    Sprite.prototype.draw = function (renderer, light) {
+        var scalex = this.projectedSize.x / this.image.width;
+        var scaley = this.projectedSize.y / this.image.height;
+        var x = this.projectedPosition.x - this.projectedSize.x / 2;
+        var y = this.projectedPosition.y - this.projectedSize.y / 2;
+        renderer.renderer2d.drawImage(this.image, x, y, this.projectedPosition.z, scalex, scaley);
+    };
     return Sprite;
 })(Rectangle);
 var Tile = (function (_super) {
     __extends(Tile, _super);
     function Tile(image) {
         _super.call(this, image);
-        this.fullSize = BABYLON.Vector3.Zero();
-        this.fullProjectedSize = BABYLON.Vector3.Zero();
+        this.fullSize = BABYLON.Vector3.zero();
+        this.fullProjectedSize = BABYLON.Vector3.zero();
         this.countH = 1;
         this.countV = 1;
     }
+    Tile.prototype.draw = function (renderer, light) {
+        var scalex = this.projectedSize.x / this.image.width;
+        var scaley = this.projectedSize.y / this.image.height;
+        var x = this.projectedPosition.x - this.projectedSize.x / 2;
+        var y = this.projectedPosition.y - this.projectedSize.y / 2;
+        renderer.renderer2d.drawTiles(this.image, x, y, this.projectedPosition.z, this.countH, this.countV, scalex, scaley);
+    };
     return Tile;
 })(Sprite);
 var Texture = (function () {
@@ -708,11 +743,37 @@ var Mesh = (function (_super) {
         this.projectedVertices = Mesh.createArrayOfVertexes(verticesCount);
         this.faces = new Array(facesCount);
     }
+    Mesh.prototype.project = function (renderer, worldMatrix, transformMatrix, rotMatrix) {
+        for (var indexFaces = 0; indexFaces < this.faces.length; indexFaces++) {
+            var currentFace = this.faces[indexFaces];
+            renderer.projectVertex(this.vertices[currentFace.a], transformMatrix, worldMatrix, rotMatrix, this.projectedVertices[currentFace.a]);
+            renderer.projectVertex(this.vertices[currentFace.b], transformMatrix, worldMatrix, rotMatrix, this.projectedVertices[currentFace.b]);
+            renderer.projectVertex(this.vertices[currentFace.c], transformMatrix, worldMatrix, rotMatrix, this.projectedVertices[currentFace.c]);
+        }
+    };
+    Mesh.prototype.draw = function (renderer, light) {
+        var linesColor = new BABYLON.Color4(1, 1, 1, 1);
+        for (var indexFaces = 0; indexFaces < this.faces.length; indexFaces++) {
+            var currentFace = this.faces[indexFaces];
+            var va = this.projectedVertices[currentFace.a];
+            var vb = this.projectedVertices[currentFace.b];
+            var vc = this.projectedVertices[currentFace.c];
+            if (renderer.renderSettings.showFaces) {
+                var color = new BABYLON.Color4(1, 1, 1, 1);
+                renderer.drawTriangle(va, vb, vc, color, light, renderer.renderSettings.showTextures ? this.texture : null);
+            }
+            if (renderer.renderSettings.showMeshes) {
+                renderer.renderer2d.drawLine(va.coordinates.x, va.coordinates.y, vb.coordinates.x, vb.coordinates.y, 0, linesColor);
+                renderer.renderer2d.drawLine(vb.coordinates.x, vb.coordinates.y, vc.coordinates.x, vc.coordinates.y, 0, linesColor);
+                renderer.renderer2d.drawLine(vc.coordinates.x, vc.coordinates.y, va.coordinates.x, va.coordinates.y, 0, linesColor);
+            }
+        }
+    };
     Mesh.createVertex = function () {
         return {
-            normal: BABYLON.Vector3.Zero(),
-            coordinates: BABYLON.Vector3.Zero(),
-            worldCoordinates: BABYLON.Vector3.Zero(),
+            normal: BABYLON.Vector3.zero(),
+            coordinates: BABYLON.Vector3.zero(),
+            worldCoordinates: BABYLON.Vector3.zero(),
             textureCoordinates: BABYLON.Vector2.Zero()
         };
     };
@@ -838,7 +899,7 @@ var Camera = (function () {
     function Camera() {
         this.position = new BABYLON.Vector3(0, 0, -100);
         this.direction = new BABYLON.Vector3(0, 0, 1);
-        this.up = BABYLON.Vector3.Up();
+        this.up = BABYLON.Vector3.up();
         this.fov = 0.78;
         this.zNear = 0.01;
         this.zFar = 1.0;
@@ -1029,7 +1090,8 @@ var Renderer3d = (function (_super) {
         this.renderer2d = new Renderer2d(output);
     }
     Renderer3d.prototype.get_viewProjectionMatrix = function (camera) {
-        var viewMatrix = BABYLON.Matrix.LookAtLH(camera.position, camera.position.add(camera.direction), camera.up);
+        var target = BABYLON.Vector3.from(camera.position);
+        var viewMatrix = BABYLON.Matrix.LookAtLH(camera.position, target.add(camera.direction), camera.up);
         var projectionMatrix = BABYLON.Matrix.PerspectiveFovLH(camera.fov, this.output.width / this.output.height, camera.zNear, camera.zFar);
         return viewMatrix.multiply(projectionMatrix);
     };
@@ -1040,93 +1102,25 @@ var Renderer3d = (function (_super) {
             var rotMatrix = BABYLON.Matrix.RotationYawPitchRoll(f.rotation.y, f.rotation.x, f.rotation.z);
             var worldMatrix = rotMatrix.multiply(BABYLON.Matrix.Translation(f.position.x, f.position.y, f.position.z));
             var transformMatrix = worldMatrix.multiply(viewProjectionMatrix);
-            this.projectFigure(f, worldMatrix, transformMatrix, rotMatrix);
+            f.project(this, worldMatrix, transformMatrix, rotMatrix);
         }
     };
     Renderer3d.prototype.projectVector = function (v, transMat, pv) {
-        BABYLON.Vector3.TransformCoordinates(v, transMat, pv);
+        BABYLON.Vector3.transformCoordinates(v, transMat, pv);
         pv.x = pv.x * this.output.width + this.output.widthHalf;
         pv.y = -pv.y * this.output.height + this.output.heightHalf;
         pv.z = pv.z;
     };
     Renderer3d.prototype.projectVertex = function (vertex, transMat, worldMat, rotMatrix, pvertex) {
-        BABYLON.Vector3.TransformCoordinates(vertex.coordinates, worldMat, pvertex.worldCoordinates);
-        BABYLON.Vector3.TransformCoordinates(vertex.normal, rotMatrix, pvertex.normal);
+        BABYLON.Vector3.transformCoordinates(vertex.coordinates, worldMat, pvertex.worldCoordinates);
+        BABYLON.Vector3.transformCoordinates(vertex.normal, rotMatrix, pvertex.normal);
         this.projectVector(vertex.coordinates, transMat, pvertex.coordinates);
         pvertex.textureCoordinates = vertex.textureCoordinates;
-    };
-    Renderer3d.prototype.projectFigure = function (f, worldMatrix, transformMatrix, rotMatrix) {
-        this.projectVector(f.position, transformMatrix, f.projectedPosition);
-        var posPlusSize = f.position.add(f.size);
-        var posPlusSizeProjected = BABYLON.Vector3.Zero();
-        this.projectVector(posPlusSize, transformMatrix, posPlusSizeProjected);
-        f.projectedSize.x = (posPlusSizeProjected.x - f.projectedPosition.x) * 2;
-        f.projectedSize.y = (-posPlusSizeProjected.y + f.projectedPosition.y) * 2;
-        if (f instanceof Mesh) {
-            this.projectMesh(f, worldMatrix, transformMatrix, rotMatrix);
-        }
-    };
-    Renderer3d.prototype.projectMesh = function (m, worldMatrix, transformMatrix, rotMatrix) {
-        for (var indexFaces = 0; indexFaces < m.faces.length; indexFaces++) {
-            var currentFace = m.faces[indexFaces];
-            this.projectVertex(m.vertices[currentFace.a], transformMatrix, worldMatrix, rotMatrix, m.projectedVertices[currentFace.a]);
-            this.projectVertex(m.vertices[currentFace.b], transformMatrix, worldMatrix, rotMatrix, m.projectedVertices[currentFace.b]);
-            this.projectVertex(m.vertices[currentFace.c], transformMatrix, worldMatrix, rotMatrix, m.projectedVertices[currentFace.c]);
-        }
     };
     Renderer3d.prototype.drawScene = function (scene) {
         this.projectScene(scene);
         for (var i = 0; i < scene.figures.length; i++) {
-            this.drawFigure(scene.figures[i], scene.light);
-        }
-    };
-    Renderer3d.prototype.drawFigure = function (f, light) {
-        if (f instanceof Circle) {
-            this.drawCircle(f);
-        }
-        else if (f instanceof Tile) {
-            this.drawTile(f);
-        }
-        else if (f instanceof Sprite) {
-            this.drawSprite(f);
-        }
-        else if (f instanceof Mesh) {
-            this.drawMesh(f, light);
-        }
-    };
-    Renderer3d.prototype.drawCircle = function (circle) {
-        this.renderer2d.drawFilledCircle(circle.projectedPosition.x, circle.projectedPosition.y, circle.projectedPosition.z, circle.get_projectedRadius(), circle.color);
-    };
-    Renderer3d.prototype.drawSprite = function (sprite) {
-        var scalex = sprite.projectedSize.x / sprite.image.width;
-        var scaley = sprite.projectedSize.y / sprite.image.height;
-        var x = sprite.projectedPosition.x - sprite.projectedSize.x / 2;
-        var y = sprite.projectedPosition.y - sprite.projectedSize.y / 2;
-        this.renderer2d.drawImage(sprite.image, x, y, sprite.projectedPosition.z, scalex, scaley);
-    };
-    Renderer3d.prototype.drawTile = function (tile) {
-        var scalex = tile.projectedSize.x / tile.image.width;
-        var scaley = tile.projectedSize.y / tile.image.height;
-        var x = tile.projectedPosition.x - tile.projectedSize.x / 2;
-        var y = tile.projectedPosition.y - tile.projectedSize.y / 2;
-        this.renderer2d.drawTiles(tile.image, x, y, tile.projectedPosition.z, tile.countH, tile.countV, scalex, scaley);
-    };
-    Renderer3d.prototype.drawMesh = function (m, light) {
-        var linesColor = new BABYLON.Color4(1, 1, 1, 1);
-        for (var indexFaces = 0; indexFaces < m.faces.length; indexFaces++) {
-            var currentFace = m.faces[indexFaces];
-            var va = m.projectedVertices[currentFace.a];
-            var vb = m.projectedVertices[currentFace.b];
-            var vc = m.projectedVertices[currentFace.c];
-            if (this.renderSettings.showFaces) {
-                var color = new BABYLON.Color4(1, 1, 1, 1);
-                this.drawTriangle(va, vb, vc, color, light, this.renderSettings.showTextures ? m.texture : null);
-            }
-            if (this.renderSettings.showMeshes) {
-                this.renderer2d.drawLine(va.coordinates.x, va.coordinates.y, vb.coordinates.x, vb.coordinates.y, 0, linesColor);
-                this.renderer2d.drawLine(vb.coordinates.x, vb.coordinates.y, vc.coordinates.x, vc.coordinates.y, 0, linesColor);
-                this.renderer2d.drawLine(vc.coordinates.x, vc.coordinates.y, va.coordinates.x, va.coordinates.y, 0, linesColor);
-            }
+            scene.figures[i].draw(this, scene.light);
         }
     };
     Renderer3d.prototype.drawTriangle = function (v1, v2, v3, color, light, texture) {
@@ -1296,7 +1290,7 @@ var Renderer3d = (function (_super) {
     Renderer3d.prototype.computeNDotL = function (vertex, normal, lightPosition) {
         var lightDirection = lightPosition.subtract(vertex);
         lightDirection.normalize();
-        return Math.max(0, BABYLON.Vector3.Dot(normal, lightDirection));
+        return Math.max(0, BABYLON.Vector3.dot(normal, lightDirection));
     };
     return Renderer3d;
 })(Renderer);
@@ -1473,7 +1467,7 @@ var Phisics = (function () {
     Phisics.prototype.areCirclesCollided = function (c1, c2) {
         var xd = c1.position.x - c2.position.x;
         var yd = c1.position.y - c2.position.y;
-        var rs = c1.get_radius() + c2.get_radius();
+        var rs = c1.radius + c2.radius;
         return xd * xd + yd * yd <= rs * rs;
     };
     return Phisics;

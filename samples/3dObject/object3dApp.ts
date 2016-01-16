@@ -75,7 +75,7 @@
             var b = mesh.vertices[j + 1].coordinates;
             var c = mesh.vertices[j + 2].coordinates;
             
-            var normal = BABYLON.Vector3.Cross(b.subtract(a), c.subtract(a));
+            var normal = BABYLON.Vector3.cross(b.subtract(a), c.subtract(a));
             normal.normalize();
             mesh.vertices[j].normal = normal;
             mesh.vertices[j + 1].normal = normal;
@@ -171,7 +171,7 @@
 
         if (eventArgs.leftButtonClicked) {
             this.rotateVector = new BABYLON.Vector3(-eventArgs.deltaY, -eventArgs.deltaX, 0);
-            this.rotateVector = this.rotateVector.scale(0.003);
+            this.rotateVector.scale(0.003);
         }
     }
 }

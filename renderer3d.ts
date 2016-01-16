@@ -17,8 +17,9 @@ class Renderer3d extends Renderer {
         this.renderer2d = new Renderer2d(output);
     }
 
-    public get_viewProjectionMatrix(camera: Camera) {
-        var viewMatrix = BABYLON.Matrix.LookAtLH(camera.position, camera.position.add(camera.direction), camera.up);
+    private get_viewProjectionMatrix(camera: Camera) {
+        var target = BABYLON.Vector3.from(camera.position);        
+        var viewMatrix = BABYLON.Matrix.LookAtLH(camera.position, target.add(camera.direction), camera.up);
         var projectionMatrix = BABYLON.Matrix.PerspectiveFovLH(camera.fov, this.output.width / this.output.height, camera.zNear, camera.zFar);
         return viewMatrix.multiply(projectionMatrix);
     }
@@ -35,116 +36,33 @@ class Renderer3d extends Renderer {
             var worldMatrix = rotMatrix.multiply(BABYLON.Matrix.Translation(f.position.x, f.position.y, f.position.z));
             var transformMatrix = worldMatrix.multiply(viewProjectionMatrix);
 
-            this.projectFigure(f, worldMatrix, transformMatrix, rotMatrix);
+            f.project(this, worldMatrix, transformMatrix, rotMatrix);
         }
     }
 
     public projectVector(v: BABYLON.Vector3, transMat: BABYLON.Matrix, pv: BABYLON.Vector3) {    
-        BABYLON.Vector3.TransformCoordinates(v, transMat, pv);
+        BABYLON.Vector3.transformCoordinates(v, transMat, pv);
         pv.x = pv.x * this.output.width + this.output.widthHalf;
         pv.y = -pv.y * this.output.height + this.output.heightHalf;
         pv.z = pv.z;                      
     }
 
-    private projectVertex(vertex: Vertex, transMat: BABYLON.Matrix, worldMat: BABYLON.Matrix, rotMatrix: BABYLON.Matrix, pvertex: Vertex) {
+    public projectVertex(vertex: Vertex, transMat: BABYLON.Matrix, worldMat: BABYLON.Matrix, rotMatrix: BABYLON.Matrix, pvertex: Vertex) {
 
-        BABYLON.Vector3.TransformCoordinates(vertex.coordinates, worldMat, pvertex.worldCoordinates);
-        BABYLON.Vector3.TransformCoordinates(vertex.normal, rotMatrix, pvertex.normal);        
+        BABYLON.Vector3.transformCoordinates(vertex.coordinates, worldMat, pvertex.worldCoordinates);
+        BABYLON.Vector3.transformCoordinates(vertex.normal, rotMatrix, pvertex.normal);        
         this.projectVector(vertex.coordinates, transMat, pvertex.coordinates);
         pvertex.textureCoordinates = vertex.textureCoordinates;
-    }
-
-    public projectFigure(f: Figure, worldMatrix: BABYLON.Matrix, transformMatrix: BABYLON.Matrix, rotMatrix: BABYLON.Matrix) {
-           
-        this.projectVector(f.position, transformMatrix, f.projectedPosition);
-        var posPlusSize = f.position.add(f.size);
-        var posPlusSizeProjected = BABYLON.Vector3.Zero();
-        this.projectVector(posPlusSize, transformMatrix, posPlusSizeProjected);
-        f.projectedSize.x = (posPlusSizeProjected.x - f.projectedPosition.x) * 2;
-        f.projectedSize.y = (-posPlusSizeProjected.y + f.projectedPosition.y) * 2;
-
-        if (f instanceof Mesh) {
-            this.projectMesh(<Mesh>f, worldMatrix, transformMatrix, rotMatrix);
-        }
-    }
-
-    private projectMesh(m: Mesh, worldMatrix: BABYLON.Matrix, transformMatrix: BABYLON.Matrix, rotMatrix: BABYLON.Matrix) {
-
-        for (var indexFaces = 0; indexFaces < m.faces.length; indexFaces++) {
-            var currentFace = m.faces[indexFaces];
-            this.projectVertex(m.vertices[currentFace.a], transformMatrix, worldMatrix, rotMatrix, m.projectedVertices[currentFace.a]);
-            this.projectVertex(m.vertices[currentFace.b], transformMatrix, worldMatrix, rotMatrix, m.projectedVertices[currentFace.b]);
-            this.projectVertex(m.vertices[currentFace.c], transformMatrix, worldMatrix, rotMatrix, m.projectedVertices[currentFace.c]);            
-        }
-    }
+    }        
 
     public drawScene(scene: Scene) {
 
         this.projectScene(scene);
 
         for (var i = 0; i < scene.figures.length; i++) {
-            this.drawFigure(scene.figures[i], scene.light);
+            scene.figures[i].draw(this, scene.light);            
         } 
-    }
-
-    public drawFigure(f: Figure, light: Light) {
-        if (f instanceof Circle) {
-            this.drawCircle(<Circle>f);
-        }
-        else if (f instanceof Tile) {
-            this.drawTile(<Tile>f);
-        }
-        else if (f instanceof Sprite) {
-            this.drawSprite(<Sprite>f);
-        }
-        else if (f instanceof Mesh) {
-            this.drawMesh(<Mesh>f, light);
-        }
-    }
-
-    private drawCircle(circle: Circle) {
-        this.renderer2d.drawFilledCircle(circle.projectedPosition.x, circle.projectedPosition.y, circle.projectedPosition.z, circle.get_projectedRadius(), circle.color);
-    }
-
-    private drawSprite(sprite: Sprite) {
-        var scalex = sprite.projectedSize.x / sprite.image.width;
-        var scaley = sprite.projectedSize.y / sprite.image.height;
-        var x = sprite.projectedPosition.x - sprite.projectedSize.x / 2;
-        var y = sprite.projectedPosition.y - sprite.projectedSize.y / 2;
-        this.renderer2d.drawImage(sprite.image, x, y, sprite.projectedPosition.z, scalex, scaley);
-    }
-
-    private drawTile(tile: Tile) {
-        var scalex = tile.projectedSize.x / tile.image.width;
-        var scaley = tile.projectedSize.y / tile.image.height;
-        var x = tile.projectedPosition.x - tile.projectedSize.x / 2;
-        var y = tile.projectedPosition.y - tile.projectedSize.y / 2;
-        this.renderer2d.drawTiles(tile.image, x, y, tile.projectedPosition.z, tile.countH, tile.countV, scalex, scaley);
-    }
-
-    private drawMesh(m: Mesh, light: Light) {
-
-        var linesColor = new BABYLON.Color4(1, 1, 1, 1);
-                
-        for (var indexFaces = 0; indexFaces < m.faces.length; indexFaces++) {
-            var currentFace = m.faces[indexFaces];
-
-            var va = m.projectedVertices[currentFace.a];
-            var vb = m.projectedVertices[currentFace.b];
-            var vc = m.projectedVertices[currentFace.c];
-
-            if (this.renderSettings.showFaces) {
-                var color = new BABYLON.Color4(1, 1, 1, 1);
-                this.drawTriangle(va, vb, vc, color, light, this.renderSettings.showTextures ? m.texture : null);
-            }
-
-            if (this.renderSettings.showMeshes) {
-                this.renderer2d.drawLine(va.coordinates.x, va.coordinates.y, vb.coordinates.x, vb.coordinates.y, 0, linesColor);
-                this.renderer2d.drawLine(vb.coordinates.x, vb.coordinates.y, vc.coordinates.x, vc.coordinates.y, 0, linesColor);
-                this.renderer2d.drawLine(vc.coordinates.x, vc.coordinates.y, va.coordinates.x, va.coordinates.y, 0, linesColor);
-            }
-        }
-    }
+    }    
 
     public drawTriangle(v1: Vertex, v2: Vertex, v3: Vertex, color: BABYLON.Color4, light: Light, texture?: Texture): void {
         // Sorting the points in order to always have this order on screen p1, p2 & p3
@@ -350,6 +268,6 @@ class Renderer3d extends Renderer {
     private computeNDotL(vertex: BABYLON.Vector3, normal: BABYLON.Vector3, lightPosition: BABYLON.Vector3): number {
         var lightDirection = lightPosition.subtract(vertex);
         lightDirection.normalize();
-        return Math.max(0, BABYLON.Vector3.Dot(normal, lightDirection));
+        return Math.max(0, BABYLON.Vector3.dot(normal, lightDirection));
     }
 }

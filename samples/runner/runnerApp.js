@@ -157,7 +157,7 @@ var RunnerApp = (function (_super) {
         this.particles = [];
         for (var i = 0; i < 100; i++) {
             var p = new Particle();
-            p.set_radius(Math.random() * 0.5);
+            p.radius = Math.random() * 0.5;
             p.position.x = 70 - Math.random() * 140;
             p.position.y = 50 - Math.random() * 100;
             p.position.z = 100 + Math.random() * 100;

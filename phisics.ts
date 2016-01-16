@@ -25,7 +25,7 @@
     private areCirclesCollided(c1: Circle, c2: Circle): boolean {
         var xd = c1.position.x - c2.position.x;
         var yd = c1.position.y - c2.position.y;
-        var rs = c1.get_radius() + c2.get_radius();
+        var rs = c1.radius + c2.radius;
         return xd * xd + yd * yd <= rs * rs;
     }
 } 

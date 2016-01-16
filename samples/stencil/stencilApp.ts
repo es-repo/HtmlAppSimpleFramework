@@ -123,7 +123,7 @@
             a = new BABYLON.Vector3(-t.a.x + xs, -t.a.y + ys, hheight);
             b = new BABYLON.Vector3(-t.a.x + xs, -t.a.y + ys, 0);
             c = new BABYLON.Vector3(-t.b.x + xs, -t.b.y + ys, hheight);
-            normal = BABYLON.Vector3.Cross(a.subtract(b), c.subtract(b));
+            normal = BABYLON.Vector3.cross(a.subtract(b), c.subtract(b));
             normal.normalize();
             l = j + 6;
             m = k + 2;
@@ -139,7 +139,7 @@
             a = new BABYLON.Vector3(-t.b.x + xs, -t.b.y + ys, hheight);
             b = new BABYLON.Vector3(-t.a.x + xs, -t.a.y + ys, 0);
             c = new BABYLON.Vector3(-t.b.x + xs, -t.b.y + ys, 0);
-            normal = BABYLON.Vector3.Cross(a.subtract(b), c.subtract(b));
+            normal = BABYLON.Vector3.cross(a.subtract(b), c.subtract(b));
             normal.normalize();
             l = j + 9;
             m = k + 3;
@@ -152,7 +152,7 @@
             a = new BABYLON.Vector3(-t.b.x + xs, -t.b.y + ys, hheight);
             b = new BABYLON.Vector3(-t.b.x + xs, -t.b.y + ys, 0);
             c = new BABYLON.Vector3(-t.c.x + xs, -t.c.y + ys, hheight);
-            normal = BABYLON.Vector3.Cross(a.subtract(b), c.subtract(b));
+            normal = BABYLON.Vector3.cross(a.subtract(b), c.subtract(b));
             normal.normalize();
             l = j + 12;
             m = k + 4;
@@ -164,7 +164,7 @@
             a = new BABYLON.Vector3(-t.c.x + xs, -t.c.y + ys, hheight);
             b = new BABYLON.Vector3(-t.b.x + xs, -t.b.y + ys, 0);
             c = new BABYLON.Vector3(-t.c.x + xs, -t.c.y + ys, 0);
-            normal = BABYLON.Vector3.Cross(a.subtract(b), c.subtract(b));
+            normal = BABYLON.Vector3.cross(a.subtract(b), c.subtract(b));
             normal.normalize();
             l = j + 15;
             m = k + 5;
@@ -177,7 +177,7 @@
             a = new BABYLON.Vector3(-t.c.x + xs, -t.c.y + ys, hheight);
             b = new BABYLON.Vector3(-t.c.x + xs, -t.c.y + ys, 0);
             c = new BABYLON.Vector3(-t.a.x + xs, -t.a.y + ys, hheight);
-            normal = BABYLON.Vector3.Cross(a.subtract(b), c.subtract(b));
+            normal = BABYLON.Vector3.cross(a.subtract(b), c.subtract(b));
             normal.normalize();
             l = j + 18;
             m = k + 6;
@@ -189,7 +189,7 @@
             a = new BABYLON.Vector3(-t.a.x + xs, -t.a.y + ys, hheight);
             b = new BABYLON.Vector3(-t.c.x + xs, -t.c.y + ys, 0);
             c = new BABYLON.Vector3(-t.a.x + xs, -t.a.y + ys, 0);
-            normal = BABYLON.Vector3.Cross(a.subtract(b), c.subtract(b));
+            normal = BABYLON.Vector3.cross(a.subtract(b), c.subtract(b));
             normal.normalize();
             l = j + 21;
             m = k + 7;

@@ -42,9 +42,11 @@ module BABYLON {
         public negate(): Vector2 {
             return new Vector2(-this.x, -this.y);
         }
+
         public scale(scale: number): Vector2 {
             return new Vector2(this.x * scale, this.y * scale);
         }
+
         public equals(otherVector: Vector2): boolean {
             return this.x === otherVector.x && this.y === otherVector.y;
         }
@@ -112,34 +114,46 @@ module BABYLON {
 
         public toString(): string {
             return "{X: " + this.x + " Y:" + this.y + " Z:" + this.z + "}";
+        }        
+
+        public add(vector: Vector3): Vector3 {
+            this.x += vector.x;
+            this.y += vector.y;
+            this.z += vector.z;
+            return this;            
         }
-        public add(otherVector: Vector3): Vector3 {
-            return new Vector3(this.x + otherVector.x, this.y + otherVector.y, this.z + otherVector.z);
-        }
+
         public subtract(otherVector: Vector3): Vector3 {
             return new Vector3(this.x - otherVector.x, this.y - otherVector.y, this.z - otherVector.z);
-        }
-        public negate(): Vector3 {
-            return new Vector3(-this.x, -this.y, -this.z);
-        }
+        }        
+
         public scale(scale: number): Vector3 {
-            return new Vector3(this.x * scale, this.y * scale, this.z * scale);
+            this.x *= scale;
+            this.y *= scale;
+            this.z *= scale;
+            return this;
         }
+
         public equals(otherVector: Vector3): boolean {
             return this.x === otherVector.x && this.y === otherVector.y && this.z === otherVector.z;
         }
+
         public multiply(otherVector: Vector3): Vector3 {
             return new Vector3(this.x * otherVector.x, this.y * otherVector.y, this.z * otherVector.z);
         }
+
         public divide(otherVector: Vector3): Vector3 {
             return new Vector3(this.x / otherVector.x, this.y / otherVector.y, this.z / otherVector.z);
         }
+
         public length(): number {
             return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
         }
+
         public lengthSquared(): number {
             return (this.x * this.x + this.y * this.y + this.z * this.z);
         }
+
         public normalize(): void {
             var len = this.length();
             if (len === 0) {
@@ -151,22 +165,29 @@ module BABYLON {
             this.z *= num;
         }
 
-        static FromArray(array, offset): Vector3 {
-            if (!offset) {
-                offset = 0;
-            }
-            return new Vector3(array[offset], array[offset + 1], array[offset + 2]);
+        static from(v: Vector3): Vector3 {
+            return new Vector3(v.x, v.y, v.z);
         }
-        static Zero(): Vector3 {
+
+        static zero(): Vector3 {
             return new Vector3(0, 0, 0);
         }
-        static Up(): Vector3 {
+
+        static up(): Vector3 {
             return new Vector3(0, 1.0, 0);
         }
-        static Copy(source: Vector3): Vector3 {
-            return new Vector3(source.x, source.y, source.z);
+
+        public copyTo(v: Vector3) {
+            v.x = this.x;
+            v.y = this.y;
+            v.z = this.z;            
         }
-        static TransformCoordinates(vector: Vector3, transformation: Matrix, resultVector: Vector3) {
+
+        //public copy(): Vector3 {
+        //    return new Vector3(this.x, this.y, this.z);
+        //}
+
+        static transformCoordinates(vector: Vector3, transformation: Matrix, resultVector: Vector3) {
             var x = (vector.x * transformation.m[0]) + (vector.y * transformation.m[4]) + (vector.z * transformation.m[8]) + transformation.m[12];
             var y = (vector.x * transformation.m[1]) + (vector.y * transformation.m[5]) + (vector.z * transformation.m[9]) + transformation.m[13];
             var z = (vector.x * transformation.m[2]) + (vector.y * transformation.m[6]) + (vector.z * transformation.m[10]) + transformation.m[14];
@@ -175,30 +196,30 @@ module BABYLON {
             resultVector.y = y / w;
             resultVector.z = z / w;            
         }
-        static TransformNormal(vector: Vector3, transformation: Matrix): Vector3 {
+
+        static transformNormal(vector: Vector3, transformation: Matrix): Vector3 {
             var x = (vector.x * transformation.m[0]) + (vector.y * transformation.m[4]) + (vector.z * transformation.m[8]);
             var y = (vector.x * transformation.m[1]) + (vector.y * transformation.m[5]) + (vector.z * transformation.m[9]);
             var z = (vector.x * transformation.m[2]) + (vector.y * transformation.m[6]) + (vector.z * transformation.m[10]);
             return new Vector3(x, y, z);
         }
-        public static Dot(left: Vector3, right: Vector3): number {
+
+        public static dot(left: Vector3, right: Vector3): number {
             return (left.x * right.x + left.y * right.y + left.z * right.z);
         }
-        static Cross(left: Vector3, right: Vector3) {
+
+        static cross(left: Vector3, right: Vector3) {
             var x = left.y * right.z - left.z * right.y;
             var y = left.z * right.x - left.x * right.z;
             var z = left.x * right.y - left.y * right.x;
             return new Vector3(x, y, z);
+        }        
+
+        static distance(value1: Vector3, value2: Vector3): number {
+            return Math.sqrt(Vector3.distanceSquared(value1, value2));
         }
-        static Normalize(vector: Vector3): Vector3 {
-            var newVector = Vector3.Copy(vector);
-            newVector.normalize();
-            return newVector;
-        }
-        static Distance(value1: Vector3, value2: Vector3): number {
-            return Math.sqrt(Vector3.DistanceSquared(value1, value2));
-        }
-        static DistanceSquared(value1: Vector3, value2: Vector3): number {
+
+        static distanceSquared(value1: Vector3, value2: Vector3): number {
             var x = value1.x - value2.x;
             var y = value1.y - value2.y;
             var z = value1.z - value2.z;
@@ -421,13 +442,13 @@ module BABYLON {
         static LookAtLH(eye: Vector3, target: Vector3, up: Vector3): Matrix {
             var zAxis = target.subtract(eye);
             zAxis.normalize();
-            var xAxis = Vector3.Cross(up, zAxis);
+            var xAxis = Vector3.cross(up, zAxis);
             xAxis.normalize();
-            var yAxis = Vector3.Cross(zAxis, xAxis);
+            var yAxis = Vector3.cross(zAxis, xAxis);
             yAxis.normalize();
-            var ex = -Vector3.Dot(xAxis, eye);
-            var ey = -Vector3.Dot(yAxis, eye);
-            var ez = -Vector3.Dot(zAxis, eye);
+            var ex = -Vector3.dot(xAxis, eye);
+            var ey = -Vector3.dot(yAxis, eye);
+            var ez = -Vector3.dot(zAxis, eye);
             return Matrix.FromValues(xAxis.x, yAxis.x, zAxis.x, 0, xAxis.y, yAxis.y, zAxis.y, 0, xAxis.z, yAxis.z, zAxis.z, 0, ex, ey, ez, 1);
         }
         static PerspectiveLH(width: number, height: number, znear: number, zfar: number): Matrix {
