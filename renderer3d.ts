@@ -40,16 +40,16 @@ class Renderer3d extends Renderer {
     }
 
     public projectVector(v: BABYLON.Vector3, transMat: BABYLON.Matrix, pv: BABYLON.Vector3) {    
-        var point = BABYLON.Vector3.TransformCoordinates(v, transMat);
-        pv.x = point.x * this.output.width + this.output.widthHalf;
-        pv.y = -point.y * this.output.height + this.output.heightHalf;
-        pv.z = point.z;        
+        BABYLON.Vector3.TransformCoordinates(v, transMat, pv);
+        pv.x = pv.x * this.output.width + this.output.widthHalf;
+        pv.y = -pv.y * this.output.height + this.output.heightHalf;
+        pv.z = pv.z;                      
     }
 
     private projectVertex(vertex: Vertex, transMat: BABYLON.Matrix, worldMat: BABYLON.Matrix, rotMatrix: BABYLON.Matrix, pvertex: Vertex) {
 
-        pvertex.worldCoordinates = BABYLON.Vector3.TransformCoordinates(vertex.coordinates, worldMat);
-        pvertex.normal = BABYLON.Vector3.TransformCoordinates(vertex.normal, rotMatrix);        
+        BABYLON.Vector3.TransformCoordinates(vertex.coordinates, worldMat, pvertex.worldCoordinates);
+        BABYLON.Vector3.TransformCoordinates(vertex.normal, rotMatrix, pvertex.normal);        
         this.projectVector(vertex.coordinates, transMat, pvertex.coordinates);
         pvertex.textureCoordinates = vertex.textureCoordinates;
     }

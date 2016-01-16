@@ -166,14 +166,16 @@
         static Copy(source: Vector3): Vector3 {
             return new Vector3(source.x, source.y, source.z);
         }
-        static TransformCoordinates(vector: Vector3, transformation): Vector3 {
+        static TransformCoordinates(vector: Vector3, transformation: Matrix, resultVector: Vector3) {
             var x = (vector.x * transformation.m[0]) + (vector.y * transformation.m[4]) + (vector.z * transformation.m[8]) + transformation.m[12];
             var y = (vector.x * transformation.m[1]) + (vector.y * transformation.m[5]) + (vector.z * transformation.m[9]) + transformation.m[13];
             var z = (vector.x * transformation.m[2]) + (vector.y * transformation.m[6]) + (vector.z * transformation.m[10]) + transformation.m[14];
             var w = (vector.x * transformation.m[3]) + (vector.y * transformation.m[7]) + (vector.z * transformation.m[11]) + transformation.m[15];
-            return new Vector3(x / w, y / w, z / w);
+            resultVector.x = x / w;
+            resultVector.y = y / w;
+            resultVector.z = z / w;            
         }
-        static TransformNormal(vector: Vector3, transformation): Vector3 {
+        static TransformNormal(vector: Vector3, transformation: Matrix): Vector3 {
             var x = (vector.x * transformation.m[0]) + (vector.y * transformation.m[4]) + (vector.z * transformation.m[8]);
             var y = (vector.x * transformation.m[1]) + (vector.y * transformation.m[5]) + (vector.z * transformation.m[9]);
             var z = (vector.x * transformation.m[2]) + (vector.y * transformation.m[6]) + (vector.z * transformation.m[10]);
@@ -201,7 +203,7 @@
             var y = value1.y - value2.y;
             var z = value1.z - value2.z;
             return (x * x) + (y * y) + (z * z);
-        }
+        }        
     }
 
     export class Matrix {
@@ -1124,16 +1126,16 @@ class Renderer3d extends Renderer {
     }
 
     public projectVector(v: BABYLON.Vector3, transMat: BABYLON.Matrix, pv: BABYLON.Vector3) {    
-        var point = BABYLON.Vector3.TransformCoordinates(v, transMat);
-        pv.x = point.x * this.output.width + this.output.widthHalf;
-        pv.y = -point.y * this.output.height + this.output.heightHalf;
-        pv.z = point.z;        
+        BABYLON.Vector3.TransformCoordinates(v, transMat, pv);
+        pv.x = pv.x * this.output.width + this.output.widthHalf;
+        pv.y = -pv.y * this.output.height + this.output.heightHalf;
+        pv.z = pv.z;                      
     }
 
     private projectVertex(vertex: Vertex, transMat: BABYLON.Matrix, worldMat: BABYLON.Matrix, rotMatrix: BABYLON.Matrix, pvertex: Vertex) {
 
-        pvertex.worldCoordinates = BABYLON.Vector3.TransformCoordinates(vertex.coordinates, worldMat);
-        pvertex.normal = BABYLON.Vector3.TransformCoordinates(vertex.normal, rotMatrix);        
+        BABYLON.Vector3.TransformCoordinates(vertex.coordinates, worldMat, pvertex.worldCoordinates);
+        BABYLON.Vector3.TransformCoordinates(vertex.normal, rotMatrix, pvertex.normal);        
         this.projectVector(vertex.coordinates, transMat, pvertex.coordinates);
         pvertex.textureCoordinates = vertex.textureCoordinates;
     }

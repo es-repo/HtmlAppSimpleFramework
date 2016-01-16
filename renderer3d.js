@@ -35,14 +35,14 @@ var Renderer3d = (function (_super) {
         }
     };
     Renderer3d.prototype.projectVector = function (v, transMat, pv) {
-        var point = BABYLON.Vector3.TransformCoordinates(v, transMat);
-        pv.x = point.x * this.output.width + this.output.widthHalf;
-        pv.y = -point.y * this.output.height + this.output.heightHalf;
-        pv.z = point.z;
+        BABYLON.Vector3.TransformCoordinates(v, transMat, pv);
+        pv.x = pv.x * this.output.width + this.output.widthHalf;
+        pv.y = -pv.y * this.output.height + this.output.heightHalf;
+        pv.z = pv.z;
     };
     Renderer3d.prototype.projectVertex = function (vertex, transMat, worldMat, rotMatrix, pvertex) {
-        pvertex.worldCoordinates = BABYLON.Vector3.TransformCoordinates(vertex.coordinates, worldMat);
-        pvertex.normal = BABYLON.Vector3.TransformCoordinates(vertex.normal, rotMatrix);
+        BABYLON.Vector3.TransformCoordinates(vertex.coordinates, worldMat, pvertex.worldCoordinates);
+        BABYLON.Vector3.TransformCoordinates(vertex.normal, rotMatrix, pvertex.normal);
         this.projectVector(vertex.coordinates, transMat, pvertex.coordinates);
         pvertex.textureCoordinates = vertex.textureCoordinates;
     };

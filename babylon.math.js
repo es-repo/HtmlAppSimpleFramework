@@ -151,12 +151,14 @@ var BABYLON;
         Vector3.Copy = function (source) {
             return new Vector3(source.x, source.y, source.z);
         };
-        Vector3.TransformCoordinates = function (vector, transformation) {
+        Vector3.TransformCoordinates = function (vector, transformation, resultVector) {
             var x = (vector.x * transformation.m[0]) + (vector.y * transformation.m[4]) + (vector.z * transformation.m[8]) + transformation.m[12];
             var y = (vector.x * transformation.m[1]) + (vector.y * transformation.m[5]) + (vector.z * transformation.m[9]) + transformation.m[13];
             var z = (vector.x * transformation.m[2]) + (vector.y * transformation.m[6]) + (vector.z * transformation.m[10]) + transformation.m[14];
             var w = (vector.x * transformation.m[3]) + (vector.y * transformation.m[7]) + (vector.z * transformation.m[11]) + transformation.m[15];
-            return new Vector3(x / w, y / w, z / w);
+            resultVector.x = x / w;
+            resultVector.y = y / w;
+            resultVector.z = z / w;
         };
         Vector3.TransformNormal = function (vector, transformation) {
             var x = (vector.x * transformation.m[0]) + (vector.y * transformation.m[4]) + (vector.z * transformation.m[8]);
