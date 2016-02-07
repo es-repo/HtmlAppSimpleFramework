@@ -1,8 +1,14 @@
+// TODO: get rid off BABYLON module.
 module BABYLON {
+
+    // TODO: move from BABYLON module.
     export class Color4 {
 
         public static white = new Color4(1, 1, 1, 1);
         public static black = new Color4(0, 0, 0, 1);
+        public static red = new Color4(1, 0, 0, 1);
+        public static green = new Color4(0, 1, 0, 1);
+        public static blue = new Color4(0, 0, 1, 1);
 
         r: number;
         g: number;
@@ -177,10 +183,11 @@ module BABYLON {
             return new Vector3(0, 1.0, 0);
         }
 
-        public copyTo(v: Vector3) {
+        public copyTo(v: Vector3): Vector3 {
             v.x = this.x;
             v.y = this.y;
-            v.z = this.z;            
+            v.z = this.z;
+            return v;         
         }
 
         //public copy(): Vector3 {

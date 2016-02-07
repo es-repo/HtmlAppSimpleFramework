@@ -47,7 +47,9 @@ var App = (function () {
         if (this.showDebugInfo)
             this.drawDebugInfo();
     };
+    // TODO: rename to tick.
     App.prototype.doLogicStep = function () {
+        this.scene.tick();
         for (var i = 0; i < this.scene.figures.length; i++) {
             var f = this.scene.figures[i];
             f.position.x += f.velocity.x;
@@ -57,6 +59,8 @@ var App = (function () {
     App.prototype.drawFrame = function () {
         this.renderer3d.output.clear();
         this.renderer3d.drawScene(this.scene);
+        //this.renderer2d.drawRectangle(10, 10, 100, 100, 10, BABYLON.Color4.red);
+        //this.renderer2d.drawRectangle(10, 10, 2, 100, 30, BABYLON.Color4.green);        
         this.graphicOutput.drawBuffer();
     };
     App.prototype.drawFps = function (fps) {

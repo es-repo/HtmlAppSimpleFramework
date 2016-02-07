@@ -1,8 +1,14 @@
-﻿module BABYLON {
+﻿// TODO: get rid off BABYLON module.
+module BABYLON {
+
+    // TODO: move from BABYLON module.
     export class Color4 {
 
         public static white = new Color4(1, 1, 1, 1);
         public static black = new Color4(0, 0, 0, 1);
+        public static red = new Color4(1, 0, 0, 1);
+        public static green = new Color4(0, 1, 0, 1);
+        public static blue = new Color4(0, 0, 1, 1);
 
         r: number;
         g: number;
@@ -177,10 +183,11 @@
             return new Vector3(0, 1.0, 0);
         }
 
-        public copyTo(v: Vector3) {
+        public copyTo(v: Vector3): Vector3 {
             v.x = this.x;
             v.y = this.y;
-            v.z = this.z;            
+            v.z = this.z;
+            return v;         
         }
 
         //public copy(): Vector3 {
@@ -649,6 +656,8 @@ class Figure {
     public velocity: BABYLON.Vector3 = BABYLON.Vector3.zero();
     public color: BABYLON.Color4 = new BABYLON.Color4(0, 0, 0, 0);
 
+    public onSceneTick: (ticks: number) => void = ticks => { };
+
     public project(renderer: Renderer3d, worldMatrix: BABYLON.Matrix, transformMatrix: BABYLON.Matrix, rotMatrix: BABYLON.Matrix) {
         renderer.projectVector(this.position, transformMatrix, this.projectedPosition);
     }
@@ -673,12 +682,16 @@ class Rectangle extends Figure2d {
 
     public project(renderer: Renderer3d, worldMatrix: BABYLON.Matrix, transformMatrix: BABYLON.Matrix, rotMatrix: BABYLON.Matrix) {
         super.project(renderer, worldMatrix, transformMatrix, rotMatrix);
-        this.position.copyTo(this.tempVector);
-        this.tempVector.add(this.size);
+        this.position.copyTo(this.tempVector).add(this.size);        
         renderer.projectVector(this.tempVector, transformMatrix, this.tempVector2);
         this.projectedSize.x = (this.tempVector2.x - this.projectedPosition.x) * 2;
         this.projectedSize.y = (-this.tempVector2.y + this.projectedPosition.y) * 2;
     } 
+
+    public draw(renderer: Renderer3d, light: Light) {                  
+        renderer.renderer2d.drawRectangle(this.projectedPosition.x, this.projectedPosition.y - this.projectedSize.y,
+            this.projectedPosition.z, this.projectedSize.x, this.projectedSize.y, this.color);
+    }
 }
 
 class Circle extends Figure2d {
@@ -711,12 +724,13 @@ class Sprite extends Rectangle {
         this.image = image;
     }
 
-    public draw(renderer: Renderer3d, light: Light) {
+    public draw(renderer: Renderer3d, light: Light) {    
         var scalex = this.projectedSize.x / this.image.width;
         var scaley = this.projectedSize.y / this.image.height;
-        var x = this.projectedPosition.x - this.projectedSize.x / 2;
-        var y = this.projectedPosition.y - this.projectedSize.y / 2;
-        renderer.renderer2d.drawImage(this.image, x, y, this.projectedPosition.z, scalex, scaley);
+        var scaledHeight = this.projectedSize.y * scaley;
+        renderer.renderer2d.drawImage(this.image, this.projectedPosition.x, this.projectedPosition.y - scaledHeight, this.projectedPosition.z, scalex, scaley);
+
+        super.draw(renderer, light);
     }
 }
 
@@ -735,9 +749,8 @@ class Tile extends Sprite {
     public draw(renderer: Renderer3d, light: Light) {
         var scalex = this.projectedSize.x / this.image.width;
         var scaley = this.projectedSize.y / this.image.height;
-        var x = this.projectedPosition.x - this.projectedSize.x / 2;
-        var y = this.projectedPosition.y - this.projectedSize.y / 2;
-        renderer.renderer2d.drawTiles(this.image, x, y, this.projectedPosition.z, this.countH, this.countV, scalex, scaley);
+        var scaledHeight = this.projectedSize.y * scaley;
+        renderer.renderer2d.drawTiles(this.image, this.projectedPosition.x, this.projectedPosition.y - scaledHeight, this.projectedPosition.z, this.countH, this.countV, scalex, scaley);        
     }    
 }
 interface Vertex {
@@ -1007,6 +1020,14 @@ class Camera {
      public figures: Figure[] = [];
      public camera: Camera = new Camera();
      public light = new Light();
+
+     private ticks: number = 0;
+
+     public tick() {
+         this.ticks++;
+         for (var i = 0; i < this.figures.length; i++)
+             this.figures[i].onSceneTick(this.ticks);
+     }
  }
 class RendererOutput {
     
@@ -1165,8 +1186,10 @@ class Renderer2d extends Renderer {
     }
 
     public drawFilledRectangle(x: number, y: number, z: number, width: number, height: number, color: BABYLON.Color4) {
-        for (var i = y; i < y + width; i++)
-            this.drawLine(x, i, x + width - 1, i, z, color);
+        var ye = y + height;
+        var xe = x + width;
+        for (var i = y; i <= ye; i++)
+            this.drawLine(x, i, xe, i, z, color);
     }
 
     public drawPolygon(path: { x: number; y: number }[], z: number, color: BABYLON.Color4) {
@@ -1786,7 +1809,7 @@ class App {
     public scene: Scene;
     protected phisics: Phisics;
     protected inputDevices: InputDevices;
-    private previousFrameTime: number;
+    private previousFrameTime: number;    
 
     protected showDebugInfo = false;
     protected mouseWheelVectorControl: BABYLON.Vector3;
@@ -1845,7 +1868,11 @@ class App {
             this.drawDebugInfo();
     }
 
+    // TODO: rename to tick.
     protected doLogicStep() {
+        
+        this.scene.tick();
+
         for (var i = 0; i < this.scene.figures.length; i++) {
             var f = this.scene.figures[i];
             f.position.x += f.velocity.x;
@@ -1856,6 +1883,8 @@ class App {
     protected drawFrame() {
         this.renderer3d.output.clear();
         this.renderer3d.drawScene(this.scene);
+        //this.renderer2d.drawRectangle(10, 10, 100, 100, 10, BABYLON.Color4.red);
+        //this.renderer2d.drawRectangle(10, 10, 2, 100, 30, BABYLON.Color4.green);        
         this.graphicOutput.drawBuffer();
     }
 

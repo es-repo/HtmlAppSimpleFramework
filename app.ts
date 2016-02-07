@@ -65,7 +65,11 @@
             this.drawDebugInfo();
     }
 
+    // TODO: rename to tick.
     protected doLogicStep() {
+        
+        this.scene.tick();
+
         for (var i = 0; i < this.scene.figures.length; i++) {
             var f = this.scene.figures[i];
             f.position.x += f.velocity.x;

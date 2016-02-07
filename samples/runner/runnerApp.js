@@ -40,30 +40,29 @@ var Wall = (function (_super) {
 var Runner = (function (_super) {
     __extends(Runner, _super);
     function Runner(images) {
+        var _this = this;
         _super.call(this, images[0]);
-        this.ticks = 0;
         this.currentImageIndex = 0;
         this.speed = 0.3;
         this.gravyAcc = -0.03;
         this.jumpAcc = 0.5;
         this.gatheredCoins = 0;
         this.images = images;
-    }
-    Runner.prototype.tick = function () {
-        this.ticks++;
-        if (this.isInJumpOrInFall()) {
-            this.currentImageIndex = 2;
-        }
-        else {
-            if (this.ticks % 4 == 0) {
-                this.currentImageIndex++;
-                if (this.currentImageIndex >= this.images.length)
-                    this.currentImageIndex = 0;
+        this.onSceneTick = function (ticks) {
+            if (_this.isInJumpOrInFall()) {
+                _this.currentImageIndex = 2;
             }
-            this.stepSound.play();
-        }
-        this.image = this.images[this.currentImageIndex];
-    };
+            else {
+                if (ticks % 4 == 0) {
+                    _this.currentImageIndex++;
+                    if (_this.currentImageIndex >= _this.images.length)
+                        _this.currentImageIndex = 0;
+                }
+                _this.stepSound.play();
+            }
+            _this.image = _this.images[_this.currentImageIndex];
+        };
+    }
     Runner.prototype.jump = function () {
         if (!this.isInJumpOrInFall()) {
             this.velocity.y = this.jumpAcc;
@@ -74,21 +73,15 @@ var Runner = (function (_super) {
         return this.velocity.y != 0;
     };
     Runner.prototype.isOnWall = function (wall) {
-        var footCenterX = this.position.x;
-        var footCenterY = this.position.y - this.size.y / 2.0;
-        var wallX = wall.position.x - wall.size.x / 2.0;
-        var wallY = wall.position.y - wall.size.y / 2.0;
-        var wallW = wall.size.x * wall.countH;
-        var wallH = wall.size.y * wall.countV;
-        return Geom.Rectangle.isPointInside(footCenterX, footCenterY, wallX, wallY, wallW, wallH);
+        return Geom.Rectangle.isIntersected(this.position.x, this.position.y, this.size.x, this.size.y / 10, wall.position.x, wall.position.y, wall.size.x * wall.countH, wall.size.y * wall.countV);
     };
     Runner.prototype.isNearCoin = function (coin) {
-        var x1 = this.position.x - this.size.x / 2;
-        var y1 = this.position.y - this.size.y / 2;
+        var x1 = this.position.x;
+        var y1 = this.position.y;
         var w1 = this.size.x;
         var h1 = this.size.y;
-        var x2 = coin.position.x - coin.size.x / 2;
-        var y2 = coin.position.y - coin.size.y / 2;
+        var x2 = coin.position.x;
+        var y2 = coin.position.y;
         var w2 = coin.size.x;
         var h2 = coin.size.y;
         return Geom.Rectangle.isIntersected(x1, y1, w1, h1, x2, y2, w2, h2);
@@ -132,7 +125,6 @@ var RunnerApp = (function (_super) {
             return;
         }
         var scene = new Scene();
-        //scene.camera.position.z = -70;
         this.walls = [];
         this.coins = [];
         for (var l = 0; l < 4; l++) {
@@ -183,6 +175,7 @@ var RunnerApp = (function (_super) {
         this.runner.velocity.y = 0;
     };
     RunnerApp.prototype.doLogicStep = function () {
+        _super.prototype.doLogicStep.call(this);
         for (var i = 0; i < this.particles.length; i++) {
             var p = this.particles[i];
             p.position.x -= this.runner.speed;
@@ -202,7 +195,6 @@ var RunnerApp = (function (_super) {
             }
             this.rearrangeCoins();
             this.takeCoin();
-            this.runner.position.y += this.runner.velocity.y;
             var onWall = null;
             for (var l = 0; l < this.walls.length; l++) {
                 for (var i = 0; i < this.walls[l].length; i++) {
@@ -221,20 +213,17 @@ var RunnerApp = (function (_super) {
             else {
                 if (this.runner.velocity.y < 0) {
                     this.runner.velocity.y = 0;
-                    this.runner.position.y = onWall.position.y - onWall.size.y / 2 + onWall.size.y * onWall.countV + this.runner.size.y / 2;
+                    this.runner.position.y = onWall.position.y + onWall.size.y * onWall.countV;
                 }
             }
             var bottom = -15;
-            //var top = 10;
             if (this.runner.position.y < bottom) {
-                //this.runner.position.y = top;
                 this.gameEnded = true;
                 this.gameStarted = false;
                 this.resources.sounds["song"].pause();
                 this.resources.sounds["death"].play();
                 this.hideWallsCoinsAndRunner();
             }
-            this.runner.tick();
         }
     };
     RunnerApp.prototype.hideWallsCoinsAndRunner = function () {
@@ -276,8 +265,8 @@ var RunnerApp = (function (_super) {
             if (Math.random() > 0.5) {
                 var c = this.availableCoins[0];
                 var w = this.walls[i][this.walls[i].length - 1];
-                c.position.x = w.position.x - w.size.x / 2 + Math.random() * (w.size.x * w.countH);
-                c.position.y = w.position.y + w.size.y / 2 + c.size.y / 2;
+                c.position.x = w.position.x + Math.random() * (w.size.x * w.countH);
+                c.position.y = w.position.y + w.size.y;
                 this.availableCoins.splice(0, 1);
                 this.coins.push(c);
                 this.scene.figures.push(c);

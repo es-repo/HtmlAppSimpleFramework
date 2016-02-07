@@ -1,5 +1,7 @@
+// TODO: get rid off BABYLON module.
 var BABYLON;
 (function (BABYLON) {
+    // TODO: move from BABYLON module.
     var Color4 = (function () {
         function Color4(initialR, initialG, initialB, initialA) {
             this.r = initialR;
@@ -12,6 +14,9 @@ var BABYLON;
         };
         Color4.white = new Color4(1, 1, 1, 1);
         Color4.black = new Color4(0, 0, 0, 1);
+        Color4.red = new Color4(1, 0, 0, 1);
+        Color4.green = new Color4(0, 1, 0, 1);
+        Color4.blue = new Color4(0, 0, 1, 1);
         return Color4;
     })();
     BABYLON.Color4 = Color4;
@@ -152,6 +157,7 @@ var BABYLON;
             v.x = this.x;
             v.y = this.y;
             v.z = this.z;
+            return v;
         };
         //public copy(): Vector3 {
         //    return new Vector3(this.x, this.y, this.z);

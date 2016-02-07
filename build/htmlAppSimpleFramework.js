@@ -3,8 +3,10 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+// TODO: get rid off BABYLON module.
 var BABYLON;
 (function (BABYLON) {
+    // TODO: move from BABYLON module.
     var Color4 = (function () {
         function Color4(initialR, initialG, initialB, initialA) {
             this.r = initialR;
@@ -17,6 +19,9 @@ var BABYLON;
         };
         Color4.white = new Color4(1, 1, 1, 1);
         Color4.black = new Color4(0, 0, 0, 1);
+        Color4.red = new Color4(1, 0, 0, 1);
+        Color4.green = new Color4(0, 1, 0, 1);
+        Color4.blue = new Color4(0, 0, 1, 1);
         return Color4;
     })();
     BABYLON.Color4 = Color4;
@@ -157,6 +162,7 @@ var BABYLON;
             v.x = this.x;
             v.y = this.y;
             v.z = this.z;
+            return v;
         };
         //public copy(): Vector3 {
         //    return new Vector3(this.x, this.y, this.z);
@@ -600,6 +606,7 @@ var Figure = (function () {
         this.rotation = BABYLON.Vector3.zero();
         this.velocity = BABYLON.Vector3.zero();
         this.color = new BABYLON.Color4(0, 0, 0, 0);
+        this.onSceneTick = function (ticks) { };
     }
     Figure.prototype.project = function (renderer, worldMatrix, transformMatrix, rotMatrix) {
         renderer.projectVector(this.position, transformMatrix, this.projectedPosition);
@@ -633,11 +640,13 @@ var Rectangle = (function (_super) {
     }
     Rectangle.prototype.project = function (renderer, worldMatrix, transformMatrix, rotMatrix) {
         _super.prototype.project.call(this, renderer, worldMatrix, transformMatrix, rotMatrix);
-        this.position.copyTo(this.tempVector);
-        this.tempVector.add(this.size);
+        this.position.copyTo(this.tempVector).add(this.size);
         renderer.projectVector(this.tempVector, transformMatrix, this.tempVector2);
         this.projectedSize.x = (this.tempVector2.x - this.projectedPosition.x) * 2;
         this.projectedSize.y = (-this.tempVector2.y + this.projectedPosition.y) * 2;
+    };
+    Rectangle.prototype.draw = function (renderer, light) {
+        renderer.renderer2d.drawRectangle(this.projectedPosition.x, this.projectedPosition.y - this.projectedSize.y, this.projectedPosition.z, this.projectedSize.x, this.projectedSize.y, this.color);
     };
     return Rectangle;
 })(Figure2d);
@@ -670,9 +679,9 @@ var Sprite = (function (_super) {
     Sprite.prototype.draw = function (renderer, light) {
         var scalex = this.projectedSize.x / this.image.width;
         var scaley = this.projectedSize.y / this.image.height;
-        var x = this.projectedPosition.x - this.projectedSize.x / 2;
-        var y = this.projectedPosition.y - this.projectedSize.y / 2;
-        renderer.renderer2d.drawImage(this.image, x, y, this.projectedPosition.z, scalex, scaley);
+        var scaledHeight = this.projectedSize.y * scaley;
+        renderer.renderer2d.drawImage(this.image, this.projectedPosition.x, this.projectedPosition.y - scaledHeight, this.projectedPosition.z, scalex, scaley);
+        _super.prototype.draw.call(this, renderer, light);
     };
     return Sprite;
 })(Rectangle);
@@ -688,9 +697,8 @@ var Tile = (function (_super) {
     Tile.prototype.draw = function (renderer, light) {
         var scalex = this.projectedSize.x / this.image.width;
         var scaley = this.projectedSize.y / this.image.height;
-        var x = this.projectedPosition.x - this.projectedSize.x / 2;
-        var y = this.projectedPosition.y - this.projectedSize.y / 2;
-        renderer.renderer2d.drawTiles(this.image, x, y, this.projectedPosition.z, this.countH, this.countV, scalex, scaley);
+        var scaledHeight = this.projectedSize.y * scaley;
+        renderer.renderer2d.drawTiles(this.image, this.projectedPosition.x, this.projectedPosition.y - scaledHeight, this.projectedPosition.z, this.countH, this.countV, scalex, scaley);
     };
     return Tile;
 })(Sprite);
@@ -917,7 +925,13 @@ var Scene = (function () {
         this.figures = [];
         this.camera = new Camera();
         this.light = new Light();
+        this.ticks = 0;
     }
+    Scene.prototype.tick = function () {
+        this.ticks++;
+        for (var i = 0; i < this.figures.length; i++)
+            this.figures[i].onSceneTick(this.ticks);
+    };
     return Scene;
 })();
 var RendererOutput = (function () {
@@ -1056,8 +1070,10 @@ var Renderer2d = (function (_super) {
         this.drawLine(x, y + height, x, y, z, color);
     };
     Renderer2d.prototype.drawFilledRectangle = function (x, y, z, width, height, color) {
-        for (var i = y; i < y + width; i++)
-            this.drawLine(x, i, x + width - 1, i, z, color);
+        var ye = y + height;
+        var xe = x + width;
+        for (var i = y; i <= ye; i++)
+            this.drawLine(x, i, xe, i, z, color);
     };
     Renderer2d.prototype.drawPolygon = function (path, z, color) {
         for (var i = 0; i < path.length - 1; i++) {
@@ -1643,7 +1659,9 @@ var App = (function () {
         if (this.showDebugInfo)
             this.drawDebugInfo();
     };
+    // TODO: rename to tick.
     App.prototype.doLogicStep = function () {
+        this.scene.tick();
         for (var i = 0; i < this.scene.figures.length; i++) {
             var f = this.scene.figures[i];
             f.position.x += f.velocity.x;
@@ -1653,6 +1671,8 @@ var App = (function () {
     App.prototype.drawFrame = function () {
         this.renderer3d.output.clear();
         this.renderer3d.drawScene(this.scene);
+        //this.renderer2d.drawRectangle(10, 10, 100, 100, 10, BABYLON.Color4.red);
+        //this.renderer2d.drawRectangle(10, 10, 2, 100, 30, BABYLON.Color4.green);        
         this.graphicOutput.drawBuffer();
     };
     App.prototype.drawFps = function (fps) {

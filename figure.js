@@ -10,6 +10,7 @@ var Figure = (function () {
         this.rotation = BABYLON.Vector3.zero();
         this.velocity = BABYLON.Vector3.zero();
         this.color = new BABYLON.Color4(0, 0, 0, 0);
+        this.onSceneTick = function (ticks) { };
     }
     Figure.prototype.project = function (renderer, worldMatrix, transformMatrix, rotMatrix) {
         renderer.projectVector(this.position, transformMatrix, this.projectedPosition);
@@ -43,11 +44,13 @@ var Rectangle = (function (_super) {
     }
     Rectangle.prototype.project = function (renderer, worldMatrix, transformMatrix, rotMatrix) {
         _super.prototype.project.call(this, renderer, worldMatrix, transformMatrix, rotMatrix);
-        this.position.copyTo(this.tempVector);
-        this.tempVector.add(this.size);
+        this.position.copyTo(this.tempVector).add(this.size);
         renderer.projectVector(this.tempVector, transformMatrix, this.tempVector2);
         this.projectedSize.x = (this.tempVector2.x - this.projectedPosition.x) * 2;
         this.projectedSize.y = (-this.tempVector2.y + this.projectedPosition.y) * 2;
+    };
+    Rectangle.prototype.draw = function (renderer, light) {
+        renderer.renderer2d.drawRectangle(this.projectedPosition.x, this.projectedPosition.y - this.projectedSize.y, this.projectedPosition.z, this.projectedSize.x, this.projectedSize.y, this.color);
     };
     return Rectangle;
 })(Figure2d);
@@ -80,9 +83,9 @@ var Sprite = (function (_super) {
     Sprite.prototype.draw = function (renderer, light) {
         var scalex = this.projectedSize.x / this.image.width;
         var scaley = this.projectedSize.y / this.image.height;
-        var x = this.projectedPosition.x - this.projectedSize.x / 2;
-        var y = this.projectedPosition.y - this.projectedSize.y / 2;
-        renderer.renderer2d.drawImage(this.image, x, y, this.projectedPosition.z, scalex, scaley);
+        var scaledHeight = this.projectedSize.y * scaley;
+        renderer.renderer2d.drawImage(this.image, this.projectedPosition.x, this.projectedPosition.y - scaledHeight, this.projectedPosition.z, scalex, scaley);
+        _super.prototype.draw.call(this, renderer, light);
     };
     return Sprite;
 })(Rectangle);
@@ -98,9 +101,8 @@ var Tile = (function (_super) {
     Tile.prototype.draw = function (renderer, light) {
         var scalex = this.projectedSize.x / this.image.width;
         var scaley = this.projectedSize.y / this.image.height;
-        var x = this.projectedPosition.x - this.projectedSize.x / 2;
-        var y = this.projectedPosition.y - this.projectedSize.y / 2;
-        renderer.renderer2d.drawTiles(this.image, x, y, this.projectedPosition.z, this.countH, this.countV, scalex, scaley);
+        var scaledHeight = this.projectedSize.y * scaley;
+        renderer.renderer2d.drawTiles(this.image, this.projectedPosition.x, this.projectedPosition.y - scaledHeight, this.projectedPosition.z, this.countH, this.countV, scalex, scaley);
     };
     return Tile;
 })(Sprite);

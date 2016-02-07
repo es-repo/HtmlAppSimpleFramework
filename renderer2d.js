@@ -101,8 +101,10 @@ var Renderer2d = (function (_super) {
         this.drawLine(x, y + height, x, y, z, color);
     };
     Renderer2d.prototype.drawFilledRectangle = function (x, y, z, width, height, color) {
-        for (var i = y; i < y + width; i++)
-            this.drawLine(x, i, x + width - 1, i, z, color);
+        var ye = y + height;
+        var xe = x + width;
+        for (var i = y; i <= ye; i++)
+            this.drawLine(x, i, xe, i, z, color);
     };
     Renderer2d.prototype.drawPolygon = function (path, z, color) {
         for (var i = 0; i < path.length - 1; i++) {

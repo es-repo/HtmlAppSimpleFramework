@@ -106,8 +106,10 @@
     }
 
     public drawFilledRectangle(x: number, y: number, z: number, width: number, height: number, color: BABYLON.Color4) {
-        for (var i = y; i < y + width; i++)
-            this.drawLine(x, i, x + width - 1, i, z, color);
+        var ye = y + height;
+        var xe = x + width;
+        for (var i = y; i <= ye; i++)
+            this.drawLine(x, i, xe, i, z, color);
     }
 
     public drawPolygon(path: { x: number; y: number }[], z: number, color: BABYLON.Color4) {
