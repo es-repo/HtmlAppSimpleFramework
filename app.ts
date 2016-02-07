@@ -58,15 +58,14 @@
         var now = new Date().getTime();
         var fps = 1000.0 / (now - this.previousFrameTime) >> 0;
         this.previousFrameTime = now;
-        this.doLogicStep();
+        this.tick();
         this.drawFrame();
         this.drawFps(fps);
         if (this.showDebugInfo)
             this.drawDebugInfo();
     }
 
-    // TODO: rename to tick.
-    protected doLogicStep() {
+    protected tick() {
         
         this.scene.tick();
 

@@ -93,8 +93,8 @@ var Object3dApp = (function (_super) {
         mesh.faces[11] = { a: 6, b: 7, c: 3 };
         return mesh;
     };
-    Object3dApp.prototype.doLogicStep = function () {
-        _super.prototype.doLogicStep.call(this);
+    Object3dApp.prototype.tick = function () {
+        _super.prototype.tick.call(this);
         Object3dApp.rotateScene(this.scene, this.rotateVector);
     };
     Object3dApp.rotateScene = function (scene, rotationDelta) {

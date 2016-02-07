@@ -112,8 +112,8 @@
         return mesh;
     }
 
-    protected doLogicStep() {
-        super.doLogicStep();
+    protected tick() {
+        super.tick();
         Object3dApp.rotateScene(this.scene, this.rotateVector);
     }
 

@@ -198,9 +198,9 @@ class RunnerApp extends App {
         this.runner.velocity.y = 0;
     }
 
-    protected doLogicStep() {        
+    protected tick() {        
 
-        super.doLogicStep();        
+        super.tick();        
 
         for (var i = 0; i < this.particles.length; i++) {
             var p = this.particles[i];

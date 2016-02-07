@@ -60,8 +60,8 @@
         });
     }
 
-    protected doLogicStep() {
-        super.doLogicStep();
+    protected tick() {
+        super.tick();
         this.rotateAngle += this.rotateDelta;
         for (var i = 0, p; i < this.stars.length; i++) {
             p = this.stars[i].position;

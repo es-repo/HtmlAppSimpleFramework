@@ -86,8 +86,8 @@ class PaintBrushApp extends App {
         continuation(scene);
     }
 
-    protected doLogicStep() {
-        super.doLogicStep();
+    protected tick() {
+        super.tick();
 
         if (this.isDrunkMode) {
             var v = new BABYLON.Vector3(

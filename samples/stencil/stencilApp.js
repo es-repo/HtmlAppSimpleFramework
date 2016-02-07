@@ -173,7 +173,7 @@ var StencilApp = (function (_super) {
         ;
         return mesh;
     };
-    StencilApp.prototype.doLogicStep = function () {
+    StencilApp.prototype.tick = function () {
     };
     StencilApp.prototype.drawFrame = function () {
         this.renderer2d.output.clear();

@@ -174,8 +174,8 @@ var RunnerApp = (function (_super) {
         this.runner.position.y = w.position.y + w.size.y + this.runner.size.y;
         this.runner.velocity.y = 0;
     };
-    RunnerApp.prototype.doLogicStep = function () {
-        _super.prototype.doLogicStep.call(this);
+    RunnerApp.prototype.tick = function () {
+        _super.prototype.tick.call(this);
         for (var i = 0; i < this.particles.length; i++) {
             var p = this.particles[i];
             p.position.x -= this.runner.speed;

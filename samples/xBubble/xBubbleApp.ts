@@ -11,8 +11,8 @@
         continuation(new XBubbleScene());
     }
 
-    protected doLogicStep() {
-        super.doLogicStep();
+    protected tick() {
+        super.tick();
         var xBubbleScene = <XBubbleScene>this.scene;
 
         if (this.gameOver) return;

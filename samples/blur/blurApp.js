@@ -30,7 +30,7 @@ var BlurApp = (function (_super) {
         if (this.image != null)
             ImageEffects.blur(this.image, this.bluredImage, v);
     };
-    BlurApp.prototype.doLogicStep = function () {
+    BlurApp.prototype.tick = function () {
     };
     BlurApp.prototype.drawFrame = function () {
         this.renderer2d.output.clear();

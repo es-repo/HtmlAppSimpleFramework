@@ -11,8 +11,8 @@ var XBubbleApp = (function (_super) {
     XBubbleApp.prototype.createScene = function (continuation) {
         continuation(new XBubbleScene());
     };
-    XBubbleApp.prototype.doLogicStep = function () {
-        _super.prototype.doLogicStep.call(this);
+    XBubbleApp.prototype.tick = function () {
+        _super.prototype.tick.call(this);
         var xBubbleScene = this.scene;
         if (this.gameOver)
             return;

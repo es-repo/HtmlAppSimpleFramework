@@ -36,7 +36,7 @@
             ImageEffects.blur(this.image, this.bluredImage, v);
     }
 
-    protected doLogicStep() {
+    protected tick() {
     }
 
     protected drawFrame() {

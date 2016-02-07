@@ -202,7 +202,7 @@
         return mesh;
     }
 
-    protected doLogicStep() {
+    protected tick() {
     }
 
     protected drawFrame() {

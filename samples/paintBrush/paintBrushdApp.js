@@ -79,8 +79,8 @@ var PaintBrushApp = (function (_super) {
         scene.figures.push(this.sprite);
         continuation(scene);
     };
-    PaintBrushApp.prototype.doLogicStep = function () {
-        _super.prototype.doLogicStep.call(this);
+    PaintBrushApp.prototype.tick = function () {
+        _super.prototype.tick.call(this);
         if (this.isDrunkMode) {
             var v = new BABYLON.Vector3(Math.sin(this.drunkModeShift) * 0.1, Math.cos(this.drunkModeShift) * 0.1, Math.sin(this.drunkModeShift - Math.PI / 2) * 0.4);
             this.sprite.position.x += v.x;

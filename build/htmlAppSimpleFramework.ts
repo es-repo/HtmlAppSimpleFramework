@@ -1809,7 +1809,7 @@ class App {
     public scene: Scene;
     protected phisics: Phisics;
     protected inputDevices: InputDevices;
-    private previousFrameTime: number;    
+    private previousFrameTime: number;
 
     protected showDebugInfo = false;
     protected mouseWheelVectorControl: BABYLON.Vector3;
@@ -1861,15 +1861,14 @@ class App {
         var now = new Date().getTime();
         var fps = 1000.0 / (now - this.previousFrameTime) >> 0;
         this.previousFrameTime = now;
-        this.doLogicStep();
+        this.tick();
         this.drawFrame();
         this.drawFps(fps);
         if (this.showDebugInfo)
             this.drawDebugInfo();
     }
 
-    // TODO: rename to tick.
-    protected doLogicStep() {
+    protected tick() {
         
         this.scene.tick();
 
@@ -1883,8 +1882,6 @@ class App {
     protected drawFrame() {
         this.renderer3d.output.clear();
         this.renderer3d.drawScene(this.scene);
-        //this.renderer2d.drawRectangle(10, 10, 100, 100, 10, BABYLON.Color4.red);
-        //this.renderer2d.drawRectangle(10, 10, 2, 100, 30, BABYLON.Color4.green);        
         this.graphicOutput.drawBuffer();
     }
 

@@ -11,7 +11,7 @@ var BezierCurveApp = (function (_super) {
         this.controlPointSize = 8;
         this.controlPointColor = new BABYLON.Color4(1, 1, 1, 1);
     }
-    BezierCurveApp.prototype.doLogicStep = function () {
+    BezierCurveApp.prototype.tick = function () {
     };
     BezierCurveApp.prototype.drawFrame = function () {
         this.drawControlPoints();

@@ -47,8 +47,8 @@ var Transformations2dApp = (function (_super) {
                 onImageLoaded();
         });
     };
-    Transformations2dApp.prototype.doLogicStep = function () {
-        _super.prototype.doLogicStep.call(this);
+    Transformations2dApp.prototype.tick = function () {
+        _super.prototype.tick.call(this);
         this.rotateAngle += this.rotateDelta;
         for (var i = 0, p; i < this.stars.length; i++) {
             p = this.stars[i].position;

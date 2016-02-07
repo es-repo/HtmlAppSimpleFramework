@@ -8,7 +8,7 @@
         super(graphicOutput, inputControllerHandlers);        
     }    
 
-    protected doLogicStep() {
+    protected tick() {
     }
     
     protected drawFrame() {
